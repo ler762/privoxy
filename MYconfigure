@@ -1,0 +1,71 @@
+#!/bin/sh
+autoheader
+autoconf
+
+####### configure options:
+# --enable-mingw32                Use mingw32 for a Windows GUI
+# --disable-pthread               Don't use POSIX threads (pthreads)
+# --disable-toggle                Don't support temporary disable
+# --disable-force                 Don't allow single-page disable
+# --disable-fast-redirects        Don't support fast redirects
+# --disable-stats                 Don't keep statistics
+# --disable-editor                Prevents the use of the web-based actions file
+#                                 editor and web-based temporary disable setting.
+# --disable-dynamic-pcre          Use the built-in, static pcre, even if libpcre is available
+# --with-docbook=yes              also gen documentation when building privoxy
+#
+### normal plus docbook generation
+# ./configure --build=i686-pc-cygwin --host=i686-pc-mingw32 --enable-mingw32 --enable-zlib --with-docbook=yes
+# make dok       > /tmp/make-dok.txt
+# make dok-tidy >> /tmp/make-dok.txt
+#
+
+export CFLAGS="-O2"
+# note: configure.in line 155
+#         if test "X$CFLAGS" = "X "; then # if CFLAGS were unset (see above)
+#   In other words, if you set CFLAGS you need to include -O2 if you want optimization
+#   assume I'll set cflags below, so just set O2 now
+
+export LDFLAGS=""
+# start with initially empty flags
+
+
+# add gcc stack checking: -fstack-protector-strong
+#    need to specify when compiling _and_ linking
+## CFLAGS="${CFLAGS} -fstack-protector-strong"
+## LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+
+CFLAGS="${CFLAGS} -march=native"
+# -march=cpu-type
+#   Generate instructions for the machine type cpu-type.  In contrast to -mtune=cpu-type, which merely tunes the
+#   generated code for the specified cpu-type, -march=cpu-type allows GCC to generate code that may not run at all on
+#   processors other than the one indicated.
+#   Specifying -march=cpu-type implies -mtune=cpu-type.
+#
+#   -march=native
+#      This selects the CPU to generate code for at compilation time by determining the processor type of the compiling
+#      machine.  Using -march=native enables all instruction subsets supported by the local machine (hence the result
+#      might not run on different machines).  Using -mtune=native produces code optimized for the local machine under
+#      the constraints of the selected instruction set.
+
+## CFLAGS="${CFLAGS} -D_FORTIFY_SOURCE=2"
+## LDFLAGS="${LDFLAGS} -Wl,--nxcompat -Wl,--dynamicbase,--export-all-symbols"
+#   You can enable DEP with -Wl,--nxcompat
+#   ALSR with gcc has a problem: -Wl,--dynamicbase doesn't emit the necessary relocation table.
+#   As a workaround, you can pass -Wl,--dynamicbase,--export-all-symbols
+
+# echo "CFLAGS=${CFLAGS}"
+# echo "LDFLAGS=${LDFLAGS}"
+
+./configure --host=i686-w64-mingw32 --enable-mingw32 \
+            --enable-static-linking \
+            --disable-pthread  --disable-dynamic-pcre  --enable-zlib \
+            --with-docbook=yes
+
+## ./configure cross-compilation options:
+##    --build: the system on which the program will be built.
+##    --host:  the system on which the generated program will run.
+##    --target: only used to build a cross-compiling toolchain.
+##
+## ./configure  --build=i686-pc-cygwin  --host=i686-w64-mingw32
+##
