@@ -633,6 +633,7 @@ int write_socket(jb_socket fd, const char *buf, ssize_t len)
 int write_socket(jb_socket fd, const char *buf, size_t len)
 #endif
 {
+   int status;    /* LR */
    if (len == 0)
    {
       return 0;
@@ -649,7 +650,11 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
    log_error(LOG_LEVEL_WRITING, "to socket %d: %N", fd, len, buf);
 
 #if defined(_WIN32)
-   return (send(fd, buf, (int)len, 0) != (int)len);
+   /* LR was: return (send(fd, buf, (int)len, 0) != (int)len);                       LR */
+   status = send(fd, buf, (int)len, 0);                                           /* LR */
+   log_error(LOG_LEVEL_IO,                                                        /* LR */
+             "write_socket %d len=%d status=%d", fd, (int)len, status);           /* LR */
+   return (status != (int)len);                                                   /* LR */
 #elif defined(__BEOS__) || defined(AMIGA)
    return (send(fd, buf, len, 0) != len);
 #elif defined(__OS2__)
@@ -674,7 +679,11 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
       return 0;
    }
 #else
-   return (write(fd, buf, len) != len);
+   /* LR was: return (write(fd, buf, len) != len);                     LR */
+   status = write(fd, buf, len);                                    /* LR */
+   log_error(LOG_LEVEL_IO,                                          /* LR */
+             "write_socket %d len=%d status=%d", fd, len, status);  /* LR */
+   return (status != len);                                          /* LR */
 #endif
 
 }
@@ -741,6 +750,8 @@ int read_socket(jb_socket fd, char *buf, int len)
    ret = (int)read(fd, buf, (size_t)len);
 #endif
 
+   log_error(LOG_LEVEL_IO, "read_socket  %d len=%d", fd, ret);   /* LR */
+
    if (ret > 0)
    {
       log_error(LOG_LEVEL_RECEIVED, "from socket %d: %N", fd, ret, buf);
@@ -770,6 +781,7 @@ int read_socket(jb_socket fd, char *buf, int len)
 int data_is_available(jb_socket fd, int seconds_to_wait)
 {
    int n;
+   int status = 0;    /* LR */
    char buf[10];
 #ifdef HAVE_POLL
    struct pollfd poll_fd[1];
@@ -799,7 +811,12 @@ int data_is_available(jb_socket fd, int seconds_to_wait)
    /*
     * XXX: Do we care about the different error conditions?
     */
-   return ((n == 1) && (1 == recv(fd, buf, 1, MSG_PEEK)));
+
+   /* LR was: return ((n == 1) && (1 == recv(fd, buf, 1, MSG_PEEK)));              LR */
+   if ( n == 1 ) status =  recv(fd, buf, 1, MSG_PEEK);                          /* LR */
+   log_error(LOG_LEVEL_IO,                                                      /* LR */
+             "data_is_available: socket %d select=%d recv=%d", fd, n, status);  /* LR */
+   return ((n == 1) && (1 == status));                                          /* LR */
 }
 
 
@@ -817,6 +834,7 @@ int data_is_available(jb_socket fd, int seconds_to_wait)
  *********************************************************************/
 void close_socket(jb_socket fd)
 {
+log_error(LOG_LEVEL_IO, "close_socket %d", fd);  /* LR */
 #if defined(_WIN32) || defined(__BEOS__)
    closesocket(fd);
 #elif defined(AMIGA)
@@ -1612,6 +1630,8 @@ int socket_is_still_alive(jb_socket sfd)
 {
    char buf[10];
    int no_data_waiting;
+   int status;    /* LR */
+
 #ifdef HAVE_POLL
    int poll_result;
    struct pollfd poll_fd[1];
@@ -1646,7 +1666,12 @@ int socket_is_still_alive(jb_socket sfd)
    no_data_waiting = !FD_ISSET(sfd, &readable_fds);
 #endif /* def HAVE_POLL */
 
-   return (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)));
+     /* LR was: return (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)));     LR */
+   status = (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)) );            /* LR */
+   log_error(LOG_LEVEL_CONNECT,                                                  /* LR */
+             "socket_is_still_usable: socket %d: no_data_waiting=%d status=%d",  /* LR */
+             sfd, no_data_waiting, status);                                      /* LR */
+   return status;                                                                /* LR */
 }
 
 

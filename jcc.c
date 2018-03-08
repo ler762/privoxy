@@ -1345,7 +1345,12 @@ static char *get_request_line(struct client_state *csp)
 
       len = read_socket(csp->cfd, buf, sizeof(buf) - 1);
 
-      if (len <= 0) return NULL;
+      /* LR was: if (len <= 0) return NULL;                          LR */
+      if (len <= 0) {                                             /* LR */
+         log_error(LOG_LEVEL_IO,                                  /* LR */
+                   "read_socket %d returned %d", csp->cfd, len);  /* LR */
+         return NULL;                                             /* LR */
+      }                                                           /* LR */
 
       /*
        * If there is no memory left for buffering the
@@ -2234,6 +2239,9 @@ static void handle_established_connection(struct client_state *csp)
 
          if (len <= 0)
          {
+            log_error(LOG_LEVEL_IO,                                                        /* LR */
+               "read_socket(csp->cfd, buf, max_bytes_to_read) returned %d for socket %d",  /* LR */
+               len, csp->cfd);                                                             /* LR */
             /* XXX: not sure if this is necessary. */
             mark_server_socket_tainted(csp);
             break; /* "game over, man" */
@@ -2340,6 +2348,8 @@ static void handle_established_connection(struct client_state *csp)
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
          if (csp->flags & CSP_FLAG_CHUNKED)
          {
+            log_error(LOG_LEVEL_IO, "Chunked response len: %d", len);  /* LR - add log entry */
+
             if ((len >= 5) && !memcmp(csp->receive_buffer+len-5, "0\r\n\r\n", 5))
             {
                /* XXX: this is a temporary hack */

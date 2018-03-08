@@ -270,15 +270,22 @@ static const add_header_func_ptr add_server_headers[] = {
  *********************************************************************/
 long flush_socket(jb_socket fd, struct iob *iob)
 {
+   int status;  /* LR */
+
    long len = iob->eod - iob->cur;
+
+   log_error(LOG_LEVEL_IO, "flush_socket %d len=%ld", fd, len);  /* LR */
 
    if (len <= 0)
    {
       return(0);
    }
 
-   if (write_socket(fd, iob->cur, (size_t)len))
+   /* LR was: if (write_socket(fd, iob->cur, (size_t)len))          LR */
+   if ( (status = write_socket(fd, iob->cur, (size_t)len)) )
    {
+      log_error(LOG_LEVEL_IO,                                    /* LR */
+                "flush_socket %d write error: %d", fd, status);  /* LR */
       return(-1);
    }
    iob->eod = iob->cur = iob->buf;
@@ -336,6 +343,10 @@ jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, char *src, long n)
          want *= 2;
       }
 
+      log_error(LOG_LEVEL_IO,                                                        /* LR */
+          "add_to_iob: reallocate iob->buf old: %d  need: %d  want: %d  limit: %d",  /* LR */
+          iob->size, need, want, buffer_limit);                                      /* LR */
+
       if (want <= buffer_limit && NULL != (p = (char *)realloc(iob->buf, want)))
       {
          iob->size = want;
@@ -358,6 +369,8 @@ jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, char *src, long n)
 
    /* copy the new data into the iob buffer */
    memcpy(iob->eod, src, (size_t)n);
+
+   log_error(LOG_LEVEL_IO, "add_to_iob: memcpy %d bytes", (size_t)n);  /* LR */
 
    /* point to the end of the data */
    iob->eod += n;
