@@ -24,16 +24,16 @@ export CFLAGS="-O2"
 # note: configure.in line 155
 #         if test "X$CFLAGS" = "X "; then # if CFLAGS were unset (see above)
 #   In other words, if you set CFLAGS you need to include -O2 if you want optimization
-#   assume I'll set cflags below, so just set O2 now
+#   assume I'll set cflags below, so set O2 now
 
 export LDFLAGS=""
 # start with initially empty flags
 
 
-# add gcc stack checking: -fstack-protector-strong
+CFLAGS="${CFLAGS} -fstack-protector-strong"
+LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+# add gcc stack checking
 #    need to specify when compiling _and_ linking
-## CFLAGS="${CFLAGS} -fstack-protector-strong"
-## LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 
 CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
@@ -42,20 +42,29 @@ CFLAGS="${CFLAGS} -march=native"
 #   processors other than the one indicated.
 #   Specifying -march=cpu-type implies -mtune=cpu-type.
 #
-#   -march=native
-#      This selects the CPU to generate code for at compilation time by determining the processor type of the compiling
-#      machine.  Using -march=native enables all instruction subsets supported by the local machine (hence the result
-#      might not run on different machines).  Using -mtune=native produces code optimized for the local machine under
-#      the constraints of the selected instruction set.
+# -march=native
+#   This selects the CPU to generate code for at compilation time by determining the processor type of the compiling
+#   machine.  Using -march=native enables all instruction subsets supported by the local machine (hence the result
+#   might not run on different machines).  Using -mtune=native produces code optimized for the local machine under
+#   the constraints of the selected instruction set.
 
-## CFLAGS="${CFLAGS} -D_FORTIFY_SOURCE=2"
-## LDFLAGS="${LDFLAGS} -Wl,--nxcompat -Wl,--dynamicbase,--export-all-symbols"
+CFLAGS="${CFLAGS} -D_FORTIFY_SOURCE=2"
+# enable lightweight buffer overflow protection to some memory and string functions.
+
+## LDFLAGS="${LDFLAGS} -Wl,--nxcompat"
 #   You can enable DEP with -Wl,--nxcompat
+
+## LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 #   ALSR with gcc has a problem: -Wl,--dynamicbase doesn't emit the necessary relocation table.
 #   As a workaround, you can pass -Wl,--dynamicbase,--export-all-symbols
 
-# echo "CFLAGS=${CFLAGS}"
-# echo "LDFLAGS=${LDFLAGS}"
+# more CFLAGS options:
+# -Wall   doesn't actually turn on all warnings, so consider adding:
+#   -Wmissing-field-initializers   complains too much
+#   -Wextra -Wno-missing-field-initializers -Wno-div-by-zero -Warray-bounds -Wconversion -Wsign-conversion
+
+## echo "CFLAGS=${CFLAGS}"
+## echo "LDFLAGS=${LDFLAGS}"
 
 ./configure --host=i686-w64-mingw32 --enable-mingw32 \
             --enable-static-linking \
