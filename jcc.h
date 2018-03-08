@@ -44,6 +44,26 @@ struct file_list;
 #ifdef FEATURE_STATISTICS
 extern int urls_read;
 extern int urls_rejected;
+
+#define numIosizeCounters 29
+  /* ref: May 24, 2017 "TODO 157" ijbswa-developers msg from Fabian Keil
+   *  ... a buffer that is too large can actually reduce the throughput.
+   * showing a buffer size of 524288 had better thruput than a buffer
+   * size of 1048576.  So don't worry about having to deal with buffer
+   * sizes >= 1M.
+   */
+extern unsigned int iosizeRunLen[numIosizeCounters];
+extern unsigned int iosizeCounter[numIosizeCounters];
+  /* XXX: is it reasonable to use 32 bit counters???
+   * max 32bit unsigned int = 4294967295
+   * 100Mb ethernet can do 8127 [full size] packets per second
+   * 4294967295 / 8127 = 528481 seconds or a bit over 6 days
+   * averaging 10% busy on a 100Mb link would take about 2 months to overflow a 32 bit counter
+   * Who's going to _average_ 10% busy each and every day for 2 months?
+   */
+extern char iosizeCounterDesc[numIosizeCounters][16];
+extern size_t max_buffer_size;
+extern size_t prevReadSize;
 #endif /*def FEATURE_STATISTICS*/
 
 extern struct client_states clients[1];

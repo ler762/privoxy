@@ -1115,6 +1115,13 @@ jb_err cgi_show_status(struct client_state *csp,
    float perc_rej;   /* Percentage of http requests rejected */
    int local_urls_read;
    int local_urls_rejected;
+   
+   unsigned long int total, runningTotal;
+   double percent;
+   unsigned int myCounters[numIosizeCounters];
+    /* there is no lock serializing access to iosizeCounter, so
+     * need a temp copy that won't change while being processed
+     */
 #endif /* ndef FEATURE_STATISTICS */
    jb_err err = JB_ERR_OK;
 
@@ -1184,6 +1191,27 @@ jb_err cgi_show_status(struct client_state *csp,
 
       snprintf(buf, sizeof(buf), "%6.2f", perc_rej);
       if (!err) err = map(exports, "percent-blocked", 1, buf, 1);
+   }
+
+   s = strdup("");
+   total = runningTotal = 0;
+   for ( j = 0; j < numIosizeCounters; j++ ) { myCounters[j] = iosizeCounter[j]; total += myCounters[j]; }
+
+   /* "         Range        count    cum %  runLength" */
+   for ( j = 0; j < numIosizeCounters; j++ ) {
+      if ( myCounters[j] > 0 ) {
+         runningTotal += myCounters[j];
+         percent = ((double)runningTotal / (double)total ) * 100.0;
+
+         snprintf(buf, sizeof(buf), "%s: %10d   %6.2f  %10d\n",
+                  iosizeCounterDesc[j], myCounters[j], percent, iosizeRunLen[j]);
+         if (!err) err = string_append(&s, buf);
+     }
+   }
+
+   if (*s != '\0')
+   {
+      if (!err) err = map(exports, "ioSizeCounters", 1, s, 1);
    }
 
 #else /* ndef FEATURE_STATISTICS */

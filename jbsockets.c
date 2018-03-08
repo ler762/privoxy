@@ -680,6 +680,25 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
 }
 
 
+#ifdef FEATURE_STATISTICS
+void iosizeCounter_inc(int len ) {
+  int x, samesize;
+  if ( len < 0 ) return;
+
+  if ( len == prevReadSize ) { samesize = 1; }
+  else                       { samesize = 0; prevReadSize = len; }
+
+       if ( len >= max_buffer_size ) { x = numIosizeCounters - 1; }
+  else if ( len <   10000 ) { x = (len /   1000) +  0; } /*  0- 9:       0-  9,999 x   1,000 */
+  else if ( len <  100000 ) { x = (len /  10000) +  9; } /* 10-18:  10,000- 99,999 x  10,000 */
+  else if ( len < 1000000 ) { x = (len / 100000) + 18; } /* 19-27: 100,000-999,999 x 100,000 */
+  else /* wtf? */           { x = numIosizeCounters - 1; }
+  iosizeCounter[x]++;
+  if ( samesize ) iosizeRunLen[x]++;
+}
+#endif /* defined FEATURE_STATISTICS */
+
+
 /*********************************************************************
  *
  * Function    :  read_socket
@@ -725,6 +744,9 @@ int read_socket(jb_socket fd, char *buf, int len)
    if (ret > 0)
    {
       log_error(LOG_LEVEL_RECEIVED, "from socket %d: %N", fd, ret, buf);
+#ifdef FEATURE_STATISTICS
+      iosizeCounter_inc(ret);  /* bump # reads by bytes read */
+#endif
    }
 
    return ret;

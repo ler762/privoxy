@@ -1553,6 +1553,41 @@ struct configuration_spec * load_config(void)
                   "Consider setting it to at least %d.",
                   config->receive_buffer_size, BUFFER_SIZE);
             }
+#ifdef FEATURE_STATISTICS
+if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
+  int i;
+  unsigned long int total, runningTotal;
+  double percent;
+  unsigned int myCounters[numIosizeCounters];
+    /* there is no lock serializing access to iosizeCounter, so
+     * make a temp copy that won't change while being processed
+     */
+  char s[300];
+  total = runningTotal = 0;
+  for ( i = 0; i < numIosizeCounters; i++ ) { myCounters[i] = iosizeCounter[i]; total += myCounters[i]; }
+  log_error(LOG_LEVEL_INFO, "         Range        count    cum %%   run length");
+  for ( i = 0; i < numIosizeCounters; i++ ) {
+    if ( myCounters[i] > 0 ) {
+      runningTotal += myCounters[i];
+      percent = ((double)runningTotal / (double)total ) * 100.0;
+      sprintf(s, "%s: %10d   %6.2f  %10d", iosizeCounterDesc[i], myCounters[i], percent, iosizeRunLen[i]);
+      log_error(LOG_LEVEL_INFO, "%s", s);
+    }
+  }
+} /* endif (1) */
+
+            if ( max_buffer_size != config->receive_buffer_size ) {
+              /* the receive buffer size has changed so clear out the old stats */
+              /* XXX: dump the stats into the log before clearing them ??? */
+              max_buffer_size = config->receive_buffer_size;
+              sprintf(iosizeCounterDesc[numIosizeCounters - 1], "%15d", max_buffer_size);
+                 /* set new max size in display */
+              memset(&iosizeCounter, 0, sizeof(iosizeCounter) );
+              memset(&iosizeRunLen, 0, sizeof(iosizeRunLen) );
+              /* temp ??? */ log_error(LOG_LEVEL_INFO, "receive-buffer-size %d", max_buffer_size);
+            }
+#endif /* FEATURE_STATISTICS */
+
             break;
 
 /* *************************************************************************

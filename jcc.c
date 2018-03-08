@@ -138,6 +138,33 @@ struct file_list     files[1];
 #ifdef FEATURE_STATISTICS
 int urls_read     = 0;     /* total nr of urls read inc rejected */
 int urls_rejected = 0;     /* total nr of urls rejected */
+
+size_t max_buffer_size=5000;
+  /* default read buffer size is 5000 (BUFFER_SIZE defined in project.h)
+   * set in loadcfg.c from "receive-buffer-size NNN"
+   */
+size_t prevReadSize = 0;
+
+unsigned int iosizeCounter[numIosizeCounters];
+unsigned int iosizeRunLen[numIosizeCounters];
+char iosizeCounterDesc[numIosizeCounters][16] = {
+     /*  0 -  9: x1,000 */
+   {"      0-    999"},
+   {"  1,000-  1,999"}, {"  2,000-  2,999"}, {"  3,000-  3,999"},
+   {"  4,000-  4,999"}, {"  5,000-  5,999"}, {"  6,000-  6,999"},
+   {"  7,000-  7,999"}, {"  8,000-  8,999"}, {"  9,000-  9,999"},
+     /* 10 - 18: x10,000 */
+   {" 10,000- 19,999"}, {" 20,000- 29,999"}, {" 30,000- 39,999"},
+   {" 40,000- 49,999"}, {" 50,000- 59,999"}, {" 60,000- 69,999"},
+   {" 70,000- 79,999"}, {" 80,000- 89,999"}, {" 90,000- 99,999"},
+     /* 19 - 27: x100,000 */
+   {"100,000-199,999"}, {"200,000-299,999"}, {"300,000-399,999"},
+   {"400,000-499,999"}, {"500,000-599,999"}, {"600,000-699,999"},
+   {"700,000-799,999"}, {"800,000-899,999"}, {"900,000-999,999"},
+     /* 28: max buffer size */
+   {"          5,000"} /* default buffer size = 5000 */
+ };
+
 #endif /* def FEATURE_STATISTICS */
 
 #ifdef FEATURE_GRACEFUL_TERMINATION
