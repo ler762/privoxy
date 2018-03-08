@@ -442,6 +442,8 @@ jb_err decompress_iob(struct client_state *csp)
    assert(csp->iob->eod - csp->iob->cur > 0);
 #endif
 
+   log_error(LOG_LEVEL_CONNECT, "decompress_iob: begin");    /* LR */
+
    bufsize = csp->iob->size;
    skip_size = (size_t)(csp->iob->cur - csp->iob->buf);
    old_size = (size_t)(csp->iob->eod - csp->iob->cur);
@@ -660,6 +662,8 @@ jb_err decompress_iob(struct client_state *csp)
          bufsize = csp->config->buffer_limit;
       }
 
+      log_error(LOG_LEVEL_CONNECT, "decompress_iob: realloc %d", bufsize);    /* LR */
+
       /* Try to allocate the new buffer. */
       tmpbuf = realloc(buf, bufsize);
       if (NULL == tmpbuf)
@@ -719,6 +723,8 @@ jb_err decompress_iob(struct client_state *csp)
       return JB_ERR_COMPRESS;
    }
 
+   log_error(LOG_LEVEL_CONNECT, "decompress_iob: decompressed");    /* LR */
+
    /*
     * Finally, we can actually update the iob, since the
     * decompression was successful. First, free the old
@@ -763,6 +769,7 @@ jb_err decompress_iob(struct client_state *csp)
       return JB_ERR_COMPRESS;
    }
 
+   log_error(LOG_LEVEL_CONNECT, "decompress_iob: finished");    /* LR */
    return JB_ERR_OK;
 
 }
