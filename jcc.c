@@ -742,6 +742,9 @@ static const char *crunch_reason(const struct http_response *rsp)
       case NO_SERVER_DATA:
          reason = "No server data received";
          break;
+      case BLANKED:              /* LR */
+         reason = "Blanked";     /* LR */
+         break;                  /* LR */
       default:
          reason = "No reason recorded";
          break;

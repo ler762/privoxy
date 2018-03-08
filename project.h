@@ -306,6 +306,7 @@ struct http_request
  */
 enum crunch_reason
 {
+   NONE,
    UNSUPPORTED,
    BLOCKED,
    UNTRUSTED,
@@ -317,7 +318,8 @@ enum crunch_reason
    OUT_OF_MEMORY,
    INTERNAL_ERROR,
    CONNECTION_TIMEOUT,
-   NO_SERVER_DATA
+   NO_SERVER_DATA,
+   BLANKED
 };
 
 /**
