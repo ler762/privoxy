@@ -1970,14 +1970,14 @@ static int send_http_request(struct client_state *csp)
 
    if (write_failure)
    {
-      log_error(LOG_LEVEL_CONNECT, "Failed sending request headers to: %s: %E",
+      log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",
          csp->http->hostport);
    }
    else if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
       && (flush_socket(csp->server_connection.sfd, csp->client_iob) < 0))
    {
       write_failure = 1;
-      log_error(LOG_LEVEL_CONNECT, "Failed sending request body to: %s: %E",
+      log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",
          csp->http->hostport);
    }
 
@@ -2731,7 +2731,7 @@ static void handle_established_connection(struct client_state *csp)
                if (write_socket(csp->cfd, hdr, strlen(hdr))
                 || ((len = flush_socket(csp->cfd, csp->iob)) < 0))
                {
-                  log_error(LOG_LEVEL_CONNECT, "write header to client failed: %E");
+                  log_error(LOG_LEVEL_ERROR, "socket %d write header to client failed: %E", csp->cfd);
 
                   /*
                    * The write failed, so don't bother mentioning it
@@ -2785,7 +2785,7 @@ static void handle_established_connection(struct client_state *csp)
    if ((csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
       && (csp->expected_content_length != byte_count))
    {
-      log_error(LOG_LEVEL_CONNECT,
+      log_error(LOG_LEVEL_ERROR,
          "Received %llu bytes while expecting %llu.",
          byte_count, csp->expected_content_length);
       mark_server_socket_tainted(csp);
@@ -2967,6 +2967,7 @@ static void chat(struct client_state *csp)
 
       if (csp->server_connection.sfd == JB_INVALID_SOCKET)
       {
+         log_error(LOG_LEVEL_ERROR, "connect to: %s failed: %E", http->hostport);
          if (fwd->type != SOCKS_NONE)
          {
             /* Socks error. */
@@ -4454,7 +4455,7 @@ static void listen_loop(void)
       if ((0 != config->max_client_connections)
          && (active_threads >= config->max_client_connections))
       {
-         log_error(LOG_LEVEL_CONNECT,
+         log_error(LOG_LEVEL_ERROR,
             "Rejecting connection from %s. Maximum number of connections reached.",
             csp->ip_addr_str);
          write_socket(csp->cfd, TOO_MANY_CONNECTIONS_RESPONSE,

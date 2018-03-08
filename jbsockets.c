@@ -421,7 +421,7 @@ static jb_socket rfc2553_connect_to(const char *host, int portnum, struct client
                 * it will get logged outside the loop body so we don't
                 * have to mention it here.
                 */
-               log_error(LOG_LEVEL_CONNECT, "Could not connect to [%s]:%s: %s.",
+               log_error(LOG_LEVEL_ERROR, "Could not connect to [%s]:%s: %s.",
                   csp->http->host_ip_addr_str, service, strerror(socket_error));
             }
          }
@@ -441,7 +441,7 @@ static jb_socket rfc2553_connect_to(const char *host, int portnum, struct client
    freeaddrinfo(result);
    if (!rp)
    {
-      log_error(LOG_LEVEL_CONNECT, "Could not connect to [%s]:%s: %s.",
+      log_error(LOG_LEVEL_ERROR, "Could not connect to [%s]:%s: %s.",
          host, service, strerror(socket_error));
       csp->error_message = strdup(strerror(socket_error));
       return(JB_INVALID_SOCKET);
@@ -895,7 +895,7 @@ void drain_and_close_socket(jb_socket fd)
          bytes_drained = read_socket(fd, drainage, sizeof(drainage));
          if (bytes_drained < 0)
          {
-            log_error(LOG_LEVEL_CONNECT, "Failed to drain socket %d: %E", fd);
+            log_error(LOG_LEVEL_ERROR, "Failed to drain socket %d: %E", fd);
          }
          else if (bytes_drained > 0)
          {
@@ -1660,7 +1660,7 @@ int socket_is_still_alive(jb_socket sfd)
    ret = select((int)sfd+1, &readable_fds, NULL, NULL, &timeout);
    if (ret < 0)
    {
-      log_error(LOG_LEVEL_CONNECT, "select() on socket %d failed: %E", sfd);
+      log_error(LOG_LEVEL_ERROR, "select() on socket %d failed: %E", sfd);
       return FALSE;
    }
    no_data_waiting = !FD_ISSET(sfd, &readable_fds);
