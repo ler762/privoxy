@@ -789,6 +789,20 @@ static void WINAPI privoxy_w32_service_start(DWORD dw, LPSTR* pszArgs)
     *         ./configure --host=i686-w64-mingw32 --disable-pthread
     */
    child_id = _beginthread(w32_service_listen_loop, 0, NULL);
+      /* https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/beginthread-beginthreadex
+       *   uintptr_t _beginthread( // NATIVE CODE  
+       *      void( __cdecl *start_address )( void * ),  
+       *      unsigned stack_size,  
+       *      void *arglist   
+       *   );  
+       * If successful, each of these functions returns a handle to the newly created thread
+       * On an error, _beginthread returns -1L, and errno is set
+       *   to EAGAIN if there are too many threads,
+       *   to EINVAL if the argument is invalid or the stack size is incorrect, or
+       *   to EACCES if there are insufficient resources (such as memory). 
+       *
+       * XXX: is it possible for a thread handle to be > INT_MAX (2,147,483,647)
+       */
    if (child_id > 0)
 #else
 #error "FIXME: Do pthread stuff here!"
