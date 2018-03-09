@@ -27,9 +27,7 @@
                 This file belongs into
                 ijbswa.sourceforge.net:/home/groups/i/ij/ijbswa/htdocs/
 
- $Id: faq.sgml,v 2.135 2017/03/27 10:22:27 fabiankeil Exp $
-
- Copyright (C) 2001-2014 Privoxy Developers https://www.privoxy.org/
+ Copyright (C) 2001-2018 Privoxy Developers https://www.privoxy.org/
  See LICENSE.
 
  Based partially on the Internet Junkbuster FAQ originally written by and
@@ -73,7 +71,7 @@
  <subscript>
 <!-- Completely the wrong markup, but very little is allowed  -->
 <!-- in this part of an article. FIXME -->
- <link linkend="copyright">Copyright</link> &my-copy; 2001-2016 by
+ <link linkend="copyright">Copyright</link> &my-copy; 2001-2018 by
  <ulink url="https://www.privoxy.org/">Privoxy Developers</ulink>
  </subscript>
 </pubdate>
@@ -2058,7 +2056,7 @@ ads used to be. Why?</title>
 <title>Does Privoxy support HTTP/2?</title>
 <para>
   Privoxy currently doesn't parse HTTP/2 but applications
-  cann tunnel HTTP/2 through Privoxy if Privoxy is configured
+  can tunnel HTTP/2 through Privoxy if Privoxy is configured
   to allow CONNECT requests (default) which are also used
   for HTTPS.
 </para>
