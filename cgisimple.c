@@ -1068,7 +1068,7 @@ jb_err cgi_show_status(struct client_state *csp,
    float perc_rej;   /* Percentage of http requests rejected */
    int local_urls_read;
    int local_urls_rejected;
-   
+
    unsigned long int total, runningTotal;
    double percent;
    unsigned int myCounters[numIosizeCounters];
