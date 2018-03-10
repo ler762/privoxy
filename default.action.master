@@ -17,7 +17,7 @@
 #                 syntax changes.
 #
 #  Purpose     :  Default actions file, see
-#                 https://www.privoxy.org/user-manual/actions-file.html.
+#                 https://www.privoxy.org/user-manual/actions-file.html
 #                 This file is subject to periodic updating. It is
 #                 not supposed to be edited by the user. Local exceptions
 #                 and enhancements are better placed in user.action,
@@ -380,11 +380,16 @@
 #    The CONNECT methods exists in HTTP to allow access to secure websites
 #    ("https://" URLs) through proxies. It works very simply: the proxy
 #    connects to the server on the specified port, and then short-circuits
-#    its connections to the client and to the remote server. This means
-#    CONNECT-enabled proxies can be used as TCP relays very easily. Privoxy
+#    its connections to the client and to the remote server.
+#    This can be a security issue, since
+#    CONNECT-enabled proxies can be (ab)used as TCP relays very easily. Privoxy
 #    relays HTTPS traffic without seeing the decoded content. Websites can
 #    leverage this limitation to circumvent Privoxy's filters. By specifying
 #    an invalid port range you can disable HTTPS entirely.
+#
+#    If you want to restrict CONNECT, or want to forbid CONNECT altogether,
+#    you can specify a comma separated list of ports and port ranges (the
+#    latter using dashes, with the minimum defaulting to 0 and max to 65K):
 #
 #    +limit-connect{443}                   # Only port 443 is OK.
 #    +limit-connect{80,443}                # Ports 80 and 443 are OK.
@@ -663,25 +668,39 @@ count*.
 # Blocked URL = http://metrics.performancing.com/
 metrics.
 
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+# Try blocking .ad*. and see how much trouble that causes
+# -- see above exceptions for .ad.jp/  and .ad/
+{ +block{.ad*. domain} }
+.ad*.?.
+.ad*.[a-ik-z][a-oq-z].
+.ad*.jp.*.
+.ad*.???*.
+.ad*.*.*
+.ad*.*.*.*
+
 #############################################################################
 # Generic unblockers by host:
 #############################################################################
 {-block}
 # Sticky Actions = -block
 adsl.
-ad[udmw]*.
+# ad[udmw]*.
 adbl*.
 adam*.
-adapt*.
-adob*.
-adrenaline.
-adtp*.
-adv[oia]*.
+# adapt*.
+# URL = http://adobe.com/
+adob*.		# duh!  adobe.com
+# adrenaline.
+# adtp*.
+# adv[oia]*.
+# URL = https://advocacy.mozilla.org/
+advocacy.
 adventure*.
 .*road*.
 .olympiad*.
 .*load*.
-.*[epu]ad*.
+# .*[epu]ad*.
 county*.
 countr*.
 #MASTER# REMARKS: We still like tor
@@ -695,6 +714,12 @@ adina*.
 adele*.
 # URL = http://adlibris.com/
 adlibris.
+
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+
+# URL = http://countermeasures.trendmicro.eu/diginotar-iran-certificates-and-you/
+countermeasures.
+
 
 #############################################################################
 # Generic block patterns by path:
@@ -718,7 +743,7 @@ adlibris.
 # MASTER# BLOCK-REFERRER: http://www.augsburger-allgemeine.de/donauwoerth/Grosseinsatz-Polizist-schiesst-um-sich-Er-hat-mehrere-Waffen-id30561822.html
 # Blocked URL = http://bilder.augsburger-allgemeine.de/img/incoming/orig30444932/2560007661/DigiAd-Zeopexx-03072014.gif
 # Blocked URL = http://bilder.augsburger-allgemeine.de/img/incoming/orig30463337/9180008457/DigiAd-AugenblickOptik-04072014.gif
-/.*DigiAd
+/(.*/)?DigiAd
 
 #############################################################################
 # Generic unblockers by path:
@@ -755,9 +780,9 @@ support./(.*/)?track
 .org/.*(image|banner)
 
 #############################################################################
-# Catch-all for false-positives that are just TOO obvious to let go
+# Catch-all for false-negatives that are just TOO obvious to let go
 #############################################################################
-{+block{Catch-all block for false-positives.}}
+{+block{Catch-all block for false-negatives.}}
 #MASTER# REMARKS: Going for adsrv, adserve, adserver*.
 .ads[erv][rv]*.
 # Blocked URL = http://ads.facebook.com/ads/spreadshirt/banner120x600.jpg
@@ -790,6 +815,19 @@ support./(.*/)?track
 # URL = http://popplers5.bandcamp.com/download/track?enc=mp3-128&fsig=bad421a4c31dda49faceefb0f3923630&id=342903379&stream=1&ts=1355881937.0
 /.*download
 
+
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+#MASTER# REMARKS: browsing home depot means you want ads
+# URL = www.homedepot.com/ad/foo
+.homedepot.com/
+#MASTER# REMARKS: browsing target means you want ads
+# URL = http://tgtfiles.target.com/adsyndication_everest/adengine.js
+.target.com/
+# URL = http://www.fepblue.org/fep/adv_doc_locate_v2.asp
+#MASTER# REMARKS: unintentionally blocked by  /(.*/)?ad(\?|/|s|v|_?(image|se?rv|box)|cycle|rotate|mentor|click|f[ra]m|script|stream|fetch|log|space)
+.fepblue.org/
+
+
 #----------------------------------------------------------------------------
 # Misc Web-bugs, JS and just plain Junk. Images here aren't normal images.
 #----------------------------------------------------------------------------
@@ -803,7 +841,7 @@ support./(.*/)?track
 .visistat.com
 #MASTER# REMARKS: See <http://www.google.com/analytics/> for user tracking.
 #MASTER# REMARKS: There is a ssl.google-analytics as well.
-.google-analytics./
+.google-analytics.
 #MASTER# REMARKS: Below Moved here from -handle-as-image 10/16/06 ##########
 #MASTER# BLOCK-REFERRER: http://forums2.gardenweb.com/forums/orchids/ 09/25/06
 #MASTER# REMARKS: Mostly JS and plain text stuff
@@ -1562,6 +1600,14 @@ smartad.*.*.*
 #############################################################################
 {-block}
 # Sticky Actions = -block
+
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+# URL = http://publib.boulder.ibm.com/infocenter/bladectr/documentation/topic/com.ibm.bladecenter.advmgtmod.doc/adv_mgt_mod_user_guide.html
+#MASTER# REMARKS: blocked by  /(.*/)?ad(\?|/|s|v|_?(image|se?rv|box)|cycle|rotate|mentor|click|f[ra]m|script|stream|fetch|log|space)
+publib.boulder.ibm.com/
+
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+
 #MASTER# UNBLOCK-REFERRER: http://www.faqs.org/
 .faqs.org/banner\.html
 #MASTER# UNBLOCK-REFERRER: http://bannerblind.mozdev.org/
@@ -1588,7 +1634,8 @@ banners.wunderground.com/
 .nycsubway.org/img/banner
 #MASTER# UNBLOCK-REFERRER: http://www.forgotten-ny.com/ADS/manhattanads/moremahnattan.html
 # URL = http://www.forgotten-ny.com/ADS/manhattanads/moremahnattan.html
-.forgotten-ny.com/ADS/
+# Ignore = Yes
+# .forgotten-ny.com/ADS/
 # URL = http://counter.li.org
 counter.li.org
 #MASTER# UNBLOCK-REFERRER: http://adrian.adrian.org/ 10/09/06
@@ -1596,7 +1643,8 @@ counter.li.org
 adrian.adrian.org
 #MASTER# UNBLOCK-REFERRER: http://adela.karlin.mff.cuni.cz/ 10/09/06
 # URL = http://adela.karlin.mff.cuni.cz
-adela.karlin.mff.cuni.cz
+# Ignore = Yes
+# adela.karlin.mff.cuni.cz
 #MASTER# UNBLOCK-REFERRER: http://www.swcp.com/rtoads/printmag/issue3/neg_data.html 10/09/06
 .swcp.com/rtoads/
 #MASTER# UNBLOCK-REFERRER: http://www.privoxy.org/actions/index.php
@@ -1611,14 +1659,15 @@ sourceforge.net/.*tracker
 .brawnylads.com
 #MASTER# UNBLOCK-REFERRER: http://adzapper.sourceforge.net/
 # URL = http://adzapper.sourceforge.net/
-adzapper.
+adzapper.sourceforge.net/
 #MASTER# UNBLOCK-REFERRER: http://de.altavista.com/web/adv
 # URL = http://de.altavista.com/web/adv
 .altavista.com/web/adv
 # URL = http://rads.mcafee.com/rads/scripts/RADS.dll?QueryProduct2
 rads.mcafee.com/
 # URL = http://linuxfromscratch.org/cgi-bin/lfscounter.cgi
-linuxfromscratch.org/
+# Ignore = Yes
+# linuxfromscratch.org/cgi-bin/lfscounter\.cgi
 #MASTER# UNBLOCK-REFERRER: http://dv411.com/advc50.html
 # URL = http://dv411.com/advc50.html
 dv411.com/.*advc50
@@ -1627,7 +1676,7 @@ dv411.com/.*advc50
 # URL = http://www.arm.com/support/ads_faq?OpenDocument&ExpandSection=11
 www.arm.com/.*ads
 # URL = http://www.anybrowser.org/campaign/
-www.anybrowser.org/
+www.anybrowser.org/.*banner
 # URL = http://www.tads.org/
 www.tads.org/
 # URL = http://www.mbe.com/redir/packtrack.asp
@@ -1645,7 +1694,7 @@ arnolds.dhs.org/static/adv_tools.html
 #MASTER# UNBLOCK-REFERRER: http://www.gpl.org/
 .gpl.org/
 #MASTER# UNBLOCK-REFERRER: http://europa.eu.int/yourvoice/ 10/11/06
-.europa.eu.
+# .europa.eu.
 #MASTER# UNBLOCK-REFERRER: http://www.schooner.com/~loverso/no-ads/ 10/11/06
 # URL = http://www.schooner.com/~loverso/no-ads/
 .schooner.com/~loverso/no-ads/
@@ -1655,9 +1704,9 @@ source.bungie.org/
 adonthell.linuxgames.com/
 #MASTER# UNBLOCK-REFERRER: http://news.bbc.co.uk/furniture/chinese/banner/bbccantonese_600.gif
 #MASTER# REMARKS: Banner-free site(s).
-.bbc.co.uk/
+# .bbc.co.uk/
 # URL = http://adc.netlabs.org/
-adc.netlabs.org/
+# adc.netlabs.org/
 #MASTER# UNBLOCK-REFERRER: http://www.tela.bc.ca/tads/authoring/multimedia-tads-docs/latin2.htm 10/11/06
 # URL = http://www.tela.bc.ca/tads/authoring/multimedia-tads-docs/latin2.htm
 .tela.bc.ca/tads/
@@ -1738,17 +1787,18 @@ lads.myspace.com
 #MASTER# REMARKS: 20070402 Adam Piggott first-party tracking. 20070411 Moved from generic unblockers by path to site-specific unblockers.
 #MASTER# UNBLOCK-REFERRER: http://www.shockwave.com/servlet/DownloadEcommTracker?sku=fizzball-pc&promoCode=SiteShockwaveLandingPage
 # URL = http://www.shockwave.com/servlet/DownloadEcommTracker?sku=fizzball-pc&promoCode=SiteShockwaveLandingPage
-.shockwave.com/servlet/DownloadEcommTracker
+# .shockwave.com/servlet/DownloadEcommTracker
 #MASTER# REMARKS: 20070411 Adam Piggott fish4.co.uk is a popular UK advertising site for cars, properties and jobs and uses ad/advert all over the place, understandably.
 # URL = http://www.fish4.co.uk/iad/lettings/advert?adId=12389712&src=nestoria
-.fish4.co.uk/.*ad
+# Ignore = Yes
+# .fish4.co.uk/.*ad
 #MASTER# REMARKS: Actionsfile feedback item #1700037 2007-04-13 HB
 # URL = http://www.mp3.com.au/popup/popup.asp?id=110433
 .mp3.com.au/.*popup
 #MASTER# REMARKS Actionsfile feedback #1700915 2007-04-15
 # URL = http://www.svd.se/ego/339/http://www.e24.se/dynamiskt/reklam_media/did_15092793.asp
 # URL = http://www.e24.se/dynamiskt/reklam_media/did_15092793.asp
-/(.*/)?dynamiskt/reklam_media/did_
+# /(.*/)?dynamiskt/reklam_media/did_
 #MASTER# REMARKS 20070710 Actionsfile feedback #1751020
 switch.atdmt.com/action/
 # URL = http://www.parcelforce.com/portal/pw/track?catId=7500082
@@ -1777,7 +1827,7 @@ tags.gawker.com/.*css$
 .tnt.co.uk/TrackNTrace/
 #MASTER# UNBLOCK-REFERRER: http://www.supermediastore.com/trackorder.html
 # URL = http://secure.howtoburndvd.net/ups/track.php
-/ups/track\.php
+.howtoburndvd.net/ups/track\.php
 #MASTER# REMARKS: Actionsfile feedback item #1886140  2008-02-04
 #MASTER# UNBLOCK-REFERRER: http://idonthateyouall.imeem.com/video/8zH0_f9i/kiley_rilo_pull_me_in_tighter_art_video/
 # URL = http://ad.doubleclick.net/crossdomain.xml
@@ -1810,14 +1860,21 @@ qa.debian.org/popcon
 .mta.info/.*advmain.htm$
 #MASTER# REMARKS: We also use this as a light character class test, therefore the additional URL directives.
 # URL = http://www.proaurum.de/bannerA2/image/pro_master_r3_01_04.gif
+# Ignore = Yes
 # URL = http://www.proaurum.de/bannerA1/image/limitorder2.gif
+# Ignore = Yes
 # URL = http://www.proaurum.de/bannerA3/image/pro_master_r5_banken_01_01+.gif
+# Ignore = Yes
 # URL = http://www.proaurum.de/bannerB2/image/pro_banner_mitte.gif
+# Ignore = Yes
 # URL = http://www.proaurum.de/bannerB1_/image/pro_banner_links.gif
+# Ignore = Yes
 # URL = http://www.proaurum.de/bannerC1/image/partner1.png
-.proaurum.de/banner[ABC]\d_?/
+# Ignore = Yes
+# .proaurum.de/banner[ABC]\d_?/
 # URL = http://www.goldmoney.com/en/images/home/banner_r4_c1.gif
-.goldmoney.com/
+# Ignore = Yes
+# .goldmoney.com/
 #MASTER# REMARKS: Actionsfile feedback item #2017126  2008-07-13
 #MASTER# REMARKS: The dutch newspaper site of Algemeen Dagblad (http://www.ad.nl) is blocked
 # URL = http://www.ad.nl/
@@ -1853,7 +1910,8 @@ adressa.no/
 # URL = http://adresseavisen.no/
 adresseavisen.no/
 # URL = http://apps.facebook.com/onthefarm/track.php?creative=&cat=friendvisit&subcat=weeds&key=a789a971dc687bee4c20c044834fabdd&next=index.php%3Fref%3Dnotif%26visitId%3D898835505
-.facebook.com/.*/track.php
+# Ignore = Yes
+# .facebook.com/.*/track.php
 # URL = http://www.ifdb.tads.org/
 # URL = http://www.tads.org/
 .tads.org/
@@ -1965,29 +2023,29 @@ msdn.microsoft.com/
 #MASTER# PROBLEM URL: http://metrics.apple.com 10/11/06
 # too broad: .apple.com
 www.apple.com
-store.apple.com
-images.apple.com
+# store.apple.com
+# images.apple.com
 #MASTER# REMARKS: Actions Tracker 1293057 09/02/06
 .update.microsoft.com
 #MASTER# REMARKS: Various reports 09/16/06. This site also requires pop-ups.
-mail.google.*
+# mail.google.*
 
 #----------------------------------------------------------------------------
 # Shopping and banking sites - allow cookies and pop-ups
 #----------------------------------------------------------------------------
 #MASTER# REMARKS: This section not checked 10/11/06 HB
 {shop}
-.quietpc.com
-.worldpay.com   # for quietpc.com
-.jungle.com
-.dabs.com
-.overclockers.co.uk
-.db24.de
-.ebay.*
-.mobile.de
-www.fondationlejeu.com
-www.techtv.com
-.mywebgrocer.com
+# .quietpc.com
+# .worldpay.com   # for quietpc.com
+# .jungle.com
+# .dabs.com
+# .overclockers.co.uk
+# .db24.de
+# .ebay.*
+# .mobile.de
+# www.fondationlejeu.com
+# www.techtv.com
+# .mywebgrocer.com
 
 #----------------------------------------------------------------------------
 # Subscription sites (with credible privacy policy) - allow permanent cookies
@@ -2241,6 +2299,8 @@ javascriptkit.com
 bugs.
 #MASTER# REMARKS: Actionsfile tracker 1555909 09/17/06, various problems with cpu and logging in.
 quoka.de
+#MASTER# REMARKS: publib.boulder.ibm.com is just docs
+publib.boulder.ibm.com/
 
 #----------------------------------------------------------------------------
 # Innocent images in standard banner sizes found here:
@@ -2349,7 +2409,7 @@ schneegans.de/sv/\?url=referer
 #MASTER# REMARKS: These are weather radar images. 10/18/06
 # URL = http://www.wunderground.com/radar/station.asp?ID=MPX19&type=loop&clutter=1
 .wunderground.com
-66.28.250.180/data/
+# 66.28.250.180/data/
 #MASTER# PROBLEM-URL: http://www.teamquest.com/html/gunther/laquiz.shtml
 .teamquest.com/gifs/gunther/
 #MASTER# REMARKS: 09/12/06 Art site, and ad-free
@@ -2364,9 +2424,11 @@ schneegans.de/sv/\?url=referer
 {+filter{site-specifics}}
 # Sticky Actions = +filter{site-specifics}
 # URL = http://www.spiegel.de/static/js/flash-plugin.js
-.spiegel.de/static/js/flash-plugin\.js
+# Ignore = Yes
+# .spiegel.de/static/js/flash-plugin\.js
 # URL = http://www.quelle-bausparkasse.de/
-.quelle-bausparkasse.de/$
+# Ignore = Yes
+# .quelle-bausparkasse.de/$
 # URL = http://de.groups.yahoo.com/group/die-spinner/interrupt?st=2&ln=die-spinner&m=1&done=%2Fgroup%2Fdie-spinner%2Fmessage%2F416
 .groups.yahoo.com/group/
 # URL = http://www.nytimes.com/
@@ -2390,10 +2452,12 @@ schneegans.de/sv/\?url=referer
 # Sticky Actions = -filter{content-cookies} -filter{webbugs}
 #MASTER# REMARKS: Needs content-cookies for cookie test on index page; needs webbugs for storing profile(!)
 # URL = http://www.friendscout24.de/
-.friendscout24.de
+# Ignore = Yes
+# .friendscout24.de
 #MASTER# REMARKS: Explains how content cookies work
 # URL = http://www.webreference.com/js/column8/property.html
-.webreference.com/js/column8/property.html
+# Ignore = Yes
+# .webreference.com/js/column8/property.html
 
 {-filter{fun}}
 # Sticky Actions = -filter{fun}
@@ -2412,11 +2476,11 @@ schneegans.de/sv/\?url=referer
 #MASTER# REMARKS: Google images don't show up with img-reorder on
 #MASTER# REMARKS: Also images on finance.google.com 09/25/06
 # URL = http://images.google.com
-.google.
+images.google.
 #MASTER# PROBLEM-URL: http://wired.com 09/23/06
 # URL = http://wired.com
-/.*wired(\.com)?/
-.wired.com/
+# /.*wired(\.com)?/
+# .wired.com/
 
 {-filter{js-annoyances}}
 # Sticky Actions = -filter{js-annoyances}
@@ -2433,13 +2497,15 @@ blogs.msdn.com
 {-filter{unsolicited-popups}}
 # Sticky Actions = -filter{unsolicited-popups}
 #MASTER# REMARKS: Breaks Movable Type's admin interface (http://www.movabletype.org/)
-/.*mt.cgi$
+# /.*mt.cgi$
 #MASTER# REMARKS: Exclude per Debian bug report #377843 09/17/06
 # URL = http://www2.cnrs.fr/presse/communique/900.htm
-.cnrs.fr
+# Ignore = Yes
+# .cnrs.fr
 #MASTER# REMARKS: Exclude per Debian bug report #377843 09/17/06
 # URL = http://blogs.msdn.com/wga/archive/2006/07/16/667063.aspx
-blogs.msdn.com
+# Ignore = Yes
+# blogs.msdn.com
 
 {-filter{jumping-windows}}
 # Sticky Actions = -filter{jumping-windows}
