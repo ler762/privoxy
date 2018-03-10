@@ -1327,7 +1327,7 @@ static char *get_request_line(struct client_state *csp)
       {
          if (socket_is_still_alive(csp->cfd))
          {
-            log_error(LOG_LEVEL_CONNECT,
+            log_error(LOG_LEVEL_INFO,            /* LR ** was LOG_LEVEL_CONNECT */
                "No request line on socket %d received in time. Timeout: %d.",
                csp->cfd, csp->config->socket_timeout);
             write_socket(csp->cfd, CLIENT_CONNECTION_TIMEOUT_RESPONSE,
@@ -1335,9 +1335,14 @@ static char *get_request_line(struct client_state *csp)
          }
          else
          {
-            log_error(LOG_LEVEL_CONNECT,
+            log_error(LOG_LEVEL_ERROR,            /* LR ** was LOG_LEVEL_CONNECT */
                "The client side of the connection on socket %d got "
                "closed without sending a complete request line.", csp->cfd);
+            len = (int)(csp->client_iob->cur - csp->client_iob->buf);       /* LR */
+            if ( len > 0 ) {                                                /* LR */
+               log_error(LOG_LEVEL_INFO,                                    /* LR */
+                         "Client request: %N", len, csp->client_iob->buf);  /* LR */
+            }                                                               /* LR */
          }
          return NULL;
       }
@@ -2214,9 +2219,8 @@ static void handle_established_connection(struct client_state *csp)
              * available on the socket, the client went fishing
              * and continuing talking to the server makes no sense.
              */
-            log_error(LOG_LEVEL_CONNECT,
-               "The client closed socket %d while "
-               "the server socket %d is still open.",
+            log_error(LOG_LEVEL_ERROR,				/* LR was: LOG_LEVEL_CONNECT */
+               "The client closed socket %d while the server socket %d is still open.",
                csp->cfd, csp->server_connection.sfd);
             mark_server_socket_tainted(csp);
             break;
@@ -2296,10 +2300,11 @@ static void handle_established_connection(struct client_state *csp)
          {
 #ifdef _WIN32
             log_error(LOG_LEVEL_CONNECT,
-               "The server still wants to talk, but the client may already have hung up on us.");
+               "The server still wants to talk, but client socket %d might have hung up on us.", csp->cfd); /* LR */
+               /* LR  work on socket_is_still_usable - it'd be nice not to special-case win32 */
 #else
             log_error(LOG_LEVEL_CONNECT,
-               "The server still wants to talk, but the client hung up on us.");
+               "The server still wants to talk, but client socket %d hung up on us.", csp->cfd); /* LR */
             mark_server_socket_tainted(csp);
             return;
 #endif /* def _WIN32 */
@@ -2420,6 +2425,16 @@ static void handle_established_connection(struct client_state *csp)
                   if (NULL == p)
                   {
                      csp->content_length = (size_t)(csp->iob->eod - csp->iob->cur);
+                     log_error(LOG_LEVEL_CONNECT,                                                /* LR */
+                               "No matches in content filters: len=%llu", csp->content_length);  /* LR */
+                   if ( 0 ) {                                                                    /* LR */
+                     if ( (csp->content_length > 0) && (csp->iob->buf != NULL) ) {               /* LR  dump contents of buffer */
+                        log_error(LOG_LEVEL_CONNECT,                                             /* LR */
+                                  "content: %N", (int)csp->content_length, csp->iob->buf );      /* LR */
+                           /* LR  %N Takes 2 parameters: int length, const char * string            LR */
+                     }                                                                           /* LR */
+                   }                                                                             /* LR */
+
                   }
 #ifdef FEATURE_COMPRESSION
                   else if ((csp->flags & CSP_FLAG_CLIENT_SUPPORTS_DEFLATE)
@@ -2471,6 +2486,12 @@ static void handle_established_connection(struct client_state *csp)
              * This is NOT the body, so
              * Let's pretend the server just sent us a blank line.
              */
+
+             /* LR add old log msg back in */
+             log_error(LOG_LEVEL_INFO,
+                "Malformerd HTTP headers detected and MS IIS5 hack enabled. "
+                "Expect an invalid response or even no response at all.");
+
             snprintf(csp->receive_buffer, csp->receive_buffer_size, "\r\n");
             len = (int)strlen(csp->receive_buffer);
 
@@ -2523,7 +2544,7 @@ static void handle_established_connection(struct client_state *csp)
                    || ((flushed = flush_socket(csp->cfd, csp->iob)) < 0)
                    || (write_socket(csp->cfd, csp->receive_buffer, (size_t)len)))
                   {
-                     log_error(LOG_LEVEL_CONNECT,
+                     log_error(LOG_LEVEL_ERROR,                            /* LR : was LOG_LEVEL_CONNECT */
                         "Flush header and buffers to client failed: %E");
                      freez(hdr);
                      mark_server_socket_tainted(csp);
@@ -2545,7 +2566,7 @@ static void handle_established_connection(struct client_state *csp)
             {
                if (write_socket(csp->cfd, csp->receive_buffer, (size_t)len))
                {
-                  log_error(LOG_LEVEL_ERROR, "write to client failed: %E");
+                  log_error(LOG_LEVEL_ERROR, "socket %d write to client failed: %E", csp->cfd);
                   mark_server_socket_tainted(csp);
                   return;
                }
@@ -2712,6 +2733,9 @@ static void handle_established_connection(struct client_state *csp)
             if (!http->ssl) /* We talk plaintext */
             {
                buffer_and_filter_content = content_requires_filtering(csp);
+               if ( 0 && buffer_and_filter_content ) {                                                          /* LR */
+                  log_error(LOG_LEVEL_INFO, "buffer_and_filter_content set to %d", buffer_and_filter_content);  /* LR */
+               }                                                                                                /* LR */
             }
             /*
              * Only write if we're not buffering for content modification
@@ -2764,9 +2788,12 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 2783");                  /* LR */
       mark_server_socket_tainted(csp);
       return; /* huh? we should never get here */
    }
+   log_error(LOG_LEVEL_CONNECT, "jcc.c end for (;;) content_length=%llu byte_count=%llu",  /* LR */
+             csp->content_length, byte_count);                                             /* LR */
 
    if (csp->content_length == 0)
    {
@@ -3288,6 +3315,7 @@ static void serve(struct client_state *csp)
       {
          continue_chatting = 0;
          config_file_change_detected = 1;
+         log_error(LOG_LEVEL_CONNECT, "continue_chatting cleared, config_file_change_detected set"); /* -LR- */
       }
 
       if (continue_chatting)
@@ -3373,6 +3401,19 @@ static void serve(struct client_state *csp)
             socket_is_still_alive(csp->server_connection.sfd),
             csp->server_connection.keep_alive_timeout,
             config_file_change_detected);
+
+         /* LR ------ begin **
+         log_error(LOG_LEVEL_CONNECT,"RUNTIME_FEATURE_CONNECTION_KEEP_ALIVE: %s",
+             csp->config->feature_flags & RUNTIME_FEATURE_CONNECTION_KEEP_ALIVE ? "true" : "false");
+         log_error(LOG_LEVEL_CONNECT,"CSP_FLAG_SERVER_CONNECTION_KEEP_ALIVE: %s",
+             csp->flags & CSP_FLAG_SERVER_CONNECTION_KEEP_ALIVE ? "true" : "false");
+         log_error(LOG_LEVEL_CONNECT,"CSP_FLAG_SERVER_SOCKET_TAINTED: %s",
+             csp->flags & CSP_FLAG_SERVER_SOCKET_TAINTED ? "true" : "false");
+         log_error(LOG_LEVEL_CONNECT,"csp->cfd != JB_INVALID_SOCKET: %s",
+             csp->cfd != JB_INVALID_SOCKET ? "true" : "false");
+         log_error(LOG_LEVEL_CONNECT,"csp->server_connection.sfd != JB_INVALID_SOCKET: %s",
+             csp->server_connection.sfd != JB_INVALID_SOCKET ? "true" : "false");
+         ** LR ------- end */
       }
    } while (continue_chatting);
 
