@@ -882,7 +882,7 @@ void drain_and_close_socket(jb_socket fd)
 #define ARBITRARY_DRAIN_LIMIT 10000
       do
       {
-         char drainage[500];
+         char drainage[500+1];
 
          if (!data_is_available(fd, 0))
          {
@@ -893,13 +893,16 @@ void drain_and_close_socket(jb_socket fd)
             break;
          }
 
-         bytes_drained = read_socket(fd, drainage, sizeof(drainage));
+         bytes_drained = read_socket(fd, drainage, sizeof(drainage)-1);
          if (bytes_drained < 0)
          {
-            log_error(LOG_LEVEL_ERROR, "Failed to drain socket %d: %E", fd);
+            log_error(LOG_LEVEL_ERROR, "Failed to drain socket %d: %E", fd);  /* LR  was LOG_LEVEL_CONNECT */
          }
          else if (bytes_drained > 0)
          {
+            drainage[bytes_drained] = '\0';                                   /* LR */
+            log_error(LOG_LEVEL_INFO, "socket %d drained %d bytes: %N",       /* LR */
+                      fd, bytes_drained, bytes_drained, drainage);            /* LR */
             bytes_drained_total += bytes_drained;
             if (bytes_drained_total > ARBITRARY_DRAIN_LIMIT)
             {
