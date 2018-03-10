@@ -651,6 +651,10 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
    status = send(fd, buf, (int)len, 0);                                           /* LR */
    log_error(LOG_LEVEL_IO,                                                        /* LR */
              "write_socket %d len=%d status=%d", fd, (int)len, status);           /* LR */
+
+   /*   because of page filtering, write_socket lengths could be as much             LR */
+   /*   as 1024 * buffer-limit (default buffer-limit = 4096 * 1024 = 4194304 bytes   LR */
+   /*   so don't bother keeping track of write buffer lengths                        LR */
    return (status != (int)len);                                                   /* LR */
 #elif defined(__BEOS__) || defined(AMIGA)
    return (send(fd, buf, len, 0) != len);
@@ -1479,6 +1483,11 @@ int accept_connection(struct client_state * csp, jb_socket fds[])
    host_addr = (csp->config->haddr[i] != NULL) ? csp->config->haddr[i] : "";
    listen_addr_size = strlen(host_addr) + 7;
    csp->listen_addr_str = malloc_or_die(listen_addr_size);
+
+   log_error(LOG_LEVEL_CONNECT,                                                        /* LR */
+             "accept_connection:1398: Server name (%s) port number (%d) :: %d bytes",  /* LR */
+             csp->config->haddr[i], csp->config->hport[i], listen_addr_size);          /* LR */
+
    retval = snprintf(csp->listen_addr_str, listen_addr_size,
       "%s:%d", host_addr, csp->config->hport[i]);
    if ((-1 == retval) || listen_addr_size <= retval)
