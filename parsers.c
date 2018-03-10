@@ -2194,6 +2194,8 @@ static jb_err server_content_type(struct client_state *csp, char **header)
     */
    csp->content_type |= CT_DECLARED;
 
+   /* log_error(LOG_LEVEL_INFO, "server_content_type: %s", *header);    * LR */
+
    if (!(csp->content_type & CT_TABOO))
    {
       /*
@@ -2527,6 +2529,7 @@ static jb_err server_save_content_length(struct client_state *csp, char **header
    else
    {
       csp->expected_content_length = content_length;
+      log_error(LOG_LEVEL_HEADER, "csp->expected_content_length=%llu", csp->expected_content_length); /* LR */
       csp->flags |= CSP_FLAG_SERVER_CONTENT_LENGTH_SET;
       csp->flags |= CSP_FLAG_CONTENT_LENGTH_SET;
    }
@@ -4324,7 +4327,7 @@ static jb_err parse_header_time(const char *header_time, time_t *result)
          /* Sanity check for GNU libc. */
          if (gmt.tm_year < 0)
          {
-            log_error(LOG_LEVEL_HEADER,
+            log_error(LOG_LEVEL_ERROR,				/* -LR- was LOG_LEVEL_HEADER */
                "Failed to parse '%s' using '%s'. Moving on.",
                header_time, time_formats[i]);
             continue;
@@ -4507,6 +4510,8 @@ jb_err get_destination_from_headers(const struct list *headers, struct http_requ
    {
       return JB_ERR_MEMORY;
    }
+
+   log_error(LOG_LEVEL_HEADER, "Faked request-Line: %s", http->cmd);  /* LR */
 
    return JB_ERR_OK;
 
