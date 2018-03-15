@@ -3043,7 +3043,7 @@ browsing has slowed to a crawl. What gives? </title>
 </sect2>
 
 <sect2 renderas="sect3" id="file-permissions">
-<title>What to do if privoxy is working but editing the config file of privoxy is access denied?</title>
+<title>What to do if editing the config file of privoxy is access denied?</title>
 <para>
  Your userid probably isn't allowed to edit the file.
  <!--  show how to check permissions? -->
