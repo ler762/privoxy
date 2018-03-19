@@ -30,8 +30,8 @@ export LDFLAGS=""
 # start with initially empty flags
 
 
-## CFLAGS="${CFLAGS} -fstack-protector-strong"
-## LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+CFLAGS="${CFLAGS} -fstack-protector-strong"
+LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 # add gcc stack checking
 #    need to specify when compiling _and_ linking
 
@@ -48,7 +48,7 @@ CFLAGS="${CFLAGS} -march=native"
 #   might not run on different machines).  Using -mtune=native produces code optimized for the local machine under
 #   the constraints of the selected instruction set.
 
-## CFLAGS="${CFLAGS} -D_FORTIFY_SOURCE=2"
+CFLAGS="${CFLAGS} -D_FORTIFY_SOURCE=2"
 # enable lightweight buffer overflow protection to some memory and string functions.
 
 ## LDFLAGS="${LDFLAGS} -Wl,--nxcompat"
