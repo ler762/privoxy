@@ -1552,7 +1552,7 @@ struct configuration_spec * load_config(void)
             }
 #ifdef FEATURE_STATISTICS
 if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
-  int i;
+  int x;
   unsigned long int total, runningTotal;
   double percent;
   unsigned int myCounters[numIosizeCounters];
@@ -1561,13 +1561,13 @@ if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
      */
   char s[300];
   total = runningTotal = 0;
-  for ( i = 0; i < numIosizeCounters; i++ ) { myCounters[i] = iosizeCounter[i]; total += myCounters[i]; }
+  for ( x = 0; x < numIosizeCounters; x++ ) { myCounters[x] = iosizeCounter[x]; total += myCounters[x]; }
   log_error(LOG_LEVEL_INFO, "         Range        count    cum %%   run length");
-  for ( i = 0; i < numIosizeCounters; i++ ) {
-    if ( myCounters[i] > 0 ) {
-      runningTotal += myCounters[i];
+  for ( x = 0; x < numIosizeCounters; x++ ) {
+    if ( myCounters[x] > 0 ) {
+      runningTotal += myCounters[x];
       percent = ((double)runningTotal / (double)total ) * 100.0;
-      sprintf(s, "%s: %10d   %6.2f  %10d", iosizeCounterDesc[i], myCounters[i], percent, iosizeRunLen[i]);
+      sprintf(s, "%s: %10d   %6.2f  %10d", iosizeCounterDesc[x], myCounters[x], percent, iosizeRunLen[x]);
       log_error(LOG_LEVEL_INFO, "%s", s);
     }
   }
