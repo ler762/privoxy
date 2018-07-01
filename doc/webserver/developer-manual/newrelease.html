@@ -1196,12 +1196,8 @@ NAME="NEWRELEASE-WINDOWS"
 >6.3.6. Windows</A
 ></H3
 ><P
->        Use the <A
-HREF="http://www.fruitbat.org/Cygwin/index.html#cygwincirca"
-TARGET="_top"
->        Cygwin Time Machine</A
-> to install the last 1.5 version of Cygwin.
-        Run the following commands from within the Cygwin 1.5 bash shell.
+>        Note that the docbook generated files might need some hand editing,
+        so the Windows build makefile does not rebuild the docs.
       </P
 ><P
 >        First, <SPAN
@@ -1212,25 +1208,14 @@ CLASS="EMPHASIS"
         version into an empty directory</I
 ></SPAN
 >. (See "Building and releasing
-        packages" above). Then get the Windows setup module:
+        packages" above).
+        
       </P
-><TABLE
-BORDER="0"
-BGCOLOR="#E0E0E0"
-WIDTH="100%"
-><TR
-><TD
-><PRE
-CLASS="PROGRAMLISTING"
->  cvs -z3  -d:pserver:anonymous@ijbswa.cvs.sourceforge.net:/cvsroot/ijbswa co winsetup</PRE
-></TD
-></TR
-></TABLE
 ><P
 >        Then you can build the package.  This is fully automated, and is
         controlled by <TT
 CLASS="FILENAME"
->winsetup/GNUmakefile</TT
+>windows/GNUmakefile</TT
 >.
         All you need to do is:
       </P
@@ -1242,7 +1227,7 @@ WIDTH="100%"
 ><TD
 ><PRE
 CLASS="PROGRAMLISTING"
->  cd winsetup
+>  cd windows
   make</PRE
 ></TD
 ></TR
@@ -1254,9 +1239,45 @@ CLASS="FILENAME"
 > to
         <TT
 CLASS="FILENAME"
->privoxy_setup_X_Y_Z.exe</TT
->, and upload it to
-        SourceForge. When releasing the package on SourceForge, use the release notes
+>privoxy_setup_X.Y.Z.exe</TT
+>, and the <TT
+CLASS="FILENAME"
+>build</TT
+>
+        directory to <TT
+CLASS="FILENAME"
+>privoxy_X.Y.Z</TT
+>.
+        Create a .zip file of the newly renamed <TT
+CLASS="FILENAME"
+>privoxy_X.Y.Z</TT
+> directory,
+        GPG sign the installer and zip file,
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  $ gpg --armor --detach --sign <TT
+CLASS="FILENAME"
+>privoxy_setup_X.Y.Z.exe</TT
+>
+  $ gpg --armor --detach --sign <TT
+CLASS="FILENAME"
+>privoxy_X.Y.Z.zip</TT
+></PRE
+></TD
+></TR
+></TABLE
+><P
+>        and upload the files to SourceForge.
+      </P
+><P
+>        When releasing the package on SourceForge, use the release notes
         and Change Log from the source tarball package.
       </P
 ></DIV

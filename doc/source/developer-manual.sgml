@@ -518,13 +518,13 @@ Hal.
  &lt;para&gt;
   Some text goes here.
  &lt;/para&gt;
-       </literallayout>
+</literallayout>
      <para>
        Tags marking individual words, or few words, should be in-line:
      </para>
        <literallayout>
   Just to &lt;emphasis&gt;emphasize&lt;/emphasis&gt;, some text goes here.
-       </literallayout>
+</literallayout>
    </listitem>
    <listitem>
     <para>
@@ -541,7 +541,7 @@ Hal.
    &lt;/para&gt;
   &lt;/itemizedlist&gt;
  &lt;/para&gt;
-       </literallayout>
+</literallayout>
     <para>
       This makes it easier to find the text amongst the tags ;-)
     </para>
@@ -651,6 +651,7 @@ Hal.
      the finished doc at that point.
    </para>
   </listitem>
+
   <listitem>
    <para>
     Commonly used <quote>internal entities</quote>:
@@ -2564,33 +2565,50 @@ for-privoxy-version=3.0.11
       </para>
     </sect3>
 
-    <sect3 id="newrelease-windows"><title>Windows</title>
+    <sect3 id="NEWRELEASE-WINDOWS"><title>Windows</title>
+    <!-- so annoying: docbook generated ids are UPPERCASE so
+                links to "whatever.html#idtag" DO NOT WORK!!
+         They have to be "whatever.html#IDTAG".
+         So be consistent and use uppercase on the definition.
+      -->
       <para>
-        Use the <ulink url="http://www.fruitbat.org/Cygwin/index.html#cygwincirca">
-        Cygwin Time Machine</ulink> to install the last 1.5 version of Cygwin.
-        Run the following commands from within the Cygwin 1.5 bash shell.
+        Note that the docbook generated files might need some hand editing,
+        so the Windows build makefile does not rebuild the docs.
       </para>
+
       <para>
         First, <emphasis>make sure that you have freshly exported the right
         version into an empty directory</emphasis>. (See "Building and releasing
-        packages" above). Then get the Windows setup module:
+        packages" above).
+        <!-- FIXME  ??? are we still basing releases off a tarball???
+          -->
       </para>
-      <programlisting>
-  cvs -z3  -d:pserver:anonymous@ijbswa.cvs.sourceforge.net:/cvsroot/ijbswa co winsetup
-</programlisting>
       <para>
         Then you can build the package.  This is fully automated, and is
-        controlled by <filename>winsetup/GNUmakefile</filename>.
+        controlled by <filename>windows/GNUmakefile</filename>.
         All you need to do is:
       </para>
       <programlisting>
-  cd winsetup
+  cd windows
   make
 </programlisting>
       <para>
         Now you can manually rename <filename>privoxy_setup.exe</filename> to
-        <filename>privoxy_setup_X_Y_Z.exe</filename>, and upload it to
-        SourceForge. When releasing the package on SourceForge, use the release notes
+        <filename>privoxy_setup_X.Y.Z.exe</filename>, and the <filename>build</filename>
+        directory to <filename>privoxy_X.Y.Z</filename>.
+        Create a .zip file of the newly renamed <filename>privoxy_X.Y.Z</filename> directory,
+        GPG sign the installer and zip file,
+      </para>
+      <programlisting>
+  $ gpg --armor --detach --sign <filename>privoxy_setup_X.Y.Z.exe</filename>
+  $ gpg --armor --detach --sign <filename>privoxy_X.Y.Z.zip</filename>
+</programlisting>
+      <para>
+        and upload the files to SourceForge.
+      </para>
+
+      <para>
+        When releasing the package on SourceForge, use the release notes
         and Change Log from the source tarball package.
       </para>
     </sect3>

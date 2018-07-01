@@ -1,0 +1,5 @@
+build/
+nsis-3.03/
+privoxy_setup.exe
+!GNUmakefile
+# need to include the makefile

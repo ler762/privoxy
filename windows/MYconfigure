@@ -1,4 +1,11 @@
 #!/bin/sh
+# run the configure script for a native Windows build
+
+if [ -f ../configure.in ]; then
+    #  we're in the windows directory, so we need to go up a level
+    cd ..
+fi
+
 autoheader
 #   creates config.h.in
 autoconf
@@ -42,7 +49,7 @@ export LDFLAGS=""
 # stack-protector-all: protects all functions whether they need it or not
 
 
-CFLAGS="${CFLAGS} -march=native"
+### CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
 #   Generate instructions for the machine type cpu-type.  In contrast to -mtune=cpu-type, which merely tunes the
 #   generated code for the specified cpu-type, -march=cpu-type allows GCC to generate code that may not run at all on
@@ -72,27 +79,27 @@ LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 #   As a workaround, you can pass -Wl,--dynamicbase,--export-all-symbols
 
 
-CFLAGS="${CFLAGS} -Wall"
+### CFLAGS="${CFLAGS} -Wall"
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 #    but then plenty too many complaints by
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits (strptime.h)
-CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
+### CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
 
-CFLAGS="${CFLAGS} -Warray-bounds=2"
+### CFLAGS="${CFLAGS} -Warray-bounds=2"
 # -Wall enables -Warray-bounds=1
 
 # CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
-CFLAGS="${CFLAGS} -Wlogical-op"
+### CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
 
-CFLAGS="${CFLAGS} -Wno-div-by-zero"
+### CFLAGS="${CFLAGS} -Wno-div-by-zero"
 # Do not warn about compile-time integer division by zero.
 
-CFLAGS="${CFLAGS} -Wshadow"
+### CFLAGS="${CFLAGS} -Wshadow"
 # Warn whenever a local variable or type declaration shadows
 # another variable or whenever a built-in function is shadowed.
 
