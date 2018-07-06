@@ -3317,8 +3317,8 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
    <para>
     This directive was added as a work-around for Firefox bug 492459:
     <quote>Websites are no longer rendered if SSL requests for JavaScripts are blocked by a proxy.</quote>
-    (<ulink url="https://bugzilla.mozilla.org/show_bug.cgi?id=492459"
-	>https://bugzilla.mozilla.org/show_bug.cgi?id=492459</ulink>),
+    (<ulink url="https://bugzilla.mozilla.org/show_bug.cgi?id=492459">
+                 https://bugzilla.mozilla.org/show_bug.cgi?id=492459</ulink>),
     the bug has been fixed for quite some time, but this directive is also useful
     to make it harder for websites to detect whether or not resources are being
     blocked.
