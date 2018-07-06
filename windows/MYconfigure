@@ -35,8 +35,8 @@ export LDFLAGS=""
 # start with initially empty flags
 
 
-### CFLAGS="${CFLAGS} -fstack-protector-strong"
-### LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+CFLAGS="${CFLAGS} -fstack-protector-strong"
+LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 # enable stack checking.  NOTE: need to specify when compiling _and_ linking
 # stack-protector-strong: better balance between security and performance.
 #   This flag protects more kinds of vulnerable functions than -fstack-protector does,
@@ -100,7 +100,7 @@ LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 ### CFLAGS="${CFLAGS} -Wno-div-by-zero"
 # Do not warn about compile-time integer division by zero.
 
-### CFLAGS="${CFLAGS} -Wshadow"
+CFLAGS="${CFLAGS} -Wshadow"
 # Warn whenever a local variable or type declaration shadows
 # another variable or whenever a built-in function is shadowed.
 
