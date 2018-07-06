@@ -1433,7 +1433,7 @@ struct configuration_spec
 
 /** The force load URL prefix. Not behind an ifdef because
   * it's always used for the show-status page. */
-#define FORCE_PREFIX "/PRIVOXY-DOIT-ANYWAY"
+#define FORCE_PREFIX "/PV-DOIT"
 
 #ifdef FEATURE_NO_GIFS
 /** The MIME type for images ("image/png" or "image/gif"). */
