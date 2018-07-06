@@ -42,7 +42,8 @@ export LDFLAGS=""
 #   This flag protects more kinds of vulnerable functions than -fstack-protector does,
 #   but not every function, providing better performance than -fstack-protector-all.
 # see  https://en.wikipedia.org/wiki/Buffer_overflow_protection
-# NOTE: needs --enable-static-linking or [?? WHAT ??] in the path
+# NOTE: needs static linking or the following in the path:
+#         /usr/i686-w64-mingw32/sys-root/mingw/bin/libssp-0.dll
 
 # CFLAGS="${CFLAGS} -fstack-protector-all"
 # LDFLAGS="${LDFLAGS} -fstack-protector-all"
@@ -103,7 +104,7 @@ LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 # Warn whenever a local variable or type declaration shadows
 # another variable or whenever a built-in function is shadowed.
 
-### CFLAGS="${CFLAGS} -Wwrite-strings"
+# CFLAGS="${CFLAGS} -Wwrite-strings"
 # These warnings help you find at compile time code that can try to write
 # into a string constant, but only if you have been very careful about
 # using const in declarations and prototypes.
