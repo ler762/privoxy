@@ -271,7 +271,7 @@ II. FORMAT OF THE CONFIGURATION FILE
    If the documentation is not on the local system, it can be accessed
    from a remote server, as:
   </para>
-   <screen>&nbsp;&nbsp;user-manual&nbsp;&nbsp;http://example.com/privoxy/user-manual/</screen>
+   <screen>  user-manual  http://example.com/privoxy/user-manual/</screen>
   <![%user-man;[
    <!-- this gets hammered in conversion to config. Text repeated below. -->
   <warning>
