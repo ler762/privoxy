@@ -94,7 +94,9 @@ CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno
 # CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
-CFLAGS="${CFLAGS} -Wformat-overflow=2"
+# ??? # CFLAGS="${CFLAGS} -Wformat-overflow=2"
+# ??? # i686-w64-mingw32-gcc: error: unrecognized command line option '-Wformat-overflow=2'; did you mean '-Wstrict-overflow='?
+# ??? #
 # Warn about calls to formatted input/output functions such as "sprintf" and "vsprintf"
 # that might overflow the destination buffer.
  
