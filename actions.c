@@ -780,6 +780,54 @@ jb_err merge_current_action (struct current_action_spec *dest,
 
 /*********************************************************************
  *
+ * Function    :  merge_single_actions
+ *      same thing as merge_current_action except
+ *      skip processing of multi actions
+ *      no, i have no idea what the diff is between single & multi actions
+ *
+ * Description :  Merge two actions together.
+ *                Similar to "dest += src".
+ *                Differences between this and merge_actions()
+ *                is that this one doesn't allocate memory for
+ *                strings (so "src" better be in memory for at least
+ *                as long as "dest" is, and you'd better free
+ *                "dest" using "free_current_action").
+ *                Also, there is no  mask or remove lists in dest.
+ *                (If we're applying it to a URL, we don't need them)
+ *
+ * Parameters  :
+ *          1  :  dest = Current actions, to modify.
+ *          2  :  src = Action to add.
+ *
+ * Returns  0  :  no error
+ *        !=0  :  error, probably JB_ERR_MEMORY.
+ *
+ *********************************************************************/
+jb_err merge_single_actions (struct current_action_spec *dest,
+                             const struct action_spec *src)
+{
+   int i;
+   jb_err err = JB_ERR_OK;
+
+   dest->flags  &= src->mask;
+   dest->flags  |= src->add;
+
+   for (i = 0; i < ACTION_STRING_COUNT; i++)
+   {
+      char * str = src->string[i];
+      if (str)
+      {
+         str = strdup_or_die(str);
+         freez(dest->string[i]);
+         dest->string[i] = str;
+      }
+   }
+   return err;
+}
+
+
+/*********************************************************************
+ *
  * Function    :  update_action_bits_for_tag
  *
  * Description :  Updates the action bits based on the action sections

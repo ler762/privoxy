@@ -1084,6 +1084,15 @@ jb_err cgi_show_status(struct client_state *csp,
    assert(rsp);
    assert(parameters);
 
+   /*
+    *  make sure config files are current
+    */
+   if (run_loader(csp))
+   {
+      log_error(LOG_LEVEL_FATAL, "a loader failed - must exit");
+      /* Never get here - LOG_LEVEL_FATAL causes program exit */
+   }
+
    if ('\0' != *(lookup(parameters, "file")))
    {
       return cgi_show_file(csp, rsp, parameters);
@@ -1688,6 +1697,245 @@ jb_err cgi_show_url_info(struct client_state *csp,
    }
 
    return template_fill_for_cgi(csp, "show-url-info", exports, rsp);
+}
+
+
+/*********************************************************************
+ *
+ * Function    :  cgi_show_url_final_info
+ *
+ * Description :  CGI function that shows just the "Final results:"
+ *                section from cgi_show_url_info.
+ *                If all you want to know is if a URL would be blocked
+ *                or not, this is the function for you!
+ *
+ * Parameters  :
+ *          1  :  csp = Current client state (buffers, headers, etc...)
+ *          2  :  rsp = http_response data structure for output
+ *          3  :  parameters = map of cgi parameters
+ *
+ * CGI Parameters :
+ *            url : The url whose actions are to be determined.
+ *                  If url is unset, the url-given conditional will be
+ *                  set, so that all but the form can be suppressed in
+ *                  the template.
+ *
+ * Returns     :  JB_ERR_OK on success
+ *                JB_ERR_MEMORY on out-of-memory error.
+ *
+ *********************************************************************/
+jb_err cgi_show_url_final_info(struct client_state *csp,
+                               struct http_response *rsp,
+                               const struct map *parameters)
+{
+   char *url_param;
+   struct map *exports;
+
+   assert(csp);
+   assert(rsp);
+   assert(parameters);
+
+   if (NULL == (exports = default_exports(csp, "show-url-final-info")))
+   {
+      return JB_ERR_MEMORY;
+   }
+
+   /*
+    * Get the url= parameter (if present) and remove any leading/trailing spaces.
+    */
+   url_param = strdup_or_die(lookup(parameters, "url"));
+   chomp(url_param);
+
+   /*
+    * Handle prefixes.  4 possibilities:
+    * 1) "http://" or "https://" prefix present and followed by URL - OK
+    * 2) Only the "http://" or "https://" part is present, no URL - change
+    *    to empty string so it will be detected later as "no URL".
+    * 3) Parameter specified but doesn't start with "http(s?)://" - add a
+    *    "http://" prefix.
+    * 4) Parameter not specified or is empty string - let this fall through
+    *    for now, next block of code will handle it.
+    */
+   if (0 == strncmp(url_param, "http://", 7))
+   {
+      if (url_param[7] == '\0')
+      {
+         /*
+          * Empty URL (just prefix).
+          * Make it totally empty so it's caught by the next if ()
+          */
+         url_param[0] = '\0';
+      }
+   }
+   else if (0 == strncmp(url_param, "https://", 8))
+   {
+      if (url_param[8] == '\0')
+      {
+         /*
+          * Empty URL (just prefix).
+          * Make it totally empty so it's caught by the next if ()
+          */
+         url_param[0] = '\0';
+      }
+   }
+   else if ((url_param[0] != '\0')
+      && ((NULL == strstr(url_param, "://")
+            || (strstr(url_param, "://") > strstr(url_param, "/")))))
+   {
+      /*
+       * No prefix or at least no prefix before
+       * the first slash - assume http://
+       */
+      char *url_param_prefixed = strdup_or_die("http://");
+
+      if (JB_ERR_OK != string_join(&url_param_prefixed, url_param))
+      {
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+      url_param = url_param_prefixed;
+   }
+
+   if (url_param[0] == '\0')
+   {
+      /* URL paramater not specified, display query form only. */
+      free(url_param);
+      if (map_block_killer(exports, "url-given")
+        || map(exports, "url", 1, "", 1))
+      {
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+   }
+   else
+   {
+      /* Given a URL, so query it. */
+      jb_err err;
+      char *s;
+      struct file_list *fl;
+      struct url_actions *b;
+      struct http_request url_to_query[1];
+      struct current_action_spec action[1];
+      int i;
+
+      if (map(exports, "url", 1, html_encode(url_param), 0))
+      {
+         free(url_param);
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+
+      init_current_action(action);
+
+      if (map(exports, "default", 1, current_action_to_html(csp, action), 0))
+      {
+         free_current_action(action);
+         free(url_param);
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+
+      memset(url_to_query, '\0', sizeof(url_to_query));
+      err = parse_http_url(url_param, url_to_query, REQUIRE_PROTOCOL);
+      assert((err != JB_ERR_OK) || (url_to_query->ssl == !strncmpic(url_param, "https://", 8)));
+
+      free(url_param);
+
+      if (err == JB_ERR_MEMORY)
+      {
+         free_http_request(url_to_query);
+         free_current_action(action);
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+      else if (err)
+      {
+         /* Invalid URL */
+
+         err = map(exports, "matches", 1, "<b>[Invalid URL specified!]</b>" , 1);
+         if (!err) err = map(exports, "final", 1, lookup(exports, "default"), 1);
+         if (!err) err = map_block_killer(exports, "valid-url");
+
+         free_current_action(action);
+         free_http_request(url_to_query);
+
+         if (err)
+         {
+            free_map(exports);
+            return JB_ERR_MEMORY;
+         }
+
+         return template_fill_for_cgi(csp, "show-url-final-info", exports, rsp);
+      }
+
+      for (i = 0; i < MAX_AF_FILES; i++)
+      {
+         if (NULL == csp->config->actions_file_short[i]
+             || !strcmp(csp->config->actions_file_short[i], "standard.action")) continue;
+
+         b = NULL;
+         if ((fl = csp->actions_list[i]) != NULL)
+         {
+            if ((b = fl->f) != NULL)
+            {
+               b = b->next;
+            }
+         }
+
+         for ( ; b != NULL; b = b->next)
+         {
+            if (url_match(b->url, url_to_query))
+            {
+               /* if (merge_current_action(action, b->action))   -LR-  orig */
+               if (merge_single_actions(action, b->action))
+               {
+                  free_http_request(url_to_query);
+                  free_current_action(action);
+                  free_map(exports);
+                  return JB_ERR_MEMORY;
+               }
+            }
+         }
+      }
+
+      free_current_action(csp->action);
+      get_url_actions(csp, url_to_query);
+
+      free_http_request(url_to_query);
+
+      s = current_action_to_html(csp, action);
+
+      free_current_action(action);
+
+      if (map(exports, "final", 1, s, 0))
+      {
+         free_map(exports);
+         return JB_ERR_MEMORY;
+      }
+   }
+
+   /* return template_fill_for_cgi(csp, "show-url-final-info", exports, rsp);   -LR- */
+   rsp->body = \
+"<!DOCTYPE html><html lang=\"en\"><head><title>URL Block Info</title></head>\n"\
+"<body><table cellpadding=\"20\" cellspacing=\"10\" border=\"0\" width=\"100%\">\n"\
+"<!-- @if-url-given-start -->\n"\
+"<!-- @if-valid-url-start -->\n"\
+"<tr><td><h2>Final results:</h2>\n"\
+"<b>@final@</b>\n"\
+"</td></tr>\n"\
+"<!-- if-valid-url-end@ -->\n"\
+"<!-- if-url-given-end@ -->\n"\
+"<tr><td><h2>Look up the actions for a URL:</h2>\n"\
+"<form method=\"GET\" action=\"@default-cgi@show-url-final-info\">\n"\
+"<p><input type=\"text\" name=\"url\" size=\"80\" value=\"@url@\"><input type=\"submit\" value=\"Go\"></p>\n"\
+"</form>\n"\
+"</td></tr></table>\n"\
+"</body></html>\n";
+
+   template_fill(&rsp->body, exports);
+   free_map(exports);
+   return 0;
+
 }
 
 

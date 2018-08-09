@@ -112,6 +112,10 @@ static const struct cgi_dispatcher cgi_dispatchers[] = {
          cgi_show_url_info,
          "Look up which actions apply to a URL and why",
          TRUE },
+   { "show-url-final-info",
+         cgi_show_url_final_info,
+         "Look up the final actions that apply to a URL",
+         TRUE },
 #ifdef FEATURE_TOGGLE
    { "toggle",
          cgi_toggle,

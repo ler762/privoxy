@@ -3311,7 +3311,10 @@ static void serve(struct client_state *csp)
          }
       }
 
-      if (continue_chatting && any_loaded_file_changed(csp))
+/*
+ *    don't check for action/filter file changes if processing cgi requests
+ */
+      if (continue_chatting && !(csp->flags & CSP_FLAG_CRUNCHED) && any_loaded_file_changed(csp))
       {
          continue_chatting = 0;
          config_file_change_detected = 1;

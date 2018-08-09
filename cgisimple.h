@@ -61,6 +61,9 @@ extern jb_err cgi_show_status  (struct client_state *csp,
 extern jb_err cgi_show_url_info(struct client_state *csp,
                                 struct http_response *rsp,
                                 const struct map *parameters);
+extern jb_err cgi_show_url_final_info(struct client_state *csp,
+                                      struct http_response *rsp,
+                                      const struct map *parameters);
 extern jb_err cgi_show_request (struct client_state *csp,
                                 struct http_response *rsp,
                                 const struct map *parameters);
