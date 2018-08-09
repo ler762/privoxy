@@ -82,6 +82,7 @@ CODE_STATUS="UNRELEASED"
 dnl Timestamp (date +%s) used by the mtree-spec target.
 dnl Should be updated before releases but forgetting it isn't critical.
 SOURCE_DATE_EPOCH=1494070262
+dnl To go from epoch -> date do 'date -d @$SOURCE_DATE_EPOCH'
 
 dnl CODE_STATUS can be "alpha", "beta", "stable" or "UNRELEASED",
 dnl and will be used for CGI output. Increment version number and
