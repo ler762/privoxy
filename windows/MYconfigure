@@ -35,8 +35,8 @@ export LDFLAGS=""
 # start with initially empty flags
 
 
-CFLAGS="${CFLAGS} -fstack-protector-strong"
-LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+### CFLAGS="${CFLAGS} -fstack-protector-strong"
+### LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 # enable stack checking.  NOTE: need to specify when compiling _and_ linking
 # stack-protector-strong: better balance between security and performance.
 #   This flag protects more kinds of vulnerable functions than -fstack-protector does,
@@ -64,30 +64,37 @@ LDFLAGS="${LDFLAGS} -Wl,--nxcompat"
 
 LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 # https://en.wikipedia.org/wiki/Address_space_layout_randomization
-#   ALSR with gcc has a problem: -Wl,--dynamicbase doesn't emit the necessary relocation table.
+# https://stackoverflow.com/questions/24283918/how-can-i-enable-aslr-dep-and-safeseh-on-an-exe-in-codeblocks-using-mingw
+#   ASLR with gcc has a problem: -Wl,--dynamicbase doesn't emit the necessary relocation table.
 #   As a workaround, you can pass -Wl,--dynamicbase,--export-all-symbols
+#   NOTE: you can't have both this and profiling (cflags='-pg') enabled!
+
+#CFLAGS="${CFLAGS} -pg"
+#LDFLAGS="${LDFLAGS} -pg"
+# Generate extra code to write profile information suitable for the analysis program gprof.
+# Use this option when compiling the source files you want data about, and you must also use it when linking.
+# -- creates a "gmon.out" profile file when the program exits
+# -- then do 'gprof -b privoxy.exe gmon.out'
+#  ??? WHY ???  profiling doesn't work if ASLR is enabled
 
 
-CFLAGS="${CFLAGS} -Wall"
+### CFLAGS="${CFLAGS} -Wall"
 # see: http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 #    but then plenty too many complaints by
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
-CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
+### CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
 
 # CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
-CFLAGS="${CFLAGS} -Wformat-security"
+### CFLAGS="${CFLAGS} -Wformat-security"
 # If -Wformat is specified, also warn about uses of format functions that represent possible security problems.
 
 ### CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
-
-### CFLAGS="${CFLAGS} -Wno-div-by-zero"
-# Do not warn about compile-time integer division by zero.
 
 CFLAGS="${CFLAGS} -Wshadow"
 # Warn whenever a local variable or type declaration shadows
