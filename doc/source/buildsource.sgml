@@ -51,6 +51,11 @@
 </screen>
 
 <para>
+ This will create a directory named <filename>&lt;root-dir>/privoxy/</filename>,
+ which will contain the source tree.
+</para>
+
+<para>
  Note that source code in GIT is development quality, and may not be
  stable or well tested.
 </para>

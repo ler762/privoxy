@@ -47,6 +47,9 @@ To build the development version, you can get the source code by doing:
   cd <root-dir>
   git clone https://www.privoxy.org/git/privoxy.git
 
+This will create a directory named <root-dir>/privoxy/, which will contain the
+source tree.
+
 Note that source code in GIT is development quality, and may not be stable or
 well tested.
 
