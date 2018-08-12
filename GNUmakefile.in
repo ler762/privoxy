@@ -145,7 +145,11 @@ DOC_TMP    = $(DOC_DIR)/tmp
 DOC_STATUS = @DOC_STATUS@
 TIDY       = tidy -latin1 -q -modify -indent -wrap 120 --tidy-mark no --mute MISSING_ATTRIBUTE --mute TRIM_EMPTY_ELEMENT
 # -latin1
-#     privoxy/doc/sourcep-authors.sgml is ISO-8859 *not* ASCII
+#     docbook output is ISO-8859-1 and tidy assumes ASCII
+# -q
+#     suppress nonessential output
+# -modify
+#     modify the original input file
 # --mute MISSING_ATTRIBUTE
 #     don't show <img> lacks "alt" attribute
 #             or <table> lacks "summary" attribute
