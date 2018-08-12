@@ -57,3 +57,4 @@ w32.res
 .project
 autom4te.cache
 default.action
+windows/nsis-3.03/
