@@ -1,6 +1,7 @@
 #        Sample Configuration File for Privoxy 3.0.27
 #
-# Copyright (C) 2001-2018 Privoxy Developers https://www.privoxy.org/
+#  Copyright (C) 2001-2018 Privoxy Developers https://www.privoxy.org
+#  /
 #
 #####################################################################
 #                                                                   #
@@ -381,7 +382,7 @@ logdir .
 #      configuration for ad blocking, cookie management, privacy
 #      considerations, etc.
 #
-actionsfile match-all.action ##
+actionsfile match-all.action # Actions that are applied to all sites and maybe overruled later on.
 actionsfile default.action   # Main actions file
 actionsfile user.action      # User customizations
 #
@@ -609,9 +610,9 @@ logfile logfile
 #      problem on your own.
 #
 #debug     1 # Log the destination for each request Privoxy
-#
+#   let through.
 #debug  1024 # Log the destination for requests Privoxy
-#
+#   didn't let through, and the reason why.
 #debug  4096 # Startup banner and warnings
 #debug  8192 # Non-fatal errors
 #
@@ -1218,7 +1219,7 @@ enable-proxy-authentication-forwarding 0
 #      +-----------------------------------------------------+
 #
 trusted-cgi-referer http://www.example.org/
-#
+#  local-privoxy-control-page
 #
 #  5. FORWARDING
 #  ==============
@@ -2031,7 +2032,7 @@ socket-timeout 300
 #
 #      This directive was added as a work-around for Firefox bug
 #      492459: "Websites are no longer rendered if SSL requests for
-#      JavaScripts are blocked by a proxy." (https://
+#      JavaScripts are blocked by a proxy." ( https://
 #      bugzilla.mozilla.org/show_bug.cgi?id=492459), the bug has been
 #      fixed for quite some time, but this directive is also useful
 #      to make it harder for websites to detect whether or not
@@ -2160,6 +2161,7 @@ socket-timeout 300
 #      affected by this directive.
 #
 #client-header-order Host \
+#   User-Agent \
 #   Accept \
 #   Accept-Language \
 #   Accept-Encoding \
@@ -2171,7 +2173,6 @@ socket-timeout 300
 #   Cache-Control \
 #   Content-Length \
 #   Content-Type
-#
 #
 #  6.16. client-specific-tag
 #  ==========================
@@ -2384,20 +2385,15 @@ socket-timeout 300
 #  interface:
 #
 #
-#
 #  If "activity-animation" is set to 1, the Privoxy icon will animate
 #  when "Privoxy" is active. To turn off, set to 0.
 #
 #activity-animation   1
 #
-#
-#
 #  If "log-messages" is set to 1, Privoxy copies log messages to the
 #  console window. The log detail depends on the debug directive.
 #
 #log-messages   1
-#
-#
 #
 #  If "log-buffer-size" is set to 1, the size of the log buffer, i.e.
 #  the amount of memory used for the log messages displayed in the
@@ -2408,40 +2404,28 @@ socket-timeout 300
 #
 #log-buffer-size 1
 #
-#
-#
 #  log-max-lines is the maximum number of lines held in the log
 #  buffer. See above.
 #
 #log-max-lines 200
-#
-#
 #
 #  If "log-highlight-messages" is set to 1, Privoxy will highlight
 #  portions of the log messages with a bold-faced font:
 #
 #log-highlight-messages 1
 #
-#
-#
 #  The font used in the console window:
 #
 #log-font-name Comic Sans MS
-#
-#
 #
 #  Font size used in the console window:
 #
 #log-font-size 8
 #
-#
-#
 #  "show-on-task-bar" controls whether or not Privoxy will appear as
 #  a button on the Task bar when minimized:
 #
 #show-on-task-bar 0
-#
-#
 #
 #  If "close-button-minimizes" is set to 1, the Windows close button
 #  will minimize Privoxy instead of closing the program (close with
@@ -2449,13 +2433,10 @@ socket-timeout 300
 #
 #close-button-minimizes 1
 #
-#
-#
 #  The "hide-console" option is specific to the MS-Win console
 #  version of Privoxy. If this option is used, Privoxy will
 #  disconnect from and hide the command console.
 #
 #hide-console
-#
 #
 #
