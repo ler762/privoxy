@@ -31,7 +31,7 @@
 
 (define %indent-screen-lines%
   ;; Indent lines in a 'Screen'?
-  ;; WAS #t needs to be either "#f" or a string like "  "
+  ;; "#f" or string to be used as the indent on 'screen'
   "")
 
 (define %callout-fancy-bug%

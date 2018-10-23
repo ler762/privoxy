@@ -132,22 +132,18 @@ CHGRP      = chgrp
 GROUPS     = groups
 W3M_DUMP   = @W3M@ -I ISO-8859 -O ASCII -dump
 W3M_DUMP_UTF8 = @W3M@ -I ISO-8859 -O UTF-8 -dump
-# docbook output is ISO-8859-1
+# docbook output is ISO-8859 (which is a superset of ascii)
 JADECAT    = @JADECAT@
 JADEBIN    = @JADEBIN@
 DB         = $(JADEBIN) $(JADECAT) -ihtml -t sgml  -D.. -d ldp.dsl\#html
 DB_TXT     = $(JADEBIN) $(JADECAT) -ihtml -t sgml  -D.. -d ldp.dsl\#print
-# -iname, --include=name
-#     Pretend that
-#       <!ENTITY % name "INCLUDE">
-#     occurs at the start of the document type declaration subset in the SGML document entity.
 # -d dsssl_spec
 #     This specifies that dsssl_spec is the system identifier of the DSSSL specification to be used.
 # ldp.dsl#html  : keep '&char;' strings as is
 # ldp.dsl#print : convert '&char;' strings to ISO-8859 equivalent
 # NOTE: '-d ldp.dsl\#whatever' _MUST_ be last and _MUST NOT_ have
-#       a trailing space so that '$(DB)-notoc' or '$(DB_TXT)-notoc' pulls
-#       in the correct dsl stylesheet
+#       a trailing space so that '$(DB)-notoc' or '$(DB_TXT)-notoc'
+#       pulls in the correct dsl stylesheet
 DB2HTML    = @DB2HTML@
 MAN2HTML   = @MAN2HTML@
 G2H_CMD    = groff -mandoc -Thtml
@@ -160,7 +156,7 @@ TIDY       = tidy -latin1 -q -modify -indent -wrap 120 --tidy-mark no --preserve
  --mute MISSING_ATTRIBUTE --mute TRIM_EMPTY_ELEMENT
 # -latin1
 #     use ISO-8859-1 for both input and output
-#     docbook output is ISO-8859-1 and tidy assumes UTF-8
+#     docbook output is ISO-8859 and tidy assumes UTF-8
 # -q
 #     suppress nonessential output
 # -modify
