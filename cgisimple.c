@@ -59,6 +59,7 @@
 #include "parsers.h"
 #include "urlmatch.h"
 #include "errlog.h"
+#include "loaders.h"
 #ifdef FEATURE_CLIENT_TAGS
 #include "client-tags.h"
 #endif
@@ -1918,19 +1919,15 @@ jb_err cgi_show_url_final_info(struct client_state *csp,
    rsp->body = \
 "<!DOCTYPE html><html lang=\"en\"><head><title>URL Block Info</title></head>\n"\
 "<body><table cellpadding=\"20\" cellspacing=\"10\" border=\"0\" width=\"100%\">\n"\
-"<!-- @if-url-given-start -->\n"\
 "<!-- @if-valid-url-start -->\n"\
 "<tr><td><h2>Final results:</h2>\n"\
 "<b>@final@</b>\n"\
 "</td></tr>\n"\
 "<!-- if-valid-url-end@ -->\n"\
-"<!-- if-url-given-end@ -->\n"\
 "<tr><td><h2>Look up the actions for a URL:</h2>\n"\
 "<form method=\"GET\" action=\"@default-cgi@show-url-final-info\">\n"\
-"<p><input type=\"text\" name=\"url\" size=\"80\" value=\"@url@\"><input type=\"submit\" value=\"Go\"></p>\n"\
-"</form>\n"\
-"</td></tr></table>\n"\
-"</body></html>\n";
+"<input type=\"text\" name=\"url\" size=\"80\" value=\"@url@\"><input type=\"submit\" value=\"Go\">\n"\
+"</form></td></tr></table></body></html>\n";
 
    template_fill(&rsp->body, exports);
    free_map(exports);
