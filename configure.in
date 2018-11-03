@@ -81,7 +81,7 @@ CODE_STATUS="UNRELEASED"
 
 dnl Timestamp (date +%s) used by the mtree-spec target.
 dnl Should be updated before releases but forgetting it isn't critical.
-SOURCE_DATE_EPOCH=1494070262
+SOURCE_DATE_EPOCH=1540830839
 
 dnl CODE_STATUS can be "alpha", "beta", "stable" or "UNRELEASED",
 dnl and will be used for CGI output. Increment version number and
@@ -350,7 +350,7 @@ fi
 AC_SUBST(RPM_BASE)
 
 dnl Check for jade, so we can build the documentation
-AC_CHECK_PROGS(JADEBIN,jade openjade,false)
+AC_CHECK_PROGS(JADEBIN,openjade jade,false)
 AC_SUBST(JADEBIN)
 
 dnl Check for man2html for docs.
