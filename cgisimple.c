@@ -1088,8 +1088,7 @@ jb_err cgi_show_status(struct client_state *csp,
    /*
     *  make sure config files are current
     */
-   if (run_loader(csp))
-   {
+   if (run_loader(csp)) {
       log_error(LOG_LEVEL_FATAL, "a loader failed - must exit");
       /* Never get here - LOG_LEVEL_FATAL causes program exit */
    }
@@ -1324,6 +1323,14 @@ jb_err cgi_show_url_info(struct client_state *csp,
    assert(csp);
    assert(rsp);
    assert(parameters);
+
+   /*
+    *  make sure config files are current
+    */
+   if (run_loader(csp)) {
+      log_error(LOG_LEVEL_FATAL, "a loader failed - must exit");
+      /* Never get here - LOG_LEVEL_FATAL causes program exit */
+   }
 
    if (NULL == (exports = default_exports(csp, "show-url-info")))
    {
