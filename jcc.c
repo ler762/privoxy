@@ -2778,9 +2778,6 @@ static void handle_established_connection(struct client_state *csp)
             if (!http->ssl) /* We talk plaintext */
             {
                buffer_and_filter_content = content_requires_filtering(csp);
-               if ( 0 && buffer_and_filter_content ) {                                                          /* LR */
-                  log_error(LOG_LEVEL_INFO, "buffer_and_filter_content set to %d", buffer_and_filter_content);  /* LR */
-               }                                                                                                /* LR */
             }
             /*
              * Only write if we're not buffering for content modification
