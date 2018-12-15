@@ -210,7 +210,7 @@ void remember_connection(const struct reusable_connection *connection)
 
    if (!free_slot_found)
    {
-      log_error(LOG_LEVEL_ERROR,
+      log_error(LOG_LEVEL_CONNECT,
         "No free slots found to remember socket for %s:%d. Last slot %d.",
         connection->host, connection->port, slot);
       privoxy_mutex_unlock(&connection_reuse_mutex);
@@ -1159,23 +1159,6 @@ static jb_socket socks5_connect(const struct forward_spec *fwd,
             "Optimistically sending %llu bytes of client body. Expected %llu",
             csp->expected_client_content_length, buffered_request_bytes);
          assert(csp->expected_client_content_length == buffered_request_bytes);
-
-         /* FIXME: 
-          *   unsigned long long buffered_request_bytes
-          *   int write_socket(jb_socket fd, const char *buf, size_t len)
-          *   do multiple calls to write_socket if buffered_request_bytes > ULONG_MAX ?
-          */
-#ifdef _WIN32
-#if SIZEOF_LONG != SIZEOF_SIZE_T
-#error need to adjust maxint check on buffered_request_bytes
-#endif
-         if ( buffered_request_bytes > ULONG_MAX ) {
-            log_error(LOG_LEVEL_ERROR, "FIXME: buffered_request_bytes (%llu) > ULONG_MAX (%lu)",
-                      buffered_request_bytes, ULONG_MAX );
-            return(JB_INVALID_SOCKET);
-         }
-#endif /* _WIN32 */
-
          if (write_socket(sfd, csp->client_iob->cur, buffered_request_bytes))
          {
             log_error(LOG_LEVEL_CONNECT,

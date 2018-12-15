@@ -300,7 +300,6 @@ struct http_request
  */
 enum crunch_reason
 {
-   NONE,
    UNSUPPORTED,
    BLOCKED,
    UNTRUSTED,
@@ -312,8 +311,7 @@ enum crunch_reason
    OUT_OF_MEMORY,
    INTERNAL_ERROR,
    CONNECTION_TIMEOUT,
-   NO_SERVER_DATA,
-   BLANKED
+   NO_SERVER_DATA
 };
 
 /**
@@ -1433,7 +1431,7 @@ struct configuration_spec
 
 /** The force load URL prefix. Not behind an ifdef because
   * it's always used for the show-status page. */
-#define FORCE_PREFIX "/PRIVOXY-DOIT-ANYWAY"
+#define FORCE_PREFIX "/PRIVOXY-FORCE"
 
 #ifdef FEATURE_NO_GIFS
 /** The MIME type for images ("image/png" or "image/gif"). */

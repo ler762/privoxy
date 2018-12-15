@@ -153,7 +153,6 @@ static struct _Pattern
    /* interesting text to highlight */
    /*   see jcc.c crunch_reason for the full list */
    { "Crunch: Blocked:",            STYLE_HIGHLIGHT },
-   { "Crunch: Blanked:",            STYLE_HIGHLIGHT },
    { "Crunch: Untrusted",           STYLE_HIGHLIGHT },
    { "Crunch: Redirected:",         STYLE_HIGHLIGHT },
    { "Crunch: DNS failure",         STYLE_HIGHLIGHT },

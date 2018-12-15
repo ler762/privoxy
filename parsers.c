@@ -268,22 +268,15 @@ static const add_header_func_ptr add_server_headers[] = {
  *********************************************************************/
 long flush_iob(jb_socket fd, struct iob *iob, unsigned int delay)
 {
-   int status;  /* LR */
-
    long len = iob->eod - iob->cur;
-
-   log_error(LOG_LEVEL_IO, "flush_iob %d len=%ld", fd, len);     /* LR */
 
    if (len <= 0)
    {
       return(0);
    }
 
-   /* LR was:  if (write_socket_delayed(fd, iob->cur, (size_t)len, delay))  LR */
-   if ( (status = write_socket_delayed(fd, iob->cur, (size_t)len, delay)) )
+   if (write_socket_delayed(fd, iob->cur, (size_t)len, delay))
    {
-      log_error(LOG_LEVEL_IO,                                    /* LR */
-                "flush_iob %d write error: %d", fd, status);     /* LR */
       return(-1);
    }
    iob->eod = iob->cur = iob->buf;
@@ -341,10 +334,6 @@ jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, char *src, long n)
          want *= 2;
       }
 
-      log_error(LOG_LEVEL_IO,                                                        /* LR */
-          "add_to_iob: reallocate iob->buf old: %d  need: %d  want: %d  limit: %d",  /* LR */
-          iob->size, need, want, buffer_limit);                                      /* LR */
-
       if (want <= buffer_limit && NULL != (p = (char *)realloc(iob->buf, want)))
       {
          iob->size = want;
@@ -367,8 +356,6 @@ jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, char *src, long n)
 
    /* copy the new data into the iob buffer */
    memcpy(iob->eod, src, (size_t)n);
-
-   log_error(LOG_LEVEL_IO, "add_to_iob: memcpy %d bytes", (size_t)n);  /* LR */
 
    /* point to the end of the data */
    iob->eod += n;
@@ -439,8 +426,6 @@ jb_err decompress_iob(struct client_state *csp)
    assert(csp->iob->cur - csp->iob->buf > 0);
    assert(csp->iob->eod - csp->iob->cur > 0);
 #endif
-
-   log_error(LOG_LEVEL_CONNECT, "decompress_iob: begin");    /* LR */
 
    bufsize = csp->iob->size;
    skip_size = (size_t)(csp->iob->cur - csp->iob->buf);
@@ -660,8 +645,6 @@ jb_err decompress_iob(struct client_state *csp)
          bufsize = csp->config->buffer_limit;
       }
 
-      log_error(LOG_LEVEL_CONNECT, "decompress_iob: realloc %d", bufsize);    /* LR */
-
       /* Try to allocate the new buffer. */
       tmpbuf = realloc(buf, bufsize);
       if (NULL == tmpbuf)
@@ -721,8 +704,6 @@ jb_err decompress_iob(struct client_state *csp)
       return JB_ERR_COMPRESS;
    }
 
-   log_error(LOG_LEVEL_CONNECT, "decompress_iob: decompressed");    /* LR */
-
    /*
     * Finally, we can actually update the iob, since the
     * decompression was successful. First, free the old
@@ -767,7 +748,6 @@ jb_err decompress_iob(struct client_state *csp)
       return JB_ERR_COMPRESS;
    }
 
-   log_error(LOG_LEVEL_CONNECT, "decompress_iob: finished");    /* LR */
    return JB_ERR_OK;
 
 }
@@ -2195,8 +2175,6 @@ static jb_err server_content_type(struct client_state *csp, char **header)
     */
    csp->content_type |= CT_DECLARED;
 
-   /* log_error(LOG_LEVEL_INFO, "server_content_type: %s", *header);    * LR */
-
    if (!(csp->content_type & CT_TABOO))
    {
       /*
@@ -2530,7 +2508,6 @@ static jb_err server_save_content_length(struct client_state *csp, char **header
    else
    {
       csp->expected_content_length = content_length;
-      log_error(LOG_LEVEL_HEADER, "csp->expected_content_length=%llu", csp->expected_content_length); /* LR */
       csp->flags |= CSP_FLAG_SERVER_CONTENT_LENGTH_SET;
       csp->flags |= CSP_FLAG_CONTENT_LENGTH_SET;
    }
@@ -4328,7 +4305,7 @@ static jb_err parse_header_time(const char *header_time, time_t *result)
          /* Sanity check for GNU libc. */
          if (gmt.tm_year < 0)
          {
-            log_error(LOG_LEVEL_ERROR,				/* -LR- was LOG_LEVEL_HEADER */
+            log_error(LOG_LEVEL_HEADER,
                "Failed to parse '%s' using '%s'. Moving on.",
                header_time, time_formats[i]);
             continue;
@@ -4511,8 +4488,6 @@ jb_err get_destination_from_headers(const struct list *headers, struct http_requ
    {
       return JB_ERR_MEMORY;
    }
-
-   log_error(LOG_LEVEL_HEADER, "Faked request-Line: %s", http->cmd);  /* LR */
 
    return JB_ERR_OK;
 

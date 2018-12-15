@@ -418,7 +418,7 @@ static jb_socket rfc2553_connect_to(const char *host, int portnum, struct client
                 * it will get logged outside the loop body so we don't
                 * have to mention it here.
                 */
-               log_error(LOG_LEVEL_ERROR, "Could not connect to [%s]:%s: %s.",
+               log_error(LOG_LEVEL_CONNECT, "Could not connect to [%s]:%s: %s.",
                   csp->http->host_ip_addr_str, service, strerror(socket_error));
             }
          }
@@ -438,7 +438,7 @@ static jb_socket rfc2553_connect_to(const char *host, int portnum, struct client
    freeaddrinfo(result);
    if (!rp)
    {
-      log_error(LOG_LEVEL_ERROR, "Could not connect to [%s]:%s: %s.",
+      log_error(LOG_LEVEL_CONNECT, "Could not connect to [%s]:%s: %s.",
          host, service, strerror(socket_error));
       csp->error_message = strdup(strerror(socket_error));
       return(JB_INVALID_SOCKET);
@@ -626,7 +626,6 @@ static jb_socket no_rfc2553_connect_to(const char *host, int portnum, struct cli
  *********************************************************************/
 int write_socket(jb_socket fd, const char *buf, size_t len)
 {
-   int status;    /* LR */
    if (len == 0)
    {
       return 0;
@@ -643,15 +642,7 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
    log_error(LOG_LEVEL_WRITING, "to socket %d: %N", fd, len, buf);
 
 #if defined(_WIN32)
-   /* LR was: return (send(fd, buf, (int)len, 0) != (int)len);                       LR */
-   status = send(fd, buf, (int)len, 0);                                           /* LR */
-   log_error(LOG_LEVEL_IO,                                                        /* LR */
-             "write_socket %d len=%d status=%d", fd, (int)len, status);           /* LR */
-
-   /*   because of page filtering, write_socket lengths could be as much             LR */
-   /*   as 1024 * buffer-limit (default buffer-limit = 4096 * 1024 = 4194304 bytes   LR */
-   /*   so don't bother keeping track of write buffer lengths                        LR */
-   return (status != (int)len);                                                   /* LR */
+   return (send(fd, buf, (int)len, 0) != (int)len);
 #elif defined(__BEOS__)
    return (send(fd, buf, len, 0) != len);
 #elif defined(__OS2__)
@@ -676,33 +667,10 @@ int write_socket(jb_socket fd, const char *buf, size_t len)
       return 0;
    }
 #else
-   /* LR was: return (write(fd, buf, len) != len);                     LR */
-   status = write(fd, buf, len);                                    /* LR */
-   log_error(LOG_LEVEL_IO,                                          /* LR */
-             "write_socket %d len=%d status=%d", fd, len, status);  /* LR */
-   return (status != len);                                          /* LR */
+   return (write(fd, buf, len) != len);
 #endif
 
 }
-
-
-#ifdef FEATURE_STATISTICS
-void iosizeCounter_inc(int len ) {
-  int x, samesize;
-  if ( len < 0 ) return;
-
-  if ( len == prevReadSize ) { samesize = 1; }
-  else                       { samesize = 0; prevReadSize = len; }
-
-       if ( len >= max_buffer_size ) { x = numIosizeCounters - 1; }
-  else if ( len <   10000 ) { x = (len /   1000) +  0; } /*  0- 9:       0-  9,999 x   1,000 */
-  else if ( len <  100000 ) { x = (len /  10000) +  9; } /* 10-18:  10,000- 99,999 x  10,000 */
-  else if ( len < 1000000 ) { x = (len / 100000) + 18; } /* 19-27: 100,000-999,999 x 100,000 */
-  else /* wtf? */           { x = numIosizeCounters - 1; }
-  iosizeCounter[x]++;
-  if ( samesize ) iosizeRunLen[x]++;
-}
-#endif /* defined FEATURE_STATISTICS */
 
 
 /*********************************************************************
@@ -801,14 +769,9 @@ int read_socket(jb_socket fd, char *buf, int len)
    ret = (int)read(fd, buf, (size_t)len);
 #endif
 
-   log_error(LOG_LEVEL_IO, "read_socket  %d len=%d", fd, ret);   /* LR */
-
    if (ret > 0)
    {
       log_error(LOG_LEVEL_RECEIVED, "from socket %d: %N", fd, ret, buf);
-#ifdef FEATURE_STATISTICS
-      iosizeCounter_inc(ret);  /* bump # reads by bytes read */
-#endif
    }
 
    return ret;
@@ -832,7 +795,6 @@ int read_socket(jb_socket fd, char *buf, int len)
 int data_is_available(jb_socket fd, int seconds_to_wait)
 {
    int n;
-   int status = 0;    /* LR */
    char buf[10];
 #ifdef HAVE_POLL
    struct pollfd poll_fd[1];
@@ -862,12 +824,7 @@ int data_is_available(jb_socket fd, int seconds_to_wait)
    /*
     * XXX: Do we care about the different error conditions?
     */
-
-   /* LR was: return ((n == 1) && (1 == recv(fd, buf, 1, MSG_PEEK)));              LR */
-   if ( n == 1 ) status =  recv(fd, buf, 1, MSG_PEEK);                          /* LR */
-   log_error(LOG_LEVEL_IO,                                                      /* LR */
-             "data_is_available: socket %d select=%d recv=%d", fd, n, status);  /* LR */
-   return ((n == 1) && (1 == status));                                          /* LR */
+   return ((n == 1) && (1 == recv(fd, buf, 1, MSG_PEEK)));
 }
 
 
@@ -885,7 +842,6 @@ int data_is_available(jb_socket fd, int seconds_to_wait)
  *********************************************************************/
 void close_socket(jb_socket fd)
 {
-log_error(LOG_LEVEL_IO, "close_socket %d", fd);  /* LR */
 #if defined(_WIN32) || defined(__BEOS__)
    closesocket(fd);
 #elif defined(__OS2__)
@@ -930,7 +886,7 @@ void drain_and_close_socket(jb_socket fd)
 #define ARBITRARY_DRAIN_LIMIT 10000
       do
       {
-         char drainage[500+1];
+         char drainage[500];
 
          if (!data_is_available(fd, 0))
          {
@@ -941,16 +897,13 @@ void drain_and_close_socket(jb_socket fd)
             break;
          }
 
-         bytes_drained = read_socket(fd, drainage, sizeof(drainage)-1);
+         bytes_drained = read_socket(fd, drainage, sizeof(drainage));
          if (bytes_drained < 0)
          {
-            log_error(LOG_LEVEL_ERROR, "Failed to drain socket %d: %E", fd);  /* LR  was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_CONNECT, "Failed to drain socket %d: %E", fd);
          }
          else if (bytes_drained > 0)
          {
-            drainage[bytes_drained] = '\0';                                   /* LR */
-            log_error(LOG_LEVEL_INFO, "socket %d drained %d bytes: %N",       /* LR */
-                      fd, bytes_drained, bytes_drained, drainage);            /* LR */
             bytes_drained_total += bytes_drained;
             if (bytes_drained_total > ARBITRARY_DRAIN_LIMIT)
             {
@@ -1534,11 +1487,6 @@ int accept_connection(struct client_state * csp, jb_socket fds[])
    host_addr = (csp->config->haddr[i] != NULL) ? csp->config->haddr[i] : "";
    listen_addr_size = strlen(host_addr) + 7;
    csp->listen_addr_str = malloc_or_die(listen_addr_size);
-
-   log_error(LOG_LEVEL_CONNECT,                                                        /* LR */
-             "accept_connection:1398: Server name (%s) port number (%d) :: %d bytes",  /* LR */
-             csp->config->haddr[i], csp->config->hport[i], listen_addr_size);          /* LR */
-
    retval = snprintf(csp->listen_addr_str, listen_addr_size,
       "%s:%d", host_addr, csp->config->hport[i]);
    if ((-1 == retval) || listen_addr_size <= retval)
@@ -1687,8 +1635,6 @@ int socket_is_still_alive(jb_socket sfd)
 {
    char buf[10];
    int no_data_waiting;
-   int status;    /* LR */
-
 #ifdef HAVE_POLL
    int poll_result;
    struct pollfd poll_fd[1];
@@ -1717,18 +1663,13 @@ int socket_is_still_alive(jb_socket sfd)
    ret = select((int)sfd+1, &readable_fds, NULL, NULL, &timeout);
    if (ret < 0)
    {
-      log_error(LOG_LEVEL_ERROR, "select() on socket %d failed: %E", sfd);
+      log_error(LOG_LEVEL_CONNECT, "select() on socket %d failed: %E", sfd);
       return FALSE;
    }
    no_data_waiting = !FD_ISSET(sfd, &readable_fds);
 #endif /* def HAVE_POLL */
 
-     /* LR was: return (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)));     LR */
-   status = (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)) );            /* LR */
-   log_error(LOG_LEVEL_CONNECT,                                                  /* LR */
-             "socket_is_still_usable: socket %d: no_data_waiting=%d status=%d",  /* LR */
-             sfd, no_data_waiting, status);                                      /* LR */
-   return status;                                                                /* LR */
+   return (no_data_waiting || (1 == recv(sfd, buf, 1, MSG_PEEK)));
 }
 
 

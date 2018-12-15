@@ -607,9 +607,6 @@ static inline const char *get_log_level_string(int loglevel)
       case LOG_LEVEL_CONNECT:
          log_level_string = "Connect";
          break;
-      case LOG_LEVEL_IO:                        /* LR */
-         log_level_string = "IO";               /* LR */
-         break;                                 /* LR */
       case LOG_LEVEL_WRITING:
          log_level_string = "Writing";
          break;
