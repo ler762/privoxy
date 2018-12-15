@@ -249,13 +249,14 @@ static const add_header_func_ptr add_server_headers[] = {
 
 /*********************************************************************
  *
- * Function    :  flush_socket
+ * Function    :  flush_iob
  *
  * Description :  Write any pending "buffered" content.
  *
  * Parameters  :
  *          1  :  fd = file descriptor of the socket to read
  *          2  :  iob = The I/O buffer to flush, usually csp->iob.
+ *          3  :  delay = Number of milliseconds to delay the writes
  *
  * Returns     :  On success, the number of bytes written are returned (zero
  *                indicates nothing was written).  On error, -1 is returned,
@@ -265,24 +266,24 @@ static const add_header_func_ptr add_server_headers[] = {
  *                file, the results are not portable.
  *
  *********************************************************************/
-long flush_socket(jb_socket fd, struct iob *iob)
+long flush_iob(jb_socket fd, struct iob *iob, unsigned int delay)
 {
    int status;  /* LR */
 
    long len = iob->eod - iob->cur;
 
-   log_error(LOG_LEVEL_IO, "flush_socket %d len=%ld", fd, len);  /* LR */
+   log_error(LOG_LEVEL_IO, "flush_iob %d len=%ld", fd, len);     /* LR */
 
    if (len <= 0)
    {
       return(0);
    }
 
-   /* LR was: if (write_socket(fd, iob->cur, (size_t)len))          LR */
-   if ( (status = write_socket(fd, iob->cur, (size_t)len)) )
+   /* LR was:  if (write_socket_delayed(fd, iob->cur, (size_t)len, delay))  LR */
+   if ( (status = write_socket_delayed(fd, iob->cur, (size_t)len, delay)) )
    {
       log_error(LOG_LEVEL_IO,                                    /* LR */
-                "flush_socket %d write error: %d", fd, status);  /* LR */
+                "flush_iob %d write error: %d", fd, status);     /* LR */
       return(-1);
    }
    iob->eod = iob->cur = iob->buf;
