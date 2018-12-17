@@ -4328,7 +4328,7 @@ static jb_err parse_header_time(const char *header_time, time_t *result)
          /* Sanity check for GNU libc. */
          if (gmt.tm_year < 0)
          {
-            log_error(LOG_LEVEL_ERROR,				/* -LR- was LOG_LEVEL_HEADER */
+            log_error(LOG_LEVEL_ERROR,                         /* -LR- was LOG_LEVEL_HEADER */
                "Failed to parse '%s' using '%s'. Moving on.",
                header_time, time_formats[i]);
             continue;

@@ -2260,7 +2260,7 @@ static void handle_established_connection(struct client_state *csp)
              * available on the socket, the client went fishing
              * and continuing talking to the server makes no sense.
              */
-            log_error(LOG_LEVEL_ERROR,				/* LR was: LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,                         /* LR was: LOG_LEVEL_CONNECT */
                "The client closed socket %d while the server socket %d is still open.",
                csp->cfd, csp->server_connection.sfd);
             mark_server_socket_tainted(csp);
