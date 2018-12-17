@@ -313,9 +313,9 @@ static jb_err map_copy_parameter_html(struct map *out,
                                       const char *name);
 
 static jb_err get_file_name_param(struct client_state *csp,
-                                  const struct map *parameters,
-                                  const char *param_name,
-                                  const char **pfilename);
+	                                   const struct map *parameters,
+	                                   const char *param_name,
+	                                   const char **pfilename);
 
 /* Internal convenience functions */
 static char *section_target(const unsigned sectionid);

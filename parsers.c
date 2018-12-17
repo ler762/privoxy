@@ -272,18 +272,18 @@ long flush_iob(jb_socket fd, struct iob *iob, unsigned int delay)
 
    long len = iob->eod - iob->cur;
 
-   log_error(LOG_LEVEL_IO, "flush_iob %d len=%ld", fd, len);     /* LR */
+   log_error(LOG_LEVEL_IO, "flush_iob %d len=%ld", fd, len);            /* LR */
 
    if (len <= 0)
    {
       return(0);
    }
 
-   /* LR was:  if (write_socket_delayed(fd, iob->cur, (size_t)len, delay))  LR */
+   /* LR was: if (write_socket_delayed(fd, iob->cur, (size_t)len, delay))  LR */
    if ( (status = write_socket_delayed(fd, iob->cur, (size_t)len, delay)) )
    {
-      log_error(LOG_LEVEL_IO,                                    /* LR */
-                "flush_iob %d write error: %d", fd, status);     /* LR */
+      log_error(LOG_LEVEL_IO,                                           /* LR */
+                "flush_iob %d write error: %d", fd, status);            /* LR */
       return(-1);
    }
    iob->eod = iob->cur = iob->buf;

@@ -868,7 +868,7 @@ static void send_crunch_response(const struct client_state *csp, struct http_res
        || write_socket_delayed(csp->cfd, rsp->body, rsp->content_length, get_write_delay(csp)))
       {
          /* There is nothing we can do about it. */
-         log_error(LOG_LEVEL_CONNECT,
+         log_error(LOG_LEVEL_ERROR,
             "Couldn't deliver the error message for %s through client socket %d: %E",
             http->url, csp->cfd);
       }
@@ -1985,7 +1985,7 @@ static jb_err parse_client_request(struct client_state *csp)
  * Parameters  :
  *          1  :  csp = Current client state (buffers, headers, etc...)
  *
- * Returns     :  0 on success, anything else is na error.
+ * Returns     :  0 on success, anything else is an error.
  *
  *********************************************************************/
 static int send_http_request(struct client_state *csp)
@@ -2260,7 +2260,7 @@ static void handle_established_connection(struct client_state *csp)
              * available on the socket, the client went fishing
              * and continuing talking to the server makes no sense.
              */
-            log_error(LOG_LEVEL_ERROR,                         /* LR was: LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,                      /* LR was: LOG_LEVEL_CONNECT */
                "The client closed socket %d while the server socket %d is still open.",
                csp->cfd, csp->server_connection.sfd);
             mark_server_socket_tainted(csp);
@@ -2778,6 +2778,9 @@ static void handle_established_connection(struct client_state *csp)
             if (!http->ssl) /* We talk plaintext */
             {
                buffer_and_filter_content = content_requires_filtering(csp);
+               if ( 0 && buffer_and_filter_content ) {                                                          /* LR */
+                  log_error(LOG_LEVEL_INFO, "buffer_and_filter_content set to %d", buffer_and_filter_content);  /* LR */
+               }                                                                                                /* LR */
             }
             /*
              * Only write if we're not buffering for content modification
@@ -2830,7 +2833,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 2783");                  /* LR */
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 2836");                  /* LR */
       mark_server_socket_tainted(csp);
       return; /* huh? we should never get here */
    }
