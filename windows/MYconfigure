@@ -35,8 +35,8 @@ export LDFLAGS=""
 # start with initially empty flags
 
 
-### CFLAGS="${CFLAGS} -fstack-protector-strong"
-### LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+CFLAGS="${CFLAGS} -fstack-protector-strong"
+LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 # enable stack checking.  NOTE: need to specify when compiling _and_ linking
 # stack-protector-strong: better balance between security and performance.
 #   This flag protects more kinds of vulnerable functions than -fstack-protector does,
@@ -45,7 +45,7 @@ export LDFLAGS=""
 # NOTE: needs static linking or the following in the path:
 #         /usr/i686-w64-mingw32/sys-root/mingw/bin/libssp-0.dll
 
-### CFLAGS="${CFLAGS} -march=native"
+CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
 #   Generate instructions for the machine type cpu-type.  In contrast to -mtune=cpu-type, which merely tunes the
 #   generated code for the specified cpu-type, -march=cpu-type allows GCC to generate code that may not run at all on
