@@ -1065,7 +1065,7 @@ actionsfile
  </varlistentry>
 </variablelist>
 
-<![%config-file;[<literallayout>@@#debug     1 # Log the destination for each request &my-app; let through.</literallayout>]]>
+<![%config-file;[<literallayout>@@#debug     1 # Log the destination for each request &my-app; let through. See also debug 1024.</literallayout>]]>
 <![%config-file;[<literallayout>@@#debug  1024 # Log the destination for requests &my-app; didn't let through, and the reason why.</literallayout>]]>
 <![%config-file;[<literallayout>@@#debug  4096 # Startup banner and warnings</literallayout>]]>
 <![%config-file;[<literallayout>@@#debug  8192 # Non-fatal errors</literallayout>]]>

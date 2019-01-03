@@ -1215,8 +1215,7 @@ enable-proxy-authentication-forwarding 0
 #      |the user's knowledge.                                |
 #      +-----------------------------------------------------+
 #
-#trusted-cgi-referer http://www.example.org/
-#
+#trusted-cgi-referer http://www.example.org/local-privoxy-control-page
 #
 #  5. FORWARDING
 #  ==============
@@ -1396,8 +1395,8 @@ enable-proxy-authentication-forwarding 0
 #      might want to make some exceptions:
 #
 #        forward         192.168.*.*/     .
-#        forward            10.*.*.*/     .
-#        forward           127.*.*.*/     .
+#        forward          10.*.*.*/       .
+#        forward         127.*.*.*/       .
 #
 #      Unencrypted connections to systems in these address ranges
 #      will be as (un)secure as the local network is, but the
@@ -2121,7 +2120,6 @@ socket-timeout 300
 #          # is likely to be flawed.
 #          compression-level 0
 #
-#
 #compression-level 1
 #
 #  6.15. client-header-order
@@ -2159,6 +2157,7 @@ socket-timeout 300
 #      affected by this directive.
 #
 #client-header-order Host \
+#   User-Agent \
 #   Accept \
 #   Accept-Language \
 #   Accept-Encoding \
@@ -2170,7 +2169,6 @@ socket-timeout 300
 #   Cache-Control \
 #   Content-Length \
 #   Content-Type
-#
 #
 #  6.16. client-specific-tag
 #  ==========================
@@ -2236,7 +2234,6 @@ socket-timeout 300
 #          disable-content-filters Disable content-filters but do not affect other actions
 #
 #
-#
 #  6.17. client-tag-lifetime
 #  ==========================
 #
@@ -2275,7 +2272,6 @@ socket-timeout 300
 #
 #            # Increase the time to life for temporarily enabled tags to 3 minutes
 #            client-tag-lifetime 180
-#
 #
 #
 #  6.18. trust-x-forwarded-for
@@ -2332,7 +2328,6 @@ socket-timeout 300
 #            trust-x-forwarded-for 1
 #
 #
-#
 #  6.19. receive-buffer-size
 #  ==========================
 #
@@ -2379,7 +2374,6 @@ socket-timeout 300
 #            receive-buffer-size 32768
 #
 #
-#
 #  7. WINDOWS GUI OPTIONS
 #  =======================
 #
@@ -2387,20 +2381,15 @@ socket-timeout 300
 #  interface:
 #
 #
-#
 #  If "activity-animation" is set to 1, the Privoxy icon will animate
 #  when "Privoxy" is active. To turn off, set to 0.
 #
 #activity-animation   1
 #
-#
-#
 #  If "log-messages" is set to 1, Privoxy copies log messages to the
 #  console window. The log detail depends on the debug directive.
 #
 #log-messages   1
-#
-#
 #
 #  If "log-buffer-size" is set to 1, the size of the log buffer, i.e.
 #  the amount of memory used for the log messages displayed in the
@@ -2411,40 +2400,28 @@ socket-timeout 300
 #
 #log-buffer-size 1
 #
-#
-#
 #  log-max-lines is the maximum number of lines held in the log
 #  buffer. See above.
 #
 #log-max-lines 200
-#
-#
 #
 #  If "log-highlight-messages" is set to 1, Privoxy will highlight
 #  portions of the log messages with a bold-faced font:
 #
 #log-highlight-messages 1
 #
-#
-#
 #  The font used in the console window:
 #
 #log-font-name Comic Sans MS
-#
-#
 #
 #  Font size used in the console window:
 #
 #log-font-size 8
 #
-#
-#
 #  "show-on-task-bar" controls whether or not Privoxy will appear as
 #  a button on the Task bar when minimized:
 #
 #show-on-task-bar 0
-#
-#
 #
 #  If "close-button-minimizes" is set to 1, the Windows close button
 #  will minimize Privoxy instead of closing the program (close with
@@ -2452,13 +2429,10 @@ socket-timeout 300
 #
 #close-button-minimizes 1
 #
-#
-#
 #  The "hide-console" option is specific to the MS-Win console
 #  version of Privoxy. If this option is used, Privoxy will
 #  disconnect from and hide the command console.
 #
 #hide-console
-#
 #
 #
