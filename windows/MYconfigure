@@ -85,7 +85,13 @@ CFLAGS="${CFLAGS} -Wall"
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
-CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
+CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits -Wno-unused-variable"
+
+CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"
+# used in #ifdef disabled code?
+
+CFLAGS="${CFLAGS} -Wno-unused-parameter"
+# there's a few windows calls that get flagged but they seem ok
 
 # CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
