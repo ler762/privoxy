@@ -1567,7 +1567,7 @@ if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
     if ( myCounters[x] > 0 ) {
       runningTotal += myCounters[x];
       percent = ((double)runningTotal / (double)total ) * 100.0;
-      sprintf(s, "%s: %10d   %6.2f  %10d", iosizeCounterDesc[x], myCounters[x], percent, iosizeRunLen[x]);
+      sprintf(s, "%s: %10u   %6.2f  %10u", iosizeCounterDesc[x], myCounters[x], percent, iosizeRunLen[x]);
       log_error(LOG_LEVEL_INFO, "%s", s);
     }
   }
@@ -1577,7 +1577,7 @@ if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
               /* the receive buffer size has changed so clear out the old stats */
               /* XXX: dump the stats into the log before clearing them ??? */
               max_buffer_size = config->receive_buffer_size;
-              sprintf(iosizeCounterDesc[numIosizeCounters - 1], "%15d", max_buffer_size);
+              sprintf(iosizeCounterDesc[numIosizeCounters - 1], "%15u", max_buffer_size);
                  /* set new max size in display */
               memset(&iosizeCounter, 0, sizeof(iosizeCounter) );
               memset(&iosizeRunLen, 0, sizeof(iosizeRunLen) );

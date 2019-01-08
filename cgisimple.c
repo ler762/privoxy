@@ -1165,7 +1165,7 @@ jb_err cgi_show_status(struct client_state *csp,
          runningTotal += myCounters[j];
          percent = ((double)runningTotal / (double)total ) * 100.0;
 
-         snprintf(buf, sizeof(buf), "%s: %10d   %6.2f  %10d\n",
+         snprintf(buf, sizeof(buf), "%s: %10u   %6.2f  %10u\n",
                   iosizeCounterDesc[j], myCounters[j], percent, iosizeRunLen[j]);
          if (!err) err = string_append(&s, buf);
      }
