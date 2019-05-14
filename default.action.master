@@ -1599,14 +1599,6 @@ smartad.*.*.*
 #############################################################################
 {-block}
 # Sticky Actions = -block
-
-#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
-# URL = http://publib.boulder.ibm.com/infocenter/bladectr/documentation/topic/com.ibm.bladecenter.advmgtmod.doc/adv_mgt_mod_user_guide.html
-#MASTER# REMARKS: blocked by  /(.*/)?ad(\?|/|s|v|_?(image|se?rv|box)|cycle|rotate|mentor|click|f[ra]m|script|stream|fetch|log|space)
-publib.boulder.ibm.com/
-
-#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
-
 #MASTER# UNBLOCK-REFERRER: http://www.faqs.org/
 .faqs.org/banner\.html
 #MASTER# UNBLOCK-REFERRER: http://bannerblind.mozdev.org/
@@ -2298,8 +2290,6 @@ javascriptkit.com
 bugs.
 #MASTER# REMARKS: Actionsfile tracker 1555909 09/17/06, various problems with cpu and logging in.
 quoka.de
-#MASTER# REMARKS: publib.boulder.ibm.com is just docs
-publib.boulder.ibm.com/
 
 #----------------------------------------------------------------------------
 # Innocent images in standard banner sizes found here:
