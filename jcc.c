@@ -4566,7 +4566,7 @@ static void listen_loop(void)
          }
 #endif
 
-#if defined(_WIN32) && !defined(_CYGWIN) && !defined(SELECTED_ONE_OPTION)
+#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(SELECTED_ONE_OPTION)
 #define SELECTED_ONE_OPTION
          child_id = _beginthread(
             (void (*)(void *))serve,
