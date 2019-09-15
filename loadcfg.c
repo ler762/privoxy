@@ -141,6 +141,7 @@ static struct file_list *current_configfile = NULL;
 #define hash_compression_level           2464423563U /* "compression-level" */
 #define hash_confdir                        1978389U /* "confdir" */
 #define hash_connection_sharing          1348841265U /* "connection-sharing" */
+#define hash_cors_allowed_origin         2769345637U /* "cors-allowed-origin" */
 #define hash_debug                            78263U /* "debug" */
 #define hash_default_server_timeout      2530089913U /* "default-server-timeout" */
 #define hash_deny_access                 1227333715U /* "deny-access" */
@@ -647,6 +648,7 @@ struct configuration_spec * load_config(void)
    config->compression_level         = 1;
 #endif
    config->feature_flags            &= ~RUNTIME_FEATURE_TOLERATE_PIPELINING;
+   config->cors_allowed_origin       = NULL;
 
    configfp = fopen(configfile, "r");
    if (NULL == configfp)
@@ -880,6 +882,18 @@ struct configuration_spec * load_config(void)
             }
             break;
 #endif
+
+/* *************************************************************************
+ * cors-allowed-origin http://www.example.org
+ * *************************************************************************/
+         case hash_cors_allowed_origin :
+            /*
+             * We don't validate the specified referrer as
+             * it's only used for string comparison.
+             */
+            freez(config->cors_allowed_origin);
+            config->cors_allowed_origin = strdup_or_die(arg);
+            break;
 
 /* *************************************************************************
  * debug n
@@ -1149,8 +1163,9 @@ struct configuration_spec * load_config(void)
             if (strcmp(p, ".") != 0)
             {
                cur_fwd->forward_port = 8000;
-               parse_forwarder_address(p, &cur_fwd->forward_host,
-                  &cur_fwd->forward_port);
+               parse_forwarder_address(p,
+                  &cur_fwd->forward_host, &cur_fwd->forward_port,
+                  NULL, NULL);
             }
 
             /* Add to list. */
@@ -1199,8 +1214,9 @@ struct configuration_spec * load_config(void)
             if (strcmp(p, ".") != 0)
             {
                cur_fwd->gateway_port = 1080;
-               parse_forwarder_address(p, &cur_fwd->gateway_host,
-                  &cur_fwd->gateway_port);
+               parse_forwarder_address(p,
+                  &cur_fwd->gateway_host, &cur_fwd->gateway_port,
+                  NULL, NULL);
             }
 
             /* Parse the parent HTTP proxy host[:port] */
@@ -1209,8 +1225,9 @@ struct configuration_spec * load_config(void)
             if (strcmp(p, ".") != 0)
             {
                cur_fwd->forward_port = 8000;
-               parse_forwarder_address(p, &cur_fwd->forward_host,
-                  &cur_fwd->forward_port);
+               parse_forwarder_address(p,
+                  &cur_fwd->forward_host, &cur_fwd->forward_port,
+                  NULL, NULL);
             }
 
             /* Add to list. */
@@ -1273,12 +1290,13 @@ struct configuration_spec * load_config(void)
                break;
             }
 
-            /* Parse the SOCKS proxy host[:port] */
+            /* Parse the SOCKS proxy [user:pass@]host[:port] */
             p = vec[1];
 
             cur_fwd->gateway_port = 1080;
-            parse_forwarder_address(p, &cur_fwd->gateway_host,
-               &cur_fwd->gateway_port);
+            parse_forwarder_address(p,
+               &cur_fwd->gateway_host, &cur_fwd->gateway_port,
+               &cur_fwd->auth_username, &cur_fwd->auth_password);
 
             /* Parse the parent HTTP proxy host[:port] */
             p = vec[2];
@@ -1286,8 +1304,9 @@ struct configuration_spec * load_config(void)
             if (strcmp(p, ".") != 0)
             {
                cur_fwd->forward_port = 8000;
-               parse_forwarder_address(p, &cur_fwd->forward_host,
-                  &cur_fwd->forward_port);
+               parse_forwarder_address(p,
+                  &cur_fwd->forward_host, &cur_fwd->forward_port,
+                  NULL, NULL);
             }
 
             /* Add to list. */

@@ -13,11 +13,11 @@
 <!entity p-authors SYSTEM "p-authors.sgml">
 <!entity config SYSTEM "p-config.sgml">
 <!entity changelog SYSTEM "changelog.sgml">
-<!entity p-version "3.0.28">
-<!entity p-status "stable">
+<!entity p-version "3.0.29">
+<!entity p-status "UNRELEASED">
 <!entity % p-authors-formal "INCLUDE"> <!-- include additional text, etc  -->
-<!entity % p-not-stable "IGNORE">
-<!entity % p-stable "INCLUDE">
+<!entity % p-not-stable "INCLUDE">
+<!entity % p-stable "IGNORE">
 <!entity % p-text "IGNORE">        <!-- define we are not a text only doc -->
 <!entity % p-doc "INCLUDE">        <!-- and we are a formal doc           -->
 <!entity % p-readme "IGNORE">
@@ -1517,7 +1517,7 @@ for details.
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-status">View & change the current configuration</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-version">View the source code version numbers</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/client-tags">View or toggle the tags that can be set based on the clients address</ulink>
  </member>
  <member>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-request">View the request headers.</ulink>
@@ -8041,23 +8041,23 @@ Requests</title>
 
  <listitem>
   <para>
-    Show information about the current configuration, including viewing and
-    editing of actions files:
+    View and toggle client tags:
   </para>
    <blockquote>
    <para>
-    <ulink url="http://config.privoxy.org/show-status">http://config.privoxy.org/show-status</ulink>
+    <ulink url="http://config.privoxy.org/client-tags">http://config.privoxy.org/client-tags</ulink>
    </para>
   </blockquote>
  </listitem>
 
  <listitem>
   <para>
-    Show the source code version numbers:
+    Show information about the current configuration, including viewing and
+    editing of actions files:
   </para>
-  <blockquote>
+   <blockquote>
    <para>
-    <ulink url="http://config.privoxy.org/show-version">http://config.privoxy.org/show-version</ulink>
+    <ulink url="http://config.privoxy.org/show-status">http://config.privoxy.org/show-status</ulink>
    </para>
   </blockquote>
  </listitem>

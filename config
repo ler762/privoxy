@@ -1,6 +1,6 @@
-#        Sample Configuration File for Privoxy 3.0.28
+#        Sample Configuration File for Privoxy 3.0.29
 #
-# Copyright (C) 2001-2018 Privoxy Developers https://www.privoxy.org/
+# Copyright (C) 2001-2019 Privoxy Developers https://www.privoxy.org/
 #
 #####################################################################
 #                                                                   #
@@ -1206,6 +1206,9 @@ enable-proxy-authentication-forwarding 0
 #      requests aren't rejected. Requests are accepted if the
 #      specified trusted-cgi-refer is the prefix of the Referer.
 #
+#      If the trusted source is supposed to access the CGI pages via
+#      JavaScript the cors-allowed-origin option can be used.
+#
 #      +-----------------------------------------------------+
 #      |                       Warning                       |
 #      |-----------------------------------------------------|
@@ -1216,6 +1219,53 @@ enable-proxy-authentication-forwarding 0
 #      +-----------------------------------------------------+
 #
 #trusted-cgi-referer http://www.example.org/local-privoxy-control-page
+#
+#  4.11. cors-allowed-origin
+#  ==========================
+#
+#  Specifies:
+#
+#      A trusted website which can access Privoxy's CGI pages through
+#      JavaScript.
+#
+#  Type of value:
+#
+#      URL
+#
+#  Default value:
+#
+#      Unset
+#
+#  Effect if unset:
+#
+#      No external sites get access via cross-origin resource
+#      sharing.
+#
+#  Notes:
+#
+#      Modern browsers by default prevent cross-origin requests made
+#      via JavaScript to Privoxy's CGI interface even if Privoxy
+#      would trust the referer because it's white listed via the
+#      trusted-cgi-referer directive.
+#
+#      Cross-origin resource sharing (CORS) is a mechanism to allow
+#      cross-origin requests.
+#
+#      The "cors-allowed-origin" option can be used to specify a
+#      domain that is allowed to make requests to Privoxy CGI
+#      interface via JavaScript. It is used in combination with the
+#      trusted-cgi-referer directive.
+#
+#      +-----------------------------------------------------+
+#      |                       Warning                       |
+#      |-----------------------------------------------------|
+#      |Declaring domains the admin doesn't control          |
+#      |trustworthy may allow malicious third parties to     |
+#      |modify Privoxy's internal state against the user's   |
+#      |wishes and without the user's knowledge.             |
+#      +-----------------------------------------------------+
+#
+#cors-allowed-origin http://www.example.org/
 #
 #  5. FORWARDING
 #  ==============
@@ -1317,7 +1367,7 @@ enable-proxy-authentication-forwarding 0
 #
 #  Type of value:
 #
-#      target_pattern socks_proxy[:port] http_parent[:port]
+#      target_pattern [user:pass@]socks_proxy[:port] http_parent[:port]
 #
 #      where target_pattern is a URL pattern that specifies to which
 #      requests (i.e. URLs) this forward rule shall apply. Use / to
@@ -1325,7 +1375,8 @@ enable-proxy-authentication-forwarding 0
 #      addresses in dotted decimal notation or valid DNS names (
 #      http_parent may be "." to denote "no HTTP forwarding"), and
 #      the optional port parameters are TCP ports, i.e. integer
-#      values from 1 to 65535
+#      values from 1 to 65535. user and pass can be used for SOCKS5
+#      authentication if required.
 #
 #  Default value:
 #
@@ -1379,6 +1430,11 @@ enable-proxy-authentication-forwarding 0
 #      HTTP parent looks like this:
 #
 #        forward-socks4   /               socks-gw.example.com:1080  .
+#
+#      To connect SOCKS5 proxy which requires username/password
+#      authentication:
+#
+#        forward-socks5   /               user:pass@socks-gw.example.com:1080  .
 #
 #      To chain Privoxy and Tor, both running on the same system, you
 #      would use something like:
