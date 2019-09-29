@@ -1138,6 +1138,12 @@ struct forward_spec
    /** SOCKS server port. */
    int   gateway_port;
 
+   /** SOCKS5 username. */
+   char *auth_username;
+
+   /** SOCKS5 password. */
+   char *auth_password;
+
    /** Parent HTTP proxy hostname, or NULL for none. */
    char *forward_host;
 
@@ -1304,6 +1310,9 @@ struct configuration_spec
 
    /** The directory for customized CGI templates. */
    const char *templdir;
+
+   /** "Cross-origin resource sharing" (CORS) allowed origin */
+   const char *cors_allowed_origin;
 
 #ifdef FEATURE_EXTERNAL_FILTERS
    /** The template used to create temporary files. */
