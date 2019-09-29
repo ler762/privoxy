@@ -1,7 +1,6 @@
 #        Sample Configuration File for Privoxy 3.0.29
 #
-#  Copyright (C) 2001-2019 Privoxy Developers https://www.privoxy.org
-#  /
+# Copyright (C) 2001-2019 Privoxy Developers https://www.privoxy.org/
 #
 #####################################################################
 #                                                                   #
@@ -403,8 +402,8 @@ actionsfile user.action      # User customizations
 #
 #  Effect if unset:
 #
-#      No textual content filtering takes place, i.e. all +filter{
-#      name} actions in the actions files are turned neutral.
+#      No textual content filtering takes place, i.e. all +filter{name}
+#      actions in the actions files are turned neutral.
 #
 #  Notes:
 #
@@ -609,10 +608,8 @@ logfile logfile
 #      you read the log messages, you may even be able to solve the
 #      problem on your own.
 #
-#debug     1 # Log the destination for each request Privoxy
-#   let through. See also debug 1024.
-#debug  1024 # Log the destination for requests Privoxy
-#   didn't let through, and the reason why.
+#debug     1 # Log the destination for each request Privoxy let through. See also debug 1024.
+#debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
 #debug  4096 # Startup banner and warnings
 #debug  8192 # Non-fatal errors
 #
@@ -1221,8 +1218,7 @@ enable-proxy-authentication-forwarding 0
 #      |the user's knowledge.                                |
 #      +-----------------------------------------------------+
 #
-#trusted-cgi-referer http://www.example.org/
-#  local-privoxy-control-page
+#trusted-cgi-referer http://www.example.org/local-privoxy-control-page
 #
 #  4.11. cors-allowed-origin
 #  ==========================
@@ -1371,8 +1367,7 @@ enable-proxy-authentication-forwarding 0
 #
 #  Type of value:
 #
-#      target_pattern [user:pass@]socks_proxy[:port] http_parent[:
-#      port]
+#      target_pattern [user:pass@]socks_proxy[:port] http_parent[:port]
 #
 #      where target_pattern is a URL pattern that specifies to which
 #      requests (i.e. URLs) this forward rule shall apply. Use / to
@@ -2089,10 +2084,10 @@ socket-timeout 300
 #
 #      This directive was added as a work-around for Firefox bug
 #      492459: "Websites are no longer rendered if SSL requests for
-#      JavaScripts are blocked by a proxy." ( https://
-#      bugzilla.mozilla.org/show_bug.cgi?id=492459), the bug has been
-#      fixed for quite some time, but this directive is also useful
-#      to make it harder for websites to detect whether or not
+#      JavaScripts are blocked by a proxy."
+#      (https://bugzilla.mozilla.org/show_bug.cgi?id=492459), the bug
+#      has been fixed for quite some time, but this directive is also
+#      useful to make it harder for websites to detect whether or not
 #      resources are being blocked.
 #
 #handle-as-empty-doc-returns-ok 1
