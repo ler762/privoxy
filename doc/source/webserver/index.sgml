@@ -172,7 +172,7 @@
 <!-- GNUMakefile is inserting this now -->
 <para>
  <subscript>
-  Copyright __copy 2001-2017 by Privoxy Developers
+  Copyright __copy 2001-2019 by Privoxy Developers
  </subscript>
 </para>
 
@@ -183,6 +183,9 @@
  </subscript>
  <subscript>
   <ulink url="https://thebestvpn.com">https://thebestvpn.com</ulink>
+ </subscript>
+ <subscript>
+  <ulink url="https://www.top10vpn.com">https://www.top10vpn.com</ulink>
  </subscript>
 </para>
 <para>
