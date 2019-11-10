@@ -108,6 +108,8 @@ CFLAGS="${CFLAGS} -Wshadow"
 # using const in declarations and prototypes.
 # >>> Otherwise, it is just a nuisance. <<<  -- this, very much this
 
+CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
+
 echo "CFLAGS=${CFLAGS}"
 echo "LDFLAGS=${LDFLAGS}"
 
