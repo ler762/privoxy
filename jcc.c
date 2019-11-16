@@ -883,7 +883,7 @@ static void send_crunch_response(struct client_state *csp, struct http_response 
                  (const unsigned char *)rsp->body, rsp->content_length) < 0))
          {
             /* There is nothing we can do about it. */
-            log_error(LOG_LEVEL_ERROR, "Couldn't deliver the error message "	/* LR ** was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR, "Couldn't deliver the error message "	/* LR was: LOG_LEVEL_CONNECT */
                "for %s through client socket %d using TLS/SSL",
                http->url, csp->cfd);
          }
@@ -897,7 +897,7 @@ static void send_crunch_response(struct client_state *csp, struct http_response 
                 get_write_delay(csp)))
          {
             /* There is nothing we can do about it. */
-            log_error(LOG_LEVEL_ERROR,						/* LR ** was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,						/* LR was: LOG_LEVEL_CONNECT */
                "Couldn't deliver the error message for %s through client socket %d: %E",
                http->url, csp->cfd);
          }
@@ -2038,14 +2038,14 @@ static int send_http_request(struct client_state *csp)
 
    if (write_failure)
    {
-      log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",
+      log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",	/* LR was: LOG_LEVEL_CONNECT */
          csp->http->hostport);
    }
    else if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
       && (flush_iob(csp->server_connection.sfd, csp->client_iob, 0) < 0))
    {
       write_failure = 1;
-      log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",
+      log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",	/* LR was: LOG_LEVEL_CONNECT */
          csp->http->hostport);
    }
 
@@ -3491,7 +3491,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 2836");                  /* LR */
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3494");                  /* LR */
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_FILTERING
       close_client_and_server_ssl_connections(csp);
@@ -3517,7 +3517,7 @@ static void handle_established_connection(struct client_state *csp)
    if ((csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
       && (csp->expected_content_length != byte_count))
    {
-      log_error(LOG_LEVEL_ERROR,
+      log_error(LOG_LEVEL_ERROR,			/* LR was: LOG_LEVEL_CONNECT */
          "Received %llu bytes while expecting %llu.",
          byte_count, csp->expected_content_length);
       mark_server_socket_tainted(csp);
@@ -5481,7 +5481,7 @@ static void listen_loop(void)
       if ((0 != config->max_client_connections)
          && (active_threads >= config->max_client_connections))
       {
-         log_error(LOG_LEVEL_ERROR,
+         log_error(LOG_LEVEL_ERROR,				/* LR was: LOG_LEVEL_CONNECT */
             "Rejecting connection from %s. Maximum number of connections reached.",
             csp->ip_addr_str);
          write_socket_delayed(csp->cfd, TOO_MANY_CONNECTIONS_RESPONSE,
