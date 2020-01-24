@@ -108,7 +108,7 @@ CFLAGS="${CFLAGS} -Wshadow"
 # using const in declarations and prototypes.
 # >>> Otherwise, it is just a nuisance. <<<  -- this, very much this
 
-CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
+# CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
 
 echo "CFLAGS=${CFLAGS}"
 echo "LDFLAGS=${LDFLAGS}"
@@ -119,6 +119,7 @@ echo "LDFLAGS=${LDFLAGS}"
 #    --target: only used to build a cross-compiling toolchain.
 
 ./configure  --host=i686-w64-mingw32  --enable-mingw32  --enable-zlib \
+             --without-mbedtls  \
              --enable-static-linking \
              --enable-strptime-sanity-checks \
              --disable-pthread  --disable-dynamic-pcre \
