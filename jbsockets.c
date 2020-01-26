@@ -944,7 +944,7 @@ void drain_and_close_socket(jb_socket fd)
          bytes_drained = read_socket(fd, drainage, sizeof(drainage));
          if (bytes_drained < 0)
          {
-            log_error(LOG_LEVEL_ERROR, "Failed to drain socket %d: %E", fd);  /* LR  was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_CONNECT, "Failed to drain socket %d: %E", fd);
          }
          else if (bytes_drained > 0)
          {

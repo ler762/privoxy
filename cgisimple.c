@@ -1741,11 +1741,13 @@ jb_err cgi_show_url_final_info(struct client_state *csp,
    char body[] = \
 "<!DOCTYPE html><html lang=\"en\"><head><title>URL Block Info</title></head>\n"\
 "<body><table cellpadding=\"20\" cellspacing=\"10\" border=\"0\" width=\"100%\">\n"\
+"<!-- @if-url-given-start -->"\
 "<!-- @if-valid-url-start -->\n"\
 "<tr><td><h2>Final results:</h2>\n"\
 "<b>@final@</b>\n"\
 "</td></tr>\n"\
-"<!-- if-valid-url-end@ -->\n"\
+"<!-- if-valid-url-end@ -->"\
+"<!-- if-url-given-end@ -->\n"\
 "<tr><td><h2>Look up the actions for a URL:</h2>\n"\
 "<form method=\"GET\" action=\"@default-cgi@show-url-final-info\">\n"\
 "<input type=\"text\" name=\"url\" size=\"80\" value=\"@url@\"><input type=\"submit\" value=\"Go\">\n"\

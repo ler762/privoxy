@@ -818,19 +818,6 @@ support./(.*/)?track
 # URL = http://popplers5.bandcamp.com/download/track?enc=mp3-128&fsig=bad421a4c31dda49faceefb0f3923630&id=342903379&stream=1&ts=1355881937.0
 /.*download
 
-
-#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
-#MASTER# REMARKS: browsing home depot means you want ads
-# URL = www.homedepot.com/ad/foo
-.homedepot.com/
-#MASTER# REMARKS: browsing target means you want ads
-# URL = http://tgtfiles.target.com/adsyndication_everest/adengine.js
-.target.com/
-# URL = http://www.fepblue.org/fep/adv_doc_locate_v2.asp
-#MASTER# REMARKS: unintentionally blocked by  /(.*/)?ad(\?|/|s|v|_?(image|se?rv|box)|cycle|rotate|mentor|click|f[ra]m|script|stream|fetch|log|space)
-.fepblue.org/
-
-
 #----------------------------------------------------------------------------
 # Misc Web-bugs, JS and just plain Junk. Images here aren't normal images.
 #----------------------------------------------------------------------------

@@ -2292,7 +2292,7 @@ socket-timeout 300
 #          # Define a couple of tags, the described effect requires action sections
 #          # that are enabled based on CLIENT-TAG patterns.
 #          client-specific-tag circumvent-blocks Overrule blocks but do not affect other actions
-#          client-specific-tag disable-content-filters Disable content-filters but do not affect other actions
+#          disable-content-filters Disable content-filters but do not affect other actions
 #
 #  6.17. client-tag-lifetime
 #  ==========================
