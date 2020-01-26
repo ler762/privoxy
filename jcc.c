@@ -221,11 +221,11 @@ privoxy_mutex_t log_init_mutex;
 privoxy_mutex_t connection_reuse_mutex;
 
 #ifdef LIMIT_MUTEX_NUMBER
-   privoxy_mutex_t certificates_mutexes[32];
+privoxy_mutex_t certificates_mutexes[32];
 #else
-   privoxy_mutex_t certificates_mutexes[65536];
+privoxy_mutex_t certificates_mutexes[65536];
 #endif /* LIMIT_MUTEX_NUMBER */
-   privoxy_mutex_t rng_mutex;
+privoxy_mutex_t rng_mutex;
 
 #ifdef FEATURE_EXTERNAL_FILTERS
 privoxy_mutex_t external_filter_mutex;
@@ -3397,6 +3397,9 @@ static void handle_established_connection(struct client_state *csp)
             /* Buffer and pcrs filter this if appropriate. */
             buffer_and_filter_content = content_requires_filtering(csp);
 
+               if ( 0 && buffer_and_filter_content ) {                                                          /* LR */
+                  log_error(LOG_LEVEL_INFO, "buffer_and_filter_content set to %d", buffer_and_filter_content);  /* LR */
+               }                                                                                                /* LR */
             if (!buffer_and_filter_content)
             {
                /*
@@ -3491,7 +3494,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3494");                  /* LR */
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3497");                  /* LR */
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_FILTERING
       close_client_and_server_ssl_connections(csp);
