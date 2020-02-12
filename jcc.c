@@ -146,6 +146,7 @@ size_t prevReadSize = 0;
 
 unsigned int iosizeCounter[numIosizeCounters];
 unsigned int iosizeRunLen[numIosizeCounters];
+unsigned int iosizeRunLenMax[numIosizeCounters];
 char iosizeCounterDesc[numIosizeCounters][16] = {
      /*  0 -  9: x1,000 */
    {"      0-    999"},
@@ -4295,6 +4296,10 @@ static void serve(struct client_state *csp)
 
 /*
  *    don't check for action/filter file changes if processing cgi requests
+ *
+ *    XXX skip disk access only for show-url-final-info?
+ *        (ie. any_loaded_file_changed calling stat on all the config files)
+ *        or are other cgi calls expected to be called in a tight loop?
  */
       if (continue_chatting && !(csp->flags & CSP_FLAG_CRUNCHED) && any_loaded_file_changed(csp))
       {

@@ -1617,7 +1617,7 @@ if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
     if ( myCounters[x] > 0 ) {
       runningTotal += myCounters[x];
       percent = ((double)runningTotal / (double)total ) * 100.0;
-      sprintf(s, "%s: %10u   %6.2f  %10u", iosizeCounterDesc[x], myCounters[x], percent, iosizeRunLen[x]);
+      sprintf(s, "%s: %10u   %6.2f  %10u", iosizeCounterDesc[x], myCounters[x], percent, iosizeRunLenMax[x]);
       log_error(LOG_LEVEL_INFO, "%s", s);
     }
   }
@@ -1629,8 +1629,9 @@ if ( 1 ) { /* XXX: keep?  it's kind of nice dumping stats to the log */
               max_buffer_size = config->receive_buffer_size;
               sprintf(iosizeCounterDesc[numIosizeCounters - 1], "%15u", max_buffer_size);
                  /* set new max size in display */
-              memset(&iosizeCounter, 0, sizeof(iosizeCounter) );
-              memset(&iosizeRunLen, 0, sizeof(iosizeRunLen) );
+              memset(&iosizeCounter,   0, sizeof(iosizeCounter) );
+              memset(&iosizeRunLen,    0, sizeof(iosizeRunLen) );
+              memset(&iosizeRunLenMax, 0, sizeof(iosizeRunLenMax) );
               /* temp ??? */ log_error(LOG_LEVEL_INFO, "receive-buffer-size %d", max_buffer_size);
             }
 #endif /* FEATURE_STATISTICS */

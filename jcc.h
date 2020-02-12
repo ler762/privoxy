@@ -52,6 +52,7 @@ extern int urls_rejected;
    * sizes >= 1M.
    */
 extern unsigned int iosizeRunLen[numIosizeCounters];
+extern unsigned int iosizeRunLenMax[numIosizeCounters];
 extern unsigned int iosizeCounter[numIosizeCounters];
   /* XXX: is it reasonable to use 32 bit counters???
    * max 32bit unsigned int = 4294967295

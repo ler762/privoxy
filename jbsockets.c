@@ -691,8 +691,13 @@ void iosizeCounter_inc(int len ) {
   int x, samesize;
   if ( len < 0 ) return;
 
-  if ( len == prevReadSize ) { samesize = 1; }
-  else                       { samesize = 0; prevReadSize = len; }
+  if ( len == prevReadSize ) {
+     samesize = 1;
+  } else {
+     samesize = 0;
+     prevReadSize = len;
+     memset(&iosizeRunLen, 0, sizeof(iosizeRunLen) );
+  }
 
        if ( len >= max_buffer_size ) { x = numIosizeCounters - 1; }
   else if ( len <   10000 ) { x = (len /   1000) +  0; } /*  0- 9:       0-  9,999 x   1,000 */
@@ -701,6 +706,7 @@ void iosizeCounter_inc(int len ) {
   else /* wtf? */           { x = numIosizeCounters - 1; }
   iosizeCounter[x]++;
   if ( samesize ) iosizeRunLen[x]++;
+  if ( iosizeRunLen[x] > iosizeRunLenMax[x] ) iosizeRunLenMax[x] = iosizeRunLen[x];
 }
 #endif /* defined FEATURE_STATISTICS */
 
