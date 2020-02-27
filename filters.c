@@ -556,7 +556,7 @@ struct http_response *block_url(struct client_state *csp)
    {
       return cgi_error_memory();
    }
-   rsp->crunch_reason = NONE;   /* LR */
+   rsp->crunch_reason = NONE;
 
    /*
     * If it's an image-url, send back an image or redirect
@@ -644,7 +644,7 @@ struct http_response *block_url(struct client_state *csp)
           * if the "handle-as-empty-doc-returns-ok" runtime config option is set.
           */
          rsp->status = strdup_or_die("200 Request blocked by Privoxy");
-         rsp->crunch_reason = BLANKED;   /* LR */
+         rsp->crunch_reason = BLANKED;
       }
       else
       {

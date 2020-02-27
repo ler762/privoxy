@@ -210,7 +210,7 @@ void remember_connection(const struct reusable_connection *connection)
 
    if (!free_slot_found)
    {
-      log_error(LOG_LEVEL_ERROR,				/* LR was: LOG_LEVEL_CONNECT */
+      log_error(LOG_LEVEL_ERROR,
         "No free slots found to remember socket for %s:%d. Last slot %d.",
         connection->host, connection->port, slot);
       privoxy_mutex_unlock(&connection_reuse_mutex);

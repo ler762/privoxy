@@ -112,9 +112,10 @@
 #        user-manual  /usr/share/doc/privoxy/user-manual
 #
 #      The User Manual is then available to anyone with access to
-#      Privoxy, by following the built-in URL: http://
-#      config.privoxy.org/user-manual/ (or the shortcut: http://p.p/
-#      user-manual/).
+#      Privoxy, by following the built-in URL:
+#        http://config.privoxy.org/user-manual/
+#      or the shortcut:
+#        http://p.p/user-manual/
 #
 #      If the documentation is not on the local system, it can be
 #      accessed from a remote server, as:
@@ -462,8 +463,8 @@ filterfile user.filter      # User customizations
 #
 #      Depending on the debug options below, the logfile may be a
 #      privacy risk if third parties can get access to it. As most
-#      users will never look at it, Privoxy only logs fatal errors by
-#      default.
+#      users will never look at it, Privoxy only logs fatal errors
+#      by default.
 #
 #      For most troubleshooting purposes, you will have to change
 #      that, please refer to the debugging section for details.
@@ -556,8 +557,7 @@ logfile logfile
 #
 #  Default value:
 #
-#      0 (i.e.: only fatal errors (that cause Privoxy to exit) are
-#      logged)
+#      0 (i.e.: only fatal errors (that cause Privoxy to exit) are logged)
 #
 #  Effect if unset:
 #
@@ -591,7 +591,7 @@ logfile logfile
 #      each request as it happens. 1, 1024, 4096 and 8192 are
 #      recommended so that you will notice when things go wrong. The
 #      other levels are probably only of interest if you are hunting
-#      down a specific problem. They can produce a hell of an output
+#      down a specific problem. They can produce a lot of output
 #      (especially 16).
 #
 #      If you are used to the more verbose settings, simply enable
@@ -763,8 +763,8 @@ logfile logfile
 #      consider using access control lists (ACL's, see below), and/or
 #      a firewall.
 #
-#      If you open Privoxy to untrusted users, you will also want to
-#      make sure that the following actions are disabled:
+#      If you open Privoxy to untrusted users, you should also make
+#      sure that the following actions are disabled:
 #      enable-edit-actions and enable-remote-toggle
 #
 #  Example:
@@ -1311,8 +1311,7 @@ enable-proxy-authentication-forwarding 0
 #      denote "all URLs". http_parent[:port] is the DNS name or IP
 #      address of the parent HTTP proxy through which the requests
 #      should be forwarded, optionally followed by its listening port
-#      (default: 8000). Use a single dot (.) to denote "no
-#      forwarding".
+#      (default: 8000). Use a single dot (.) to denote "no forwarding".
 #
 #  Default value:
 #
@@ -1830,11 +1829,11 @@ tolerate-pipelining 1
 #      speedups. There are also a few privacy implications you should
 #      be aware of.
 #
-#      If this option is effective, outgoing connections are shared
+#      If this option is enabled, outgoing connections are shared
 #      between clients (if there are more than one) and closing the
-#      browser that initiated the outgoing connection does no longer
-#      affect the connection between Privoxy and the server unless
-#      the client's request hasn't been completed yet.
+#      browser that initiated the outgoing connection does not affect
+#      the connection between Privoxy and the server unless the
+#      client's request hasn't been completed yet.
 #
 #      If the outgoing connection is idle, it will not be closed
 #      until either Privoxy's or the server's timeout is reached.

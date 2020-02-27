@@ -212,6 +212,17 @@
         </p>
       </td>
     </tr>
+    <tr>
+      <td class="box">
+        <h2>TCP read buffer size statistics:</h2>
+        <p>
+        </p>
+<pre>
+         Range        count    cum %  run length
+@ioSizeCounters@
+</pre>
+      </td>
+    </tr>
 <!-- if-statistics-end@ -->
 
     <tr>

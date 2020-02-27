@@ -785,9 +785,9 @@ static const char *crunch_reason(const struct http_response *rsp)
       case NO_SERVER_DATA:
          reason = "No server data received";
          break;
-      case BLANKED:              /* LR */
-         reason = "Blanked";     /* LR */
-         break;                  /* LR */
+      case BLANKED:
+         reason = "Blanked";
+         break;
       default:
          reason = "No reason recorded";
          break;
@@ -884,7 +884,7 @@ static void send_crunch_response(struct client_state *csp, struct http_response 
                  (const unsigned char *)rsp->body, rsp->content_length) < 0))
          {
             /* There is nothing we can do about it. */
-            log_error(LOG_LEVEL_ERROR, "Couldn't deliver the error message "	/* LR was: LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR, "Couldn't deliver the error message "
                "for %s through client socket %d using TLS/SSL",
                http->url, csp->cfd);
          }
@@ -898,7 +898,7 @@ static void send_crunch_response(struct client_state *csp, struct http_response 
                 get_write_delay(csp)))
          {
             /* There is nothing we can do about it. */
-            log_error(LOG_LEVEL_ERROR,						/* LR was: LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,
                "Couldn't deliver the error message for %s through client socket %d: %E",
                http->url, csp->cfd);
          }
@@ -1392,7 +1392,7 @@ static char *get_request_line(struct client_state *csp)
       {
          if (socket_is_still_alive(csp->cfd))
          {
-            log_error(LOG_LEVEL_INFO,            /* LR ** was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_INFO,
                "No request line on socket %d received in time. Timeout: %d.",
                csp->cfd, csp->config->socket_timeout);
             write_socket_delayed(csp->cfd, CLIENT_CONNECTION_TIMEOUT_RESPONSE,
@@ -1401,26 +1401,21 @@ static char *get_request_line(struct client_state *csp)
          }
          else
          {
-            log_error(LOG_LEVEL_ERROR,            /* LR ** was LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,
                "The client side of the connection on socket %d got "
                "closed without sending a complete request line.", csp->cfd);
-            len = (int)(csp->client_iob->cur - csp->client_iob->buf);       /* LR */
-            if ( len > 0 ) {                                                /* LR */
-               log_error(LOG_LEVEL_INFO,                                    /* LR */
-                         "Client request: %N", len, csp->client_iob->buf);  /* LR */
-            }                                                               /* LR */
          }
          return NULL;
       }
 
       len = read_socket(csp->cfd, buf, sizeof(buf) - 1);
 
-      /* LR was: if (len <= 0) return NULL;                          LR */
-      if (len <= 0) {                                             /* LR */
-         log_error(LOG_LEVEL_IO,                                  /* LR */
-                   "read_socket %d returned %d", csp->cfd, len);  /* LR */
-         return NULL;                                             /* LR */
-      }                                                           /* LR */
+      if (len <= 0)
+      {
+         log_error(LOG_LEVEL_IO,
+                   "read_socket %d returned %d", csp->cfd, len);
+         return NULL;
+      }
 
       /*
        * If there is no memory left for buffering the
@@ -2039,14 +2034,14 @@ static int send_http_request(struct client_state *csp)
 
    if (write_failure)
    {
-      log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",	/* LR was: LOG_LEVEL_CONNECT */
+      log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",
          csp->http->hostport);
    }
    else if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
       && (flush_iob(csp->server_connection.sfd, csp->client_iob, 0) < 0))
    {
       write_failure = 1;
-      log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",	/* LR was: LOG_LEVEL_CONNECT */
+      log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",
          csp->http->hostport);
    }
 
@@ -2662,7 +2657,7 @@ static void handle_established_connection(struct client_state *csp)
              * available on the socket, the client went fishing
              * and continuing talking to the server makes no sense.
              */
-            log_error(LOG_LEVEL_ERROR,                      /* LR was: LOG_LEVEL_CONNECT */
+            log_error(LOG_LEVEL_ERROR,
                "The client closed socket %d while the server socket %d is still open.",
                csp->cfd, csp->server_connection.sfd);
             mark_server_socket_tainted(csp);
@@ -2696,9 +2691,9 @@ static void handle_established_connection(struct client_state *csp)
 
             if (len <= 0)
             {
-               log_error(LOG_LEVEL_IO,                                                        /* LR */
-                  "read_socket(csp->cfd, buf, max_bytes_to_read) returned %d for socket %d",  /* LR */
-                  len, csp->cfd);                                                             /* LR */
+               log_error(LOG_LEVEL_IO,
+                  "read_socket(csp->cfd, buf, max_bytes_to_read) returned %d for socket %d",
+                  len, csp->cfd);
                mark_server_socket_tainted(csp);
                break;
             }
@@ -2723,9 +2718,9 @@ static void handle_established_connection(struct client_state *csp)
             if (len <= 0)
             {
                /* XXX: not sure if this is necessary. */
-               log_error(LOG_LEVEL_IO,                                                        /* LR */
-                  "read_socket(csp->cfd, buf, max_bytes_to_read) returned %d for socket %d",  /* LR */
-                  len, csp->cfd);                                                             /* LR */
+               log_error(LOG_LEVEL_IO,
+                  "read_socket(csp->cfd, buf, max_bytes_to_read) returned %d for socket %d",
+                  len, csp->cfd);
                mark_server_socket_tainted(csp);
                break; /* "game over, man" */
             }
@@ -2784,11 +2779,11 @@ static void handle_established_connection(struct client_state *csp)
          {
 #ifdef _WIN32
             log_error(LOG_LEVEL_CONNECT,
-               "The server still wants to talk, but client socket %d might have hung up on us.", csp->cfd); /* LR */
+               "The server still wants to talk, but client socket %d might have hung up on us.", csp->cfd);
                /* LR  work on socket_is_still_usable - it'd be nice not to special-case win32 */
 #else
             log_error(LOG_LEVEL_CONNECT,
-               "The server still wants to talk, but client socket %d hung up on us.", csp->cfd); /* LR */
+               "The server still wants to talk, but client socket %d hung up on us.", csp->cfd);
             mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_FILTERING
             close_client_and_server_ssl_connections(csp);
@@ -2860,7 +2855,7 @@ static void handle_established_connection(struct client_state *csp)
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
          if (csp->flags & CSP_FLAG_CHUNKED)
          {
-            log_error(LOG_LEVEL_IO, "Chunked response len: %d", len);  /* LR - add log entry */
+            log_error(LOG_LEVEL_IO, "Chunked response len: %d", len);
 
             if ((len >= 5) && !memcmp(csp->receive_buffer+len-5, "0\r\n\r\n", 5))
             {
@@ -2937,16 +2932,8 @@ static void handle_established_connection(struct client_state *csp)
                   if (NULL == p)
                   {
                      csp->content_length = (size_t)(csp->iob->eod - csp->iob->cur);
-                     log_error(LOG_LEVEL_CONNECT,                                                /* LR */
-                               "No matches in content filters: len=%llu", csp->content_length);  /* LR */
-                   if ( 0 ) {                                                                    /* LR */
-                     if ( (csp->content_length > 0) && (csp->iob->buf != NULL) ) {               /* LR  dump contents of buffer */
-                        log_error(LOG_LEVEL_CONNECT,                                             /* LR */
-                                  "content: %N", (int)csp->content_length, csp->iob->buf );      /* LR */
-                           /* LR  %N Takes 2 parameters: int length, const char * string            LR */
-                     }                                                                           /* LR */
-                   }                                                                             /* LR */
-
+                     log_error(LOG_LEVEL_CONNECT,
+                               "No matches in content filters: len=%llu", csp->content_length);
                   }
 #ifdef FEATURE_COMPRESSION
                   else if ((csp->flags & CSP_FLAG_CLIENT_SUPPORTS_DEFLATE)
@@ -3100,7 +3087,7 @@ static void handle_established_connection(struct client_state *csp)
                         || (ssl_send_data(&(csp->mbedtls_client_attr.ssl),
                               (const unsigned char *)csp->receive_buffer, (size_t)len) < 0))
                      {
-                        log_error(LOG_LEVEL_ERROR,			/* LR : was LOG_LEVEL_CONNECT */
+                        log_error(LOG_LEVEL_ERROR,
                            "Flush header and buffers to client failed");
                         freez(hdr);
                         mark_server_socket_tainted(csp);
@@ -3116,7 +3103,7 @@ static void handle_established_connection(struct client_state *csp)
                       || write_socket_delayed(csp->cfd, csp->receive_buffer, (size_t)len,
                             write_delay))
                      {
-                        log_error(LOG_LEVEL_ERROR,			/* LR : was LOG_LEVEL_CONNECT */
+                        log_error(LOG_LEVEL_ERROR,
                            "Flush header and buffers to client failed: %E");
                         freez(hdr);
                         mark_server_socket_tainted(csp);
@@ -3398,9 +3385,6 @@ static void handle_established_connection(struct client_state *csp)
             /* Buffer and pcrs filter this if appropriate. */
             buffer_and_filter_content = content_requires_filtering(csp);
 
-               if ( 0 && buffer_and_filter_content ) {                                                          /* LR */
-                  log_error(LOG_LEVEL_INFO, "buffer_and_filter_content set to %d", buffer_and_filter_content);  /* LR */
-               }                                                                                                /* LR */
             if (!buffer_and_filter_content)
             {
                /*
@@ -3495,15 +3479,15 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3497");                  /* LR */
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3485");
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_FILTERING
       close_client_and_server_ssl_connections(csp);
 #endif
       return; /* huh? we should never get here */
    }
-   log_error(LOG_LEVEL_CONNECT, "jcc.c end for (;;) content_length=%llu byte_count=%llu",  /* LR */
-             csp->content_length, byte_count);                                             /* LR */
+   log_error(LOG_LEVEL_CONNECT, "jcc.c end for (;;) content_length=%llu byte_count=%llu",
+             csp->content_length, byte_count);
 
 #ifdef FEATURE_HTTPS_FILTERING
    close_client_and_server_ssl_connections(csp);
@@ -3521,7 +3505,7 @@ static void handle_established_connection(struct client_state *csp)
    if ((csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
       && (csp->expected_content_length != byte_count))
    {
-      log_error(LOG_LEVEL_ERROR,			/* LR was: LOG_LEVEL_CONNECT */
+      log_error(LOG_LEVEL_ERROR,
          "Received %llu bytes while expecting %llu.",
          byte_count, csp->expected_content_length);
       mark_server_socket_tainted(csp);
@@ -4305,7 +4289,7 @@ static void serve(struct client_state *csp)
       {
          continue_chatting = 0;
          config_file_change_detected = 1;
-         log_error(LOG_LEVEL_CONNECT, "continue_chatting cleared, config_file_change_detected set"); /* -LR- */
+         log_error(LOG_LEVEL_CONNECT, "continue_chatting cleared, config_file_change_detected set");
       }
 
       if (continue_chatting)
@@ -5489,7 +5473,7 @@ static void listen_loop(void)
       if ((0 != config->max_client_connections)
          && (active_threads >= config->max_client_connections))
       {
-         log_error(LOG_LEVEL_ERROR,				/* LR was: LOG_LEVEL_CONNECT */
+         log_error(LOG_LEVEL_ERROR,
             "Rejecting connection from %s. Maximum number of connections reached.",
             csp->ip_addr_str);
          write_socket_delayed(csp->cfd, TOO_MANY_CONNECTIONS_RESPONSE,
@@ -5524,7 +5508,7 @@ static void listen_loop(void)
          }
 #endif
 
-#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(SELECTED_ONE_OPTION)
+#if defined(_WIN32) && !defined(SELECTED_ONE_OPTION)
 #define SELECTED_ONE_OPTION
          child_id = _beginthread(
             (void (*)(void *))serve,

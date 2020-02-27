@@ -573,7 +573,7 @@
               <p>A debug level of 1 is informative because it will show you each request as it happens. <span class=
               "emphasis"><i class="EMPHASIS">1, 1024, 4096 and 8192 are recommended</i></span> so that you will notice
               when things go wrong. The other levels are probably only of interest if you are hunting down a specific
-              problem. They can produce a hell of an output (especially 16).</p>
+              problem. They can produce a lot of output (especially 16).</p>
               <p>If you are used to the more verbose settings, simply enable the debug lines below again.</p>
               <p>If you want to use pure CLF (Common Log Format), you should set <span class="QUOTE">"debug 512"</span>
               <span class="emphasis"><i class="EMPHASIS">ONLY</i></span> and not enable anything else.</p>
@@ -689,7 +689,9 @@
               <p>If the address for the hostname isn't already known on the system (for example because it's in
               /etc/hostname), this may result in DNS traffic.</p>
               <p>If the specified address isn't available on the system, or if the hostname can't be resolved,
-              <span class="APPLICATION">Privoxy</span> will fail to start.</p>
+              <span class="APPLICATION">Privoxy</span> will fail to start. On GNU/Linux, and other platforms that can
+              listen on not yet assigned IP addresses, Privoxy will start and will listen on the specified address
+              whenever the IP address is assigned to the system</p>
               <p>IPv6 addresses containing colons have to be quoted by brackets. They can only be used if <span class=
               "APPLICATION">Privoxy</span> has been compiled with IPv6 support. If you aren't sure if your version
               supports it, have a look at <tt class="LITERAL">http://config.privoxy.org/show-status</tt>.</p>
@@ -705,8 +707,8 @@
               behaves differently.</p>
               <p>If you configure <span class="APPLICATION">Privoxy</span> to be reachable from the network, consider
               using <a href="config.html#ACLS">access control lists</a> (ACL's, see below), and/or a firewall.</p>
-              <p>If you open <span class="APPLICATION">Privoxy</span> to untrusted users, you will also want to make
-              sure that the following actions are disabled: <tt class="LITERAL"><a href=
+              <p>If you open <span class="APPLICATION">Privoxy</span> to untrusted users, you should also make sure
+              that the following actions are disabled: <tt class="LITERAL"><a href=
               "config.html#ENABLE-EDIT-ACTIONS">enable-edit-actions</a></tt> and <tt class="LITERAL"><a href=
               "config.html#ENABLE-REMOTE-TOGGLE">enable-remote-toggle</a></tt></p>
             </dd>
@@ -1834,8 +1836,8 @@
             <dd>
               <p>Note that reusing connections doesn't necessary cause speedups. There are also a few privacy
               implications you should be aware of.</p>
-              <p>If this option is effective, outgoing connections are shared between clients (if there are more than
-              one) and closing the browser that initiated the outgoing connection does no longer affect the connection
+              <p>If this option is enabled, outgoing connections are shared between clients (if there are more than
+              one) and closing the browser that initiated the outgoing connection does not affect the connection
               between <span class="APPLICATION">Privoxy</span> and the server unless the client's request hasn't been
               completed yet.</p>
               <p>If the outgoing connection is idle, it will not be closed until either <span class=
