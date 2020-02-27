@@ -9,7 +9,7 @@
  *                (though it does declare some macros).
  *
  * Copyright   :  Written by and Copyright (C) 2001-2014 the
- *                Privoxy team. http://www.privoxy.org/
+ *                Privoxy team. https://www.privoxy.org/
  *
  *                Based on the Internet Junkbuster originally written
  *                by and Copyright (C) 1997 Anonymous Coders and
@@ -44,7 +44,7 @@
 /* Needed for pcre choice */
 #include "config.h"
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
 #ifdef FEATURE_PTHREAD
 #  include <pthread.h>
    typedef pthread_mutex_t privoxy_mutex_t;
@@ -287,7 +287,7 @@ struct map
    struct map_entry *last;
 };
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
 /*
  * Struct of attributes necessary for TLS/SSL connection
  */
@@ -337,7 +337,7 @@ struct http_request
    int    dcount;  /**< How many parts to this domain? (length of dvec)   */
 #endif /* ndef FEATURE_EXTENDED_HOST_PATTERNS */
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
    int client_ssl;                                                  /**< Flag if we should comunicate with slient over ssl   */
    int server_ssl;                                                  /**< Flag if we should comunicate with server over ssl   */
    unsigned char hash_of_host_hex[(HASH_OF_HOST_BUF_SIZE * 2) + 1]; /**< chars for hash in hex string and one for '\0'       */
@@ -346,7 +346,7 @@ struct http_request
 };
 
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
 /*
  * If this macro is defined, mutexes count for generating
  * private keys is changed from 65536 to 32.
@@ -574,8 +574,8 @@ struct iob
 #define ACTION_LIMIT_COOKIE_LIFETIME                 0x08000000UL
 /** Action bitmap: Delay writes */
 #define ACTION_DELAY_RESPONSE                        0x10000000UL
-/** Action bitmap: Turn https filtering on */
-#define ACTION_ENABLE_HTTPS_FILTER                   0x20000000UL
+/** Action bitmap: Turn https inspection on */
+#define ACTION_HTTPS_INSPECTION                      0x20000000UL
 /** Action bitmap: Turn certificates verification off */
 #define ACTION_IGNORE_CERTIFICATE_ERRORS             0x40000000UL
 
@@ -1022,7 +1022,7 @@ struct client_state
    /* XXX: should be renamed to server_iob */
    struct iob iob[1];
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
    mbedtls_connection_attr  mbedtls_server_attr; /* attributes for connection to server */
    mbedtls_connection_attr  mbedtls_client_attr; /* attributes for connection to client */
 #endif
@@ -1039,7 +1039,7 @@ struct client_state
    /** List of all headers for this request */
    struct list headers[1];
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
    /** List of all encrypted headers for this request */
    struct list https_headers[1];
 #endif
@@ -1095,7 +1095,7 @@ struct client_state
     */
    char *error_message;
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
    /* Result of server certificate verification */
    uint32_t server_cert_verification_result;
 
@@ -1540,7 +1540,7 @@ struct configuration_spec
    /** Nonzero if we need to bind() to the new port. */
    int need_bind;
 
-#ifdef FEATURE_HTTPS_FILTERING
+#ifdef FEATURE_HTTPS_INSPECTION
    /** Password for proxy ca file **/
    char * ca_password;
 
