@@ -146,7 +146,7 @@ int g_terminate = 0;
 #if !defined(_WIN32) && !defined(__OS2__)
 static void sig_handler(int the_signal);
 #endif
-static int client_protocol_is_unsupported(const struct client_state *csp, char *req);
+static int client_protocol_is_unsupported(struct client_state *csp, char *req);
 static jb_err get_request_destination_elsewhere(struct client_state *csp, struct list *headers);
 static jb_err get_server_headers(struct client_state *csp);
 static const char *crunch_reason(const struct http_response *rsp);
@@ -193,12 +193,10 @@ privoxy_mutex_t log_mutex;
 privoxy_mutex_t log_init_mutex;
 privoxy_mutex_t connection_reuse_mutex;
 
-#ifdef LIMIT_MUTEX_NUMBER
-privoxy_mutex_t certificates_mutexes[32];
-#else
-privoxy_mutex_t certificates_mutexes[65536];
-#endif /* LIMIT_MUTEX_NUMBER */
+#ifdef FEATURE_HTTPS_INSPECTION
+privoxy_mutex_t certificate_mutex;
 privoxy_mutex_t rng_mutex;
+#endif
 
 #ifdef FEATURE_EXTERNAL_FILTERS
 privoxy_mutex_t external_filter_mutex;
@@ -447,7 +445,7 @@ static unsigned int get_write_delay(const struct client_state *csp)
  *                FALSE if the request doesn't look invalid.
  *
  *********************************************************************/
-static int client_protocol_is_unsupported(const struct client_state *csp, char *req)
+static int client_protocol_is_unsupported(struct client_state *csp, char *req)
 {
    /*
     * If it's a FTP or gopher request, we don't support it.
@@ -483,8 +481,19 @@ static int client_protocol_is_unsupported(const struct client_state *csp, char *
       log_error(LOG_LEVEL_CLF,
          "%s - - [%T] \"%s\" 400 0", csp->ip_addr_str, req);
       freez(req);
-      write_socket_delayed(csp->cfd, response, strlen(response),
-         get_write_delay(csp));
+
+#ifdef FEATURE_HTTPS_INSPECTION
+      if (client_use_ssl(csp))
+      {
+         ssl_send_data(&(csp->mbedtls_client_attr.ssl),
+            (const unsigned char *)response, strlen(response));
+      }
+      else
+#endif
+      {
+         write_socket_delayed(csp->cfd, response, strlen(response),
+            get_write_delay(csp));
+      }
 
       return TRUE;
    }
@@ -2030,12 +2039,23 @@ static int send_http_request(struct client_state *csp)
  *********************************************************************/
 static jb_err receive_and_send_encrypted_post_data(struct client_state *csp)
 {
-   unsigned char buf[BUFFER_SIZE];
-   int len;
+   int content_length_known = csp->expected_client_content_length != 0;
 
    while (is_ssl_pending(&(csp->mbedtls_client_attr.ssl)))
    {
-      len = ssl_recv_data(&(csp->mbedtls_client_attr.ssl), buf, sizeof(buf));
+      unsigned char buf[BUFFER_SIZE];
+      int len;
+      int max_bytes_to_read = sizeof(buf);
+
+      if (content_length_known && csp->expected_client_content_length < sizeof(buf))
+      {
+         max_bytes_to_read = (int)csp->expected_client_content_length;
+      }
+      log_error(LOG_LEVEL_CONNECT,
+         "Waiting for up to %d bytes of POST data from the client.",
+         max_bytes_to_read);
+      len = ssl_recv_data(&(csp->mbedtls_client_attr.ssl), buf,
+         (unsigned)max_bytes_to_read);
       if (len == -1)
       {
          return 1;
@@ -2057,6 +2077,11 @@ static jb_err receive_and_send_encrypted_post_data(struct client_state *csp)
          if (csp->expected_client_content_length >= len)
          {
             csp->expected_client_content_length -= (unsigned)len;
+         }
+         if (csp->expected_client_content_length == 0)
+         {
+            log_error(LOG_LEVEL_HEADER, "Forwarded the last %d bytes", len);
+            break;
          }
       }
    }
@@ -2109,7 +2134,6 @@ static int send_https_request(struct client_state *csp)
          "Failed sending encrypted request headers to: %s: %E",
          csp->http->hostport);
       mark_server_socket_tainted(csp);
-      close_client_and_server_ssl_connections(csp);
       return 1;
    }
 
@@ -2231,6 +2255,8 @@ static jb_err process_encrypted_request(struct client_state *csp)
    if (err != JB_ERR_OK)
    {
       /* XXX: Also used for JB_ERR_MEMORY */
+      log_error(LOG_LEVEL_ERROR, "Failed to receive encrypted request: %s",
+         jb_err_to_string(err));
       ssl_send_data(&(csp->mbedtls_client_attr.ssl),
          (const unsigned char *)CHEADER, strlen(CHEADER));
       return err;
@@ -2240,6 +2266,7 @@ static jb_err process_encrypted_request(struct client_state *csp)
    request_line = get_header(csp->client_iob);
    if (request_line == NULL)
    {
+      log_error(LOG_LEVEL_ERROR, "Failed to get the encrypted request line");
       ssl_send_data(&(csp->mbedtls_client_attr.ssl),
          (const unsigned char *)CHEADER, strlen(CHEADER));
       return JB_ERR_PARSE;
@@ -2248,8 +2275,11 @@ static jb_err process_encrypted_request(struct client_state *csp)
 
    if (client_protocol_is_unsupported(csp, request_line))
    {
-      ssl_send_data(&(csp->mbedtls_client_attr.ssl),
-         (const unsigned char *)CHEADER, strlen(CHEADER));
+      /*
+       * If the protocol is unsupported we're done here.
+       * client_protocol_is_unsupported() took care of sending
+       * the error response and logging the error message.
+       */
       return JB_ERR_PARSE;
    }
 
@@ -2303,6 +2333,8 @@ static jb_err process_encrypted_request(struct client_state *csp)
        * Our attempts to get the request destination
        * elsewhere failed.
        */
+      log_error(LOG_LEVEL_ERROR,
+         "Failed to get the encrypted request destination");
       ssl_send_data(&(csp->mbedtls_client_attr.ssl),
          (const unsigned char *)CHEADER, strlen(CHEADER));
       return JB_ERR_PARSE;
@@ -2395,13 +2427,6 @@ static void handle_established_connection(struct client_state *csp)
    int ret = 0;
    int use_ssl_tunnel = 0;
    csp->dont_verify_certificate = 0;
-
-   /*
-    * Preset flags informing if SSL connections with server or client
-    * are opened or closed
-    */
-   csp->ssl_with_server_is_opened = 0;
-   csp->ssl_with_client_is_opened = 0;
 
    if (csp->http->ssl && !(csp->action->flags & ACTION_HTTPS_INSPECTION))
    {
@@ -2514,114 +2539,62 @@ static void handle_established_connection(struct client_state *csp)
       }
 #endif  /* FEATURE_CONNECTION_KEEP_ALIVE */
 
-#ifdef FEATURE_HTTPS_INSPECTION
-      /*
-       * Test if some data from client or destination server are pending
-       * on TLS/SSL. We must work with them preferably. TLS/SSL data can
-       * be pending because of maximal fragment size.
-       */
-      int read_ssl_server = 0;
-      int read_ssl_client = 0;
-
-      if (client_use_ssl(csp))
-      {
-         read_ssl_client = is_ssl_pending(&(csp->mbedtls_client_attr.ssl)) != 0;
-      }
-
-      if (server_use_ssl(csp))
-      {
-         read_ssl_server = is_ssl_pending(&(csp->mbedtls_server_attr.ssl)) != 0;
-      }
-
-      if (!read_ssl_server && !read_ssl_client)
-#endif
-      {
 #ifdef HAVE_POLL
-         poll_fds[0].fd = csp->cfd;
+      poll_fds[0].fd = csp->cfd;
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
-         if (!watch_client_socket)
-         {
-            /*
-             * Ignore incoming data, but still watch out
-             * for disconnects etc. These flags are always
-             * implied anyway but explicitly setting them
-             * doesn't hurt.
-             */
-            poll_fds[0].events = POLLERR|POLLHUP;
-         }
-         else
+      if (!watch_client_socket)
+      {
+         /*
+          * Ignore incoming data, but still watch out
+          * for disconnects etc. These flags are always
+          * implied anyway but explicitly setting them
+          * doesn't hurt.
+          */
+         poll_fds[0].events = POLLERR|POLLHUP;
+      }
+      else
 #endif
-         {
-            poll_fds[0].events = POLLIN;
-         }
-         poll_fds[1].fd = csp->server_connection.sfd;
-         poll_fds[1].events = POLLIN;
-         n = poll(poll_fds, 2, csp->config->socket_timeout * 1000);
+      {
+         poll_fds[0].events = POLLIN;
+      }
+      poll_fds[1].fd = csp->server_connection.sfd;
+      poll_fds[1].events = POLLIN;
+      n = poll(poll_fds, 2, csp->config->socket_timeout * 1000);
 #else
-         timeout.tv_sec = csp->config->socket_timeout;
-         timeout.tv_usec = 0;
-         n = select((int)maxfd + 1, &rfds, NULL, NULL, &timeout);
+      timeout.tv_sec = csp->config->socket_timeout;
+      timeout.tv_usec = 0;
+      n = select((int)maxfd + 1, &rfds, NULL, NULL, &timeout);
 #endif /* def HAVE_POLL */
 
-         /*server or client not responding in timeout */
-         if (n == 0)
-         {
-            log_error(LOG_LEVEL_CONNECT, "Socket timeout %d reached: %s",
-               csp->config->socket_timeout, http->url);
-            if ((byte_count == 0) && (http->ssl == 0))
-            {
-               send_crunch_response(csp, error_response(csp, "connection-timeout"));
-            }
-            mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-            close_client_and_server_ssl_connections(csp);
-#endif
-            return;
-         }
-         else if (n < 0)
-         {
-#ifdef HAVE_POLL
-            log_error(LOG_LEVEL_ERROR, "poll() failed!: %E");
-#else
-            log_error(LOG_LEVEL_ERROR, "select() failed!: %E");
-#endif
-            mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-            close_client_and_server_ssl_connections(csp);
-#endif
-            return;
-         }
-      }
-#ifdef FEATURE_HTTPS_INSPECTION
-      else
+      /*server or client not responding in timeout */
+      if (n == 0)
       {
-         /* set FD if some data are pending on TLS/SSL connections */
-#ifndef HAVE_POLL
-         FD_ZERO(&rfds);
-#endif
-         if (read_ssl_client)
+         log_error(LOG_LEVEL_CONNECT, "Socket timeout %d reached: %s",
+            csp->config->socket_timeout, http->url);
+         if ((byte_count == 0) && (http->ssl == 0))
          {
-#ifdef HAVE_POLL
-            poll_fds[0].fd = csp->cfd;
-            poll_fds[0].events = POLLIN;
-#else
-            FD_SET(csp->cfd, &rfds);
-#endif
-            n++;
+            send_crunch_response(csp, error_response(csp, "connection-timeout"));
          }
-
-         if (read_ssl_server)
-         {
-#ifdef HAVE_POLL
-            poll_fds[1].fd = csp->server_connection.sfd;
-            poll_fds[1].events = POLLIN;
-#else
-            FD_SET(csp->server_connection.sfd, &rfds);
+         mark_server_socket_tainted(csp);
+#ifdef FEATURE_HTTPS_INSPECTION
+         close_client_and_server_ssl_connections(csp);
 #endif
-            n++;
-         }
+         return;
       }
+      else if (n < 0)
+      {
+#ifdef HAVE_POLL
+         log_error(LOG_LEVEL_ERROR, "poll() failed!: %E");
+#else
+         log_error(LOG_LEVEL_ERROR, "select() failed!: %E");
 #endif
+         mark_server_socket_tainted(csp);
+#ifdef FEATURE_HTTPS_INSPECTION
+         close_client_and_server_ssl_connections(csp);
+#endif
+         return;
+      }
+
       /*
        * This is the body of the browser's request,
        * just read and write it.
@@ -2757,9 +2730,6 @@ static void handle_established_connection(struct client_state *csp)
             {
                log_error(LOG_LEVEL_ERROR, "write to: %s failed: %E", http->host);
                mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-               close_client_and_server_ssl_connections(csp);
-#endif
                return;
             }
          }
@@ -3000,9 +2970,6 @@ static void handle_established_connection(struct client_state *csp)
                         freez(hdr);
                         freez(p);
                         mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-                        close_client_and_server_ssl_connections(csp);
-#endif
                         return;
                      }
                   }
@@ -3106,9 +3073,6 @@ static void handle_established_connection(struct client_state *csp)
                            "Flush header and buffers to client failed: %E");
                         freez(hdr);
                         mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-                        close_client_and_server_ssl_connections(csp);
-#endif
                         return;
                      }
                   }
@@ -3151,9 +3115,6 @@ static void handle_established_connection(struct client_state *csp)
                   {
                      log_error(LOG_LEVEL_ERROR, "write to client failed: %E");
                      mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-                     close_client_and_server_ssl_connections(csp);
-#endif
                      return;
                   }
                }
@@ -3428,9 +3389,6 @@ static void handle_established_connection(struct client_state *csp)
                       */
                      freez(hdr);
                      mark_server_socket_tainted(csp);
-#ifdef FEATURE_HTTPS_INSPECTION
-                     close_client_and_server_ssl_connections(csp);
-#endif
                      return;
                   }
                }
@@ -3818,6 +3776,9 @@ static void chat(struct client_state *csp)
           * client body in the buffer (if there is one) and to
           * continue parsing the bytes that follow.
           */
+#ifdef FEATURE_HTTPS_INSPECTION
+         close_client_ssl_connection(csp);
+#endif
          drain_and_close_socket(csp->cfd);
          csp->cfd = JB_INVALID_SOCKET;
 
@@ -3968,6 +3929,7 @@ static void chat(struct client_state *csp)
                   {
                      send_crunch_response(csp, rsp);
                   }
+                  close_client_and_server_ssl_connections(csp);
                   return;
                }
             }
@@ -4590,17 +4552,10 @@ static void initialize_mutexes(void)
     * Prepare global mutex semaphores
     */
 
-#ifdef LIMIT_MUTEX_NUMBER
-   int i = 0;
-   for (i = 0; i < 32; i++)
-#else
-   int i = 0;
-   for (i = 0; i < 65536; i++)
-#endif /* LIMIT_MUTEX_NUMBER */
-   {
-      privoxy_mutex_init(&(certificates_mutexes[i]));
-   }
+#ifdef FEATURE_HTTPS_INSPECTION
+   privoxy_mutex_init(&certificate_mutex);
    privoxy_mutex_init(&rng_mutex);
+#endif
 
    privoxy_mutex_init(&log_mutex);
    privoxy_mutex_init(&log_init_mutex);
