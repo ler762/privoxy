@@ -2501,8 +2501,8 @@ socket-timeout 300
 #      Privoxy clients should import the certificate so that they can
 #      validate the generated certificates.
 #
-#      The file can be generated with: openssl req -new -x509
-#      -extensions v3_ca -keyout cakey.pem -out cacert.crt -days 3650
+#      The file can be generated with:
+#      openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.crt -days 3650
 #
 #  Examples:
 #
