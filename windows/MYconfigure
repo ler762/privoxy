@@ -110,7 +110,16 @@ CFLAGS="${CFLAGS} -Wshadow"
 
 # CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
 
+# mbed-tls location
+MBEDLIB="../../mbedtls-2.16.6/library"
+MBEDINC="../../mbedtls-2.16.6/include"
+
+LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
+export CPPFLAGS="-I${MBEDINC}"
+
+###
 echo "CFLAGS=${CFLAGS}"
+echo "CPPFLAGS=${CPPFLAGS}"
 echo "LDFLAGS=${LDFLAGS}"
 
 # ./configure cross-compilation options:
@@ -122,7 +131,7 @@ echo "LDFLAGS=${LDFLAGS}"
              --enable-static-linking \
              --enable-strptime-sanity-checks \
              --disable-pthread  --disable-dynamic-pcre \
-             --without-mbedtls \
+             --with-mbedtls \
              --with-docbook=yes
 
 #  -- done --
