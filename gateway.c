@@ -1217,7 +1217,7 @@ static jb_socket socks5_connect(const struct forward_spec *fwd,
          /* FIXME: 
           *   unsigned long long buffered_request_bytes
           *   int write_socket(jb_socket fd, const char *buf, size_t len)
-          *   do multiple calls to write_socket if buffered_request_bytes > ULONG_MAX ?
+          *   do multiple calls to write_socket if buffered_request_bytes > ULONG_MAX
           */
 #ifdef _WIN32
 #if SIZEOF_LONG != SIZEOF_SIZE_T
