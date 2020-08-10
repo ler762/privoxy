@@ -2256,9 +2256,9 @@ static jb_err receive_encrypted_request(struct client_state *csp)
    do
    {
       log_error(LOG_LEVEL_HEADER, "Reading encrypted headers");
-      if (!data_is_available(csp->cfd, (int)csp->config->keep_alive_timeout))
+      if (!data_is_available(csp->cfd, csp->config->socket_timeout))
       {
-         log_error(LOG_LEVEL_CONNECT,
+         log_error(LOG_LEVEL_ERROR,
             "Socket %d timed out while waiting for client headers", csp->cfd);
          return JB_ERR_PARSE;
       }
@@ -3512,7 +3512,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3485");
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3515");
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
       close_client_and_server_ssl_connections(csp);
