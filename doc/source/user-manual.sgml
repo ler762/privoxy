@@ -430,6 +430,28 @@ How to install the binary packages depends on your operating system:
 MAKENSIS = ./nsis/makensis.exe
 </screen>
 
+      <para>
+        If you want to be able to have Privoxy do TLS Inspection, get the latest
+        MBED-TLS source code from
+        <ulink url="https://tls.mbed.org/download">
+                    https://tls.mbed.org/download</ulink>
+        extract the tar file into &lt;root-dir&gt; and build the software:
+      </para>
+
+      <screen>
+cd &lt;root-dir&gt;/mbedtls-2.16.NNN
+export WINDOWS_BUILD=1
+#  build for a Windows platform
+
+export CC=i686-w64-mingw32-gcc
+export LD=i686-w64-mingw32-gcc
+
+make lib
+
+make check
+#  run the test suite
+</screen>
+
       </sect4>
 
       <sect4 id="WINBUILD-BUILD"><title>Build</title>
@@ -5190,8 +5212,8 @@ new action
   <listitem>
    <para>
     This action allows &my-app; to filter encrypted requests and responses.
-    For this to work &my-app; has to generate a certificate and send it
-    to the client which has to accept it.
+    For this to work &my-app; has to generate a certificate for the web site
+    and send it to the client which has to accept it.
    </para>
    <para>
     Before this works the directives in the
