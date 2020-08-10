@@ -86,10 +86,11 @@ CFLAGS="${CFLAGS} -Wall"
 #      -Wsign-compare
 #      -Wtype-limits
 ### CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
-# CFLAGS="${CFLAGS} -Wno-unused-variable"
+
 # CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"
 # CFLAGS="${CFLAGS} -Wno-unused-parameter"
-# CFLAGS="${CFLAGS} -Wno-conversion"
+
+# CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
 ### CFLAGS="${CFLAGS} -Wformat-security"
@@ -111,8 +112,8 @@ CFLAGS="${CFLAGS} -Wshadow"
 # CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
 
 # mbed-tls location
-MBEDLIB="../../mbedtls-2.16.6/library"
-MBEDINC="../../mbedtls-2.16.6/include"
+MBEDLIB="/source/mbedtls-2.16.7/library"
+MBEDINC="/source/mbedtls-2.16.7/include"
 
 LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
 export CPPFLAGS="-I${MBEDINC}"
