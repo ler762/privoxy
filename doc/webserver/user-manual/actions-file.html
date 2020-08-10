@@ -394,6 +394,9 @@
           </dl>
         </div>
         <p>While flexible, this is not the sophistication of full regular expression based syntax.</p>
+        <p>When compiled with FEATURE_PCRE_HOST_PATTERNS patterns can be prefixed with <span class=
+        "QUOTE">"PCRE-HOST-PATTERN:"</span> in which case full regular expression (PCRE) can be used for the host
+        pattern as well.</p>
       </div>
       <div class="SECT3">
         <h3 class="SECT3"><a name="PATH-PATTERN" id="PATH-PATTERN">8.4.2. The Path Pattern</a></h3>
@@ -2569,8 +2572,11 @@ www.example.com</pre>
               <p>When the <a href="actions-file.html#HTTPS-INSPECTION"><span class=
               "QUOTE">"+https-inspection"</span></a> action is used <span class="APPLICATION">Privoxy</span> by default
               verifies that the remote site uses a valid certificate.</p>
-              <p>If the certificate is invalid the connection is aborted.</p>
-              <p>This action disabled the certificate check allowing requests to sites with invalid certificates.</p>
+              <p>If the certificate can't be validated by <span class="APPLICATION">Privoxy</span> the connection is
+              aborted.</p>
+              <p>This action disables the certificate check so requests to sites with certificates that can't be
+              validated are allowed.</p>
+              <p>Note that enabling this action allows Man-in-the-middle attacks.</p>
             </dd>
             <dt>Example usage:</dt>
             <dd>

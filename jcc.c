@@ -615,10 +615,8 @@ static jb_err get_request_destination_elsewhere(struct client_state *csp, struct
    }
    else if (JB_ERR_OK == get_destination_from_headers(headers, csp->http))
    {
-#ifndef FEATURE_EXTENDED_HOST_PATTERNS
       /* Split the domain we just got for pattern matching */
       init_domain_components(csp->http);
-#endif
 
       return JB_ERR_OK;
    }
@@ -2256,7 +2254,8 @@ static jb_err receive_encrypted_request(struct client_state *csp)
    do
    {
       log_error(LOG_LEVEL_HEADER, "Reading encrypted headers");
-      if (!data_is_available(csp->cfd, csp->config->socket_timeout))
+      if (!is_ssl_pending(&(csp->mbedtls_client_attr.ssl)) &&
+          !data_is_available(csp->cfd, csp->config->socket_timeout))
       {
          log_error(LOG_LEVEL_ERROR,
             "Socket %d timed out while waiting for client headers", csp->cfd);
@@ -2392,10 +2391,8 @@ static jb_err process_encrypted_request(struct client_state *csp)
       return JB_ERR_PARSE;
    }
 
-#ifndef FEATURE_EXTENDED_HOST_PATTERNS
    /* Split the domain we just got for pattern matching */
    init_domain_components(csp->http);
-#endif
 
 #ifdef FEATURE_TOGGLE
    if ((csp->flags & CSP_FLAG_TOGGLED_ON) != 0)
