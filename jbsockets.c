@@ -1539,7 +1539,7 @@ int accept_connection(struct client_state * csp, jb_socket fds[])
    csp->listen_addr_str = malloc_or_die(listen_addr_size);
 
    log_error(LOG_LEVEL_CONNECT,
-             "accept_connection:1398: Server name (%s) port number (%d) :: %d bytes",
+             "accept_connection:1542: Server name (%s) port number (%d) :: %d bytes",
              csp->config->haddr[i], csp->config->hport[i], listen_addr_size);
 
    retval = snprintf(csp->listen_addr_str, listen_addr_size,
