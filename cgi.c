@@ -545,7 +545,8 @@ static struct http_response *dispatch_known_cgi(struct client_state * csp,
       *query_args_start++ = '\0';
       param_list = new_map();
       err = map(param_list, "file", 1, url_decode(query_args_start), 0);
-      if (JB_ERR_OK != err) {
+      if (JB_ERR_OK != err)
+      {
          free(param_list);
          free(path_copy);
          return cgi_error_memory();
@@ -1568,14 +1569,14 @@ char *compress_buffer(char *buffer, size_t *buffer_length, int compression_level
          (Bytef *)buffer, *buffer_length, compression_level))
    {
       log_error(LOG_LEVEL_ERROR,
-         "compress2() failed. Buffer size: %d, compression level: %d.",
+         "compress2() failed. Buffer size: %lu, compression level: %d.",
          new_length, compression_level);
       freez(compressed_buffer);
       return NULL;
    }
 
    log_error(LOG_LEVEL_RE_FILTER,
-      "Compressed content from %d to %d bytes. Compression level: %d",
+      "Compressed content from %lu to %lu bytes. Compression level: %d",
       *buffer_length, new_length, compression_level);
 
    *buffer_length = (size_t)new_length;

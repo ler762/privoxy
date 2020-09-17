@@ -55,10 +55,6 @@
 #include <netdb.h>
 #endif /* def __BEOS__ */
 
-#ifdef __OS2__
-#include <utils.h>
-#endif /* def __OS2__ */
-
 #include "project.h"
 #include "jcc.h"
 #include "errlog.h"
@@ -78,8 +74,8 @@
 #endif /* HAVE_POLL */
 #endif /* def FEATURE_CONNECTION_KEEP_ALIVE */
 
-static jb_socket socks4_connect(const struct forward_spec * fwd,
-                                const char * target_host,
+static jb_socket socks4_connect(const struct forward_spec *fwd,
+                                const char *target_host,
                                 int target_port,
                                 struct client_state *csp);
 
@@ -129,6 +125,9 @@ struct socks_reply {
 static const char socks_userid[] = "anonymous";
 
 #ifdef FEATURE_CONNECTION_SHARING
+#ifndef FEATURE_CONNECTION_KEEP_ALIVE
+#error Using FEATURE_CONNECTION_SHARING without FEATURE_CONNECTION_KEEP_ALIVE is impossible
+#endif
 
 #define MAX_REUSABLE_CONNECTIONS 100
 
@@ -426,7 +425,7 @@ int close_unusable_connections(void)
          {
             log_error(LOG_LEVEL_CONNECT,
                "The connection to %s:%d in slot %d timed out. "
-               "Closing socket %d. Timeout is: %d. Assumed latency: %d.",
+               "Closing socket %d. Timeout is: %d. Assumed latency: %ld.",
                reusable_connection[slot].host,
                reusable_connection[slot].port, slot,
                reusable_connection[slot].sfd,
@@ -494,7 +493,7 @@ static jb_socket get_reusable_connection(const struct http_request *http,
             reusable_connection[slot].in_use = TRUE;
             sfd = reusable_connection[slot].sfd;
             log_error(LOG_LEVEL_CONNECT,
-               "Found reusable socket %d for %s:%d in slot %d. Timestamp made %d "
+               "Found reusable socket %d for %s:%d in slot %d. Timestamp made %ld "
                "seconds ago. Timeout: %d. Latency: %d. Requests served: %d",
                sfd, reusable_connection[slot].host, reusable_connection[slot].port,
                slot, time(NULL) - reusable_connection[slot].timestamp,
@@ -575,11 +574,11 @@ static int mark_connection_unused(const struct reusable_connection *connection)
  * Returns     :  JB_INVALID_SOCKET => failure, else it is the socket file descriptor.
  *
  *********************************************************************/
-jb_socket forwarded_connect(const struct forward_spec * fwd,
+jb_socket forwarded_connect(const struct forward_spec *fwd,
                             struct http_request *http,
                             struct client_state *csp)
 {
-   const char * dest_host;
+   const char *dest_host;
    int dest_port;
    jb_socket sfd = JB_INVALID_SOCKET;
 
@@ -710,8 +709,8 @@ extern jb_err socks_fuzz(struct client_state *csp)
  * Returns     :  JB_INVALID_SOCKET => failure, else a socket file descriptor.
  *
  *********************************************************************/
-static jb_socket socks4_connect(const struct forward_spec * fwd,
-                                const char * target_host,
+static jb_socket socks4_connect(const struct forward_spec *fwd,
+                                const char *target_host,
                                 int target_port,
                                 struct client_state *csp)
 {
@@ -1194,7 +1193,7 @@ static jb_socket socks5_connect(const struct forward_spec *fwd,
       header_length= strlen(client_headers);
 
       log_error(LOG_LEVEL_CONNECT,
-         "Optimistically sending %d bytes of client headers intended for %s",
+         "Optimistically sending %lu bytes of client headers intended for %s",
          header_length, csp->http->hostport);
 
       if (write_socket(sfd, client_headers, header_length))

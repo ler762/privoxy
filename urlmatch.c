@@ -45,7 +45,7 @@
 #include <assert.h>
 #include <string.h>
 
-#if !defined(_WIN32) && !defined(__OS2__)
+#if !defined(_WIN32)
 #include <unistd.h>
 #endif
 
@@ -1301,7 +1301,8 @@ static int host_matches(const struct http_request *http,
 {
    assert(http->host != NULL);
 #ifdef FEATURE_PCRE_HOST_PATTERNS
-   if (pattern->pattern.url_spec.host_regex_type == PCRE_HOST_PATTERN) {
+   if (pattern->pattern.url_spec.host_regex_type == PCRE_HOST_PATTERN)
+   {
       return ((NULL == pattern->pattern.url_spec.host_regex)
          || (0 == regexec(pattern->pattern.url_spec.host_regex,
                http->host, 0, NULL, 0)));
