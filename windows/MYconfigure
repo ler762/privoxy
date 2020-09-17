@@ -112,8 +112,8 @@ CFLAGS="${CFLAGS} -Wshadow"
 # CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
 
 # mbed-tls location
-MBEDLIB="/source/mbedtls-2.16.7/library"
-MBEDINC="/source/mbedtls-2.16.7/include"
+MBEDLIB="/source/mbedtls-2.16.8/library"
+MBEDINC="/source/mbedtls-2.16.8/include"
 
 LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
 export CPPFLAGS="-I${MBEDINC}"
