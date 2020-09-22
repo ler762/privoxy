@@ -721,7 +721,7 @@ extern int create_client_ssl_connection(struct client_state *csp)
    char *ca_file   = NULL;
    char *cert_file = NULL;
    int ret = 0;
-   SSL* ssl;
+   SSL *ssl;
 
    /*
     * Initializing OpenSSL structures for TLS/SSL connection
@@ -870,6 +870,7 @@ exit:
 extern void close_client_ssl_connection(struct client_state *csp)
 {
    struct ssl_attr *ssl_attr = &csp->ssl_client_attr;
+   SSL *ssl;
 
    if (csp->ssl_with_client_is_opened == 0)
    {
@@ -880,6 +881,20 @@ extern void close_client_ssl_connection(struct client_state *csp)
     * Notifying the peer that the connection is being closed.
     */
    BIO_ssl_shutdown(ssl_attr->openssl_attr.bio);
+   if (BIO_get_ssl(ssl_attr->openssl_attr.bio, &ssl) != 1)
+   {
+      log_ssl_errors(LOG_LEVEL_ERROR,
+         "BIO_get_ssl() failed in close_client_ssl_connection()");
+   }
+   else
+   {
+      /*
+       * Pretend we received a shutdown alert so
+       * the BIO_free_all() call later on returns
+       * quickly.
+       */
+      SSL_set_shutdown(ssl, SSL_RECEIVED_SHUTDOWN);
+   }
    free_client_ssl_structures(csp);
    csp->ssl_with_client_is_opened = 0;
 }
@@ -929,6 +944,7 @@ static void free_client_ssl_structures(struct client_state *csp)
 extern void close_server_ssl_connection(struct client_state *csp)
 {
    struct ssl_attr *ssl_attr = &csp->ssl_server_attr;
+   SSL *ssl;
 
    if (csp->ssl_with_server_is_opened == 0)
    {
@@ -939,6 +955,20 @@ extern void close_server_ssl_connection(struct client_state *csp)
    * Notifying the peer that the connection is being closed.
    */
    BIO_ssl_shutdown(ssl_attr->openssl_attr.bio);
+   if (BIO_get_ssl(ssl_attr->openssl_attr.bio, &ssl) != 1)
+   {
+      log_ssl_errors(LOG_LEVEL_ERROR,
+         "BIO_get_ssl() failed in close_server_ssl_connection()");
+   }
+   else
+   {
+      /*
+       * Pretend we received a shutdown alert so
+       * the BIO_free_all() call later on returns
+       * quickly.
+       */
+      SSL_set_shutdown(ssl, SSL_RECEIVED_SHUTDOWN);
+   }
    free_server_ssl_structures(csp);
    csp->ssl_with_server_is_opened = 0;
 }

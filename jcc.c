@@ -1207,6 +1207,22 @@ void save_connection_destination(jb_socket sfd,
       server_connection->gateway_host = NULL;
    }
    server_connection->gateway_port = fwd->gateway_port;
+   if (NULL != fwd->auth_username)
+   {
+      server_connection->auth_username = strdup_or_die(fwd->auth_username);
+   }
+   else
+   {
+      server_connection->auth_username = NULL;
+   }
+   if (NULL != fwd->auth_password)
+   {
+      server_connection->auth_password = strdup_or_die(fwd->auth_password);
+   }
+   else
+   {
+      server_connection->auth_password = NULL;
+   }
 
    if (NULL != fwd->forward_host)
    {
@@ -4561,6 +4577,20 @@ static void serve(struct client_state *csp)
    chat(csp);
 #endif /* def FEATURE_CONNECTION_KEEP_ALIVE */
 
+   if (csp->cfd != JB_INVALID_SOCKET)
+   {
+      log_error(LOG_LEVEL_CONNECT, "Closing client socket %d. "
+         "Keep-alive: %u. Socket alive: %u. Data available: %u. "
+         "Configuration file change detected: %u. Requests received: %u.",
+         csp->cfd, 0 != (csp->flags & CSP_FLAG_CLIENT_CONNECTION_KEEP_ALIVE),
+         socket_is_still_alive(csp->cfd), data_is_available(csp->cfd, 0),
+         config_file_change_detected, csp->requests_received_total);
+#ifdef FEATURE_HTTPS_INSPECTION
+      close_client_ssl_connection(csp);
+#endif
+      drain_and_close_socket(csp->cfd);
+   }
+
    if (csp->server_connection.sfd != JB_INVALID_SOCKET)
    {
 #ifdef FEATURE_CONNECTION_SHARING
@@ -4580,20 +4610,6 @@ static void serve(struct client_state *csp)
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
    mark_connection_closed(&csp->server_connection);
 #endif
-
-   if (csp->cfd != JB_INVALID_SOCKET)
-   {
-      log_error(LOG_LEVEL_CONNECT, "Closing client socket %d. "
-         "Keep-alive: %u. Socket alive: %u. Data available: %u. "
-         "Configuration file change detected: %u. Requests received: %u.",
-         csp->cfd, 0 != (csp->flags & CSP_FLAG_CLIENT_CONNECTION_KEEP_ALIVE),
-         socket_is_still_alive(csp->cfd), data_is_available(csp->cfd, 0),
-         config_file_change_detected, csp->requests_received_total);
-#ifdef FEATURE_HTTPS_INSPECTION
-      close_client_ssl_connection(csp);
-#endif
-      drain_and_close_socket(csp->cfd);
-   }
 
    free_csp_resources(csp);
 
@@ -5573,7 +5589,7 @@ static void listen_loop(void)
       csp = &csp_list->csp;
 
       log_error(LOG_LEVEL_CONNECT,
-         "Waiting for the next client connection. Currently active threads: %d",
+         "Waiting for the next client connection. Currently active threads: %u",
          active_threads);
 
       /*
@@ -5790,7 +5806,7 @@ static void listen_loop(void)
              * XXX: If you assume ...
              */
             log_error(LOG_LEVEL_ERROR,
-               "Unable to take any additional connections: %E. Active threads: %d",
+               "Unable to take any additional connections: %E. Active threads: %u",
                active_threads);
             write_socket_delayed(csp->cfd, TOO_MANY_CONNECTIONS_RESPONSE,
                strlen(TOO_MANY_CONNECTIONS_RESPONSE), get_write_delay(csp));
