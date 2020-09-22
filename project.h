@@ -75,6 +75,11 @@
 #endif /* FEATURE_HTTPS_INSPECTION_MBEDTLS */
 
 #ifdef FEATURE_HTTPS_INSPECTION_OPENSSL
+#ifdef _WIN32
+#include <wincrypt.h>
+#undef X509_NAME
+#undef X509_EXTENSIONS
+#endif
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -766,6 +771,9 @@ struct reusable_connection
    enum forwarder_type forwarder_type;
    char *gateway_host;
    int  gateway_port;
+   char *auth_username;
+   char *auth_password;
+
    char *forward_host;
    int  forward_port;
 };
