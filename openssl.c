@@ -55,7 +55,7 @@
 #define CERTIFICATE_AUTHORITY_KEY                "keyid:always"
 #define CERTIFICATE_ALT_NAME_PREFIX              "DNS:"
 #define CERTIFICATE_VERSION                      2
-#define VALID_DATETIME_FMT                       "%Y%m%d%H%M%SZ"
+#define VALID_DATETIME_FMT                       "%y%m%d%H%M%SZ"
 #define VALID_DATETIME_BUFLEN                    16
 
 static int generate_webpage_certificate(struct client_state *csp);
@@ -1578,6 +1578,7 @@ static int ssl_certificate_is_invalid(const char *cert_file)
    {
       log_ssl_errors(LOG_LEVEL_ERROR,
          "Error checking certificate %s validity", cert_file);
+      ret = -1;
    }
 
    X509_free(cert);
@@ -2178,12 +2179,14 @@ extern void ssl_release(void)
 {
    if (ssl_inited == 1)
    {
+#ifndef OPENSSL_NO_COMP
       SSL_COMP_free_compression_methods();
-
+#endif
       CONF_modules_free();
       CONF_modules_unload(1);
-
+#ifndef OPENSSL_NO_COMP
       COMP_zlib_cleanup();
+#endif
 
       ERR_free_strings();
       EVP_cleanup();

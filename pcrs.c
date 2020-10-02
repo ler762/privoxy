@@ -995,7 +995,7 @@ static int is_hex_sequence(const char *sequence)
  *                FALSE
  *
  *********************************************************************/
-int pcrs_job_is_dynamic (char *job)
+int pcrs_job_is_dynamic(char *job)
 {
    const char delimiter = job[1];
    const size_t length = strlen(job);
@@ -1106,7 +1106,6 @@ char *pcrs_execute_single_command(const char *subject, const char *pcrs_command,
 }
 
 
-static const char warning[] = "... [too long, truncated]";
 /*********************************************************************
  *
  * Function    :  pcrs_compile_dynamic_command
@@ -1173,6 +1172,7 @@ pcrs_job *pcrs_compile_dynamic_command(char *pcrs_command, const struct pcrs_var
           * with a truncation message and close the pattern
           * properly.
           */
+         static const char warning[] = "... [too long, truncated]";
          const size_t trailer_size = sizeof(warning) + 3; /* 3 for d + "gT" */
          char *trailer_start = buf + sizeof(buf) - trailer_size;
 
