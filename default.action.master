@@ -658,14 +658,14 @@ standard.Advanced
 # Generic block patterns by host:
 #############################################################################
 {+block{Host matches generic block pattern.}}
-ad*.
-.*ads.
+# ad*.
+# .*ads.
 #MASTER# REMARKS: removed .ad. 2007-12-18 HB
 #MASTER# REMARKS: Modifications per Actionsfile feedback item #1807613
-.ad.?.
-.ad.[a-ik-z][a-oq-z].
-.ad.jp.*.
-.ad.???*.
+# .ad.?.
+# .ad.[a-ik-z][a-oq-z].
+# .ad.jp.*.
+# .ad.???*.
 # Blocked URL = http://alternativos.iw-advertising.com/
 .*advert*.
 *banner*.
@@ -673,18 +673,318 @@ count*.
 *counter.
 #MASTER# BLOCK-REFERRER: http://tech.cybernetnews.com/
 # Blocked URL = http://metrics.performancing.com/
-metrics.
+# metrics.
 
 #### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
-# Try blocking .ad*. and see how much trouble that causes
+####
+.*metrics.
+promotions.
+.liveadexchanger.
+# Blocked URL = http://hlok.qertewrt.com/cg/6116.214283.579.246.39.135/
+.qertewrt.com/
+
+######################################################################
+# Try blocking .ad*. and .*ad. and see how much trouble that causes
 # -- see above exceptions for .ad.jp/  and .ad/
-{ +block{.ad*. domain} }
-.ad*.?.
-.ad*.[a-ik-z][a-oq-z].
-.ad*.jp.*.
-.ad*.???*.
-.ad*.*.*
-.ad*.*.*.*
+# -- screw the exceptions.  If i ever want to visit ad.jp/ I will unblock it
+{ +block{.*ad*. domains (LR)} }
+.ad*.
+.*ad.
+.*ads.
+
+
+######################################################################
+# .ad*. and .*ads?. sites that are OK to allow
+######################################################################
+{ -block }
+# Sticky Actions = -block
+
+##### TLDs
+# URL = http://adeona.cs.washington.edu
+.edu/
+
+
+
+##### patterns
+
+# URL = http://adblockplus.org
+# URL = http://www.adblockplus.org
+.adblock*.
+
+# URL = http://add-ons.mozilla.com
+.add-on*.
+
+# URL = http://tor.addicts.nl
+.addi*.
+
+# URL = http://addons.mozilla.org
+.addo*.
+
+# URL = http://address.mail.yahoo.com
+.addr*.
+
+# URL = http://adiumx.cachefly.net
+.adium*.
+
+# URL = http://admin.instantservice.com
+.admin.
+.adorable*.
+
+# URL = http://www.adp-gmbh.ch
+# Ignore = Yes
+# .adp-gmbh.
+
+# URL = http://speedtest.adslguide.org.uk
+.adsl*.
+
+# .ad[udmw]*.			#   default.action -- why??? allows things like addynamic.com
+
+# URL = http://www.advancedpainmd.com
+.advanced*.
+
+# URL = http://advances.sciencemag.org/
+.advances.
+
+# URL = http://adventuresinopensource.blogspot.com
+.advent*.
+
+# URL = https://adversarialfashion.com/
+.adversarialfashion.com/
+# URL = http://okbounty.adversary.org/pdf_risks.pdf
+.adversary.
+
+# URL = http://advice.cio.com/
+.advice*.
+
+# URL = http://advisorycareers.force.com/openings
+.advisory*.
+
+# URL = https://www.advocate.com/commentary/2019/1/28/has-mitch-mcconnell-and-republican-party-deserted-democracy
+.advocate.
+
+# URL = http://codepad.org/tw6EJMr4
+.codepad.org/
+
+# URL = https://nathalielawhead.com/
+.*head*.
+
+# URL = http://npad.iupui.mlab3.lga02.measurement-lab.org:8000/
+npad.
+
+
+
+##### sites
+
+# URL = https://acceptableads.org/
+# URL = https://blog.acceptableads.com/
+.acceptableads.com/
+.acceptableads.org/
+
+# URL = http://www.ad.nl/
+www.ad.nl/
+
+.adactio.com/
+
+# URL = http://adafruit.com/
+# URL = http://learn.adafruit.com/
+# URL = http://learn.adafruit.com/onion-pi/overview
+# URL = http://www.adafruit.com/
+.adafruit.com/
+
+# URL = http://adage.com/article/news/kmart-lost-attention-discount-shoppers/233369/
+.adage.com/
+
+# URL = https://www.adamhyde.net/another-good-reason-not-to-use-github/
+.adamhyde.net/
+
+# URL = http://adaptivepatchwork.com/2012/03/01/mind-the-end-of-your-line/
+.adaptivepatchwork.com/
+
+# URL = http://www.adbusters.org/foo
+.adbusters.org/
+
+# URL = http://ready.adcouncil.org/beprepared/
+.adcouncil.org/
+
+# URL = http://blog.add0n.com/2015/05/16/tracker-and-script-blocker-extensions-for-firefox.html
+.add0n.com/
+
+# URL = http://bandicoot.maths.adelaide.edu.au/AutoNetKit/
+.adelaide.edu.au/
+
+# URL = https://adexchanger.com/platforms/big-changes-coming-auctions-exchanges-roll-dice-first-price/
+adexchanger.com/
+
+#   short URLs
+# # URL = http://adf.ly/link
+# .adf.ly/link
+
+# URL = https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters
+.adguard.com/
+
+# URL = http://adhacker.com
+# URL = http://www.adhacker.com
+.adhacker.com/
+
+# URL = http://adios-hola.org/
+.adios-hola.org/
+
+# URL = https://www.adn.com/nation-world/2018/01/04/obstruction-inquiry-shows-trumps-struggle-to-keep-grip-on-russia-investigation/
+.adn.com/
+
+# URL = http://adnauseam.io/
+adnauseam.io/
+
+# URL = http://adobe.com
+# URL = http://www.adobe.com
+.adobe.com/
+
+# URL = http://www.adp.com/about-us/trust-center/security-alerts.aspx
+.adp.com/
+
+# --- uncomment if I ever allow .no/
+# # URL = http://adressa.no/
+# # URL = http://www.adressa.no/
+# .adressa.no/
+# 
+# # URL = http://adresseavisen.no/
+# # URL = http://www.adresseavisen.no/
+# .adresseavisen.no/
+
+.adrian.org           # in default.action
+
+# URL =  http://www.adriangranados.com/apps/wifi-explorer
+.adriangranados.com/
+
+#  ADS-B = airline flight tracker radio: Automatic Dependent Surveillance-Broadcast
+# URL = https://www.adsbexchange.com/
+.adsbexchange.com/
+
+#  ADS-B data
+# URL = https://www.adsbhub.org/
+.adsbhub.org/
+
+# URL = https://filters.adtidy.org/extension/chromium/filters/3.txt
+.adtidy.org/
+
+# URL = https://lists.adullact.net/pipermail/atelier-dev-commits/2007-January/003353.html
+.adullact.net/
+
+# URL = http://www.advance7.com/
+.advance7.com/
+
+# URL = https://advanxer.com/blog/2015/05/adblocking-using-bind-dns-server/
+advanxer.com/
+
+# URL = http://www.advisory.com/
+.advisory.com/
+
+# URL = http://addxorrol.blogspot.com
+addxorrol.blogspot.com/
+
+# URL = http://www.adweek.com/creativity/where-do-we-draw-the-line-between-creepy-and-creative-in-advertising/
+.adweek.com/
+
+# URL = http://blog.etherpad.org/2018/04/07/important-release-1-6-4/
+.etherpad.org/
+
+# URL = https://www.exalead.com/search/
+.exalead.com/
+
+# URL = https://www.foxnewsadvertisers.com/2018/07/15/top-advertisers-in-june-2018-monthly-summary/
+#   {+block{Host matches generic block pattern.} }
+#   .*advert*.
+.foxnewsadvertisers.com/
+
+# URL = https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+adguardteam.github.io/
+
+# URL = http://www.hmtrad.com/
+.hmtrad.com/
+
+# URL = https://securedrop.hackpad.com/
+.hackpad.com/
+
+# URL = http://adv-r.had.co.nz/Computing-on-the-language.html
+.adv-r.had.co.nz/
+
+# URL = http://binnenstad.hku.nl/Release/
+.hku.nl/
+
+# URL = http://myhometheater.homestead.com/viewingdistancecalculator.html
+.homestead.com/
+
+# URL =  http://git.infradead.org/users/dwmw2/linux-retpoline.git 
+.infradead.org/
+
+adonthell.linuxgames.com/
+
+# URL = https://coad.measurement-factory.com/details.html#pricing
+.coad.measurement-factory.com/
+
+.mikeonads.com/
+
+# URL = http://addneditcookies.mozdev.org
+addneditcookies.mozdev.org/
+
+# URL = https://etherpad.mozilla.org/19-0-2
+.etherpad.mozilla.org/
+
+# URL = https://nathanhoad.net/how-to-meld-for-git-diffs-in-ubuntu-hardy
+.nathanhoad.net/
+
+# cisco network academy
+# URL = https://www.netacad.com/
+# URL = https://www.netacad.com/web/about-us/cisco-packet-tracer
+.netacad.com/
+
+# URL = http://www.networknotepad.com/
+.*notepad.
+
+# URL = http://gnotepad.sourceforge.net/
+.notepad*.
+
+# URL = https://pad.okfn.org/p/google_alternatives
+pad.okfn.org/
+
+# URL = http://piratepad.net/ep/pad/view/ro.94TV9Ws1DUR/latest
+.piratepad.net/
+
+# URL = https://pad.riseup.net/p/87Mazw3Jsdfe_pm
+pad.riseup.net/
+
+# URL = http://www.pspad.com/en/
+.pspad.com/
+
+adzapper.sourceforge.net/   # in default.action
+
+# URL = http://akelpad.sourceforge.net/en/index.php
+akelpad.sourceforge.net/
+
+# URL = http://sleepyhead.sourceforge.net/
+sleepyhead.sourceforge.net/
+
+# URL = http://adn.speedtest.net/speedtest-config.php?x=123
+adn.speedtest.net/
+
+# URL = https://adlrocha.substack.com/p/adlrocha-software-should-be-designed
+.adlrocha.substack.com/
+
+# URL = http://addto.tomtom.com/
+addto.tomtom.com/
+
+# URL = http://esgblogs.typepad.com/steves_it_rants/
+# URL = http://vielmetti.typepad.com
+.typepad.com/
+
+
+.yimg.com/.*&media/modules/gallery/assets/js/
+
+/(.*/)?thumbs/ad/
+
+####
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+
 
 #############################################################################
 # Generic unblockers by host:
@@ -693,17 +993,22 @@ metrics.
 # Sticky Actions = -block
 adsl.
 # ad[udmw]*.
-adbl*.
+# adbl*.
 adam*.
 # adapt*.
 # URL = http://adobe.com/
-adob*.		# duh!  adobe.com
+# URL = http://www.adobe.com/
+# adob*.
 # adrenaline.
 # adtp*.
 # adv[oia]*.
 adventure*.
 .*road*.
 .olympiad*.
+# URL = http://adc-downloads.de/hixcms/
+# URL = http://www.downloads.foo.com/
+# URL = http://www.uploads.foo.com/
+# URL = http://www.loader.foo.com/
 .*load*.
 # .*[epu]ad*.
 county*.
