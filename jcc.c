@@ -2328,7 +2328,8 @@ static jb_err process_encrypted_request(struct client_state *csp)
    err = receive_encrypted_request(csp);
    if (err != JB_ERR_OK)
    {
-      if (csp->client_iob->cur == NULL)
+      if (csp->client_iob->cur == NULL ||
+          csp->client_iob->cur == csp->client_iob->eod)
       {
          /*
           * We did not receive any data, most likely because the
@@ -2875,6 +2876,37 @@ static void handle_established_connection(struct client_state *csp)
 #ifdef FEATURE_HTTPS_INSPECTION
          if (client_use_ssl(csp))
          {
+            if (csp->http->status == 101)
+            {
+               len = ssl_recv_data(&(csp->ssl_client_attr),
+                  (unsigned char *)csp->receive_buffer,
+                  (size_t)max_bytes_to_read);
+               if (len == -1)
+               {
+                  log_error(LOG_LEVEL_ERROR, "Failed to receive data "
+                     "on client socket %d for an upgraded connection",
+                     csp->cfd);
+                  break;
+               }
+               if (len == 0)
+               {
+                  log_error(LOG_LEVEL_CONNECT, "Done receiving data "
+                     "on client socket %d for an upgraded connection",
+                     csp->cfd);
+                  break;
+               }
+               byte_count += (unsigned long long)len;
+               len = ssl_send_data(&(csp->ssl_server_attr),
+                  (unsigned char *)csp->receive_buffer, (size_t)len);
+               if (len == -1)
+               {
+                  log_error(LOG_LEVEL_ERROR, "Failed to send data "
+                     "on server socket %d for an upgraded connection",
+                     csp->server_connection.sfd);
+                  break;
+               }
+               continue;
+            }
             log_error(LOG_LEVEL_CONNECT, "Breaking with TLS/SSL.");
             break;
          }

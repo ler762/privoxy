@@ -4087,7 +4087,8 @@ static jb_err server_http(struct client_state *csp, char **header)
       return JB_ERR_PARSE;
    }
 
-   if (csp->http->status == 206)
+   if (csp->http->status == 101 ||
+       csp->http->status == 206)
    {
       csp->content_type = CT_TABOO;
    }
@@ -4606,7 +4607,11 @@ jb_err get_destination_from_headers(const struct list *headers, struct http_requ
       return JB_ERR_PARSE;
    }
 
-   p = strdup_or_die(host);
+   p = string_tolower(host);
+   if (p == NULL)
+   {
+      return JB_ERR_MEMORY;
+   }
    chomp(p);
    q = strdup_or_die(p);
 
@@ -4695,7 +4700,11 @@ jb_err get_destination_from_https_headers(const struct list *headers, struct htt
       return JB_ERR_PARSE;
    }
 
-   p = strdup_or_die(host);
+   p = string_tolower(host);
+   if (p == NULL)
+   {
+      return JB_ERR_MEMORY;
+   }
    chomp(p);
    q = strdup_or_die(p);
 
