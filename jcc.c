@@ -1430,7 +1430,7 @@ static char *get_request_line(struct client_state *csp)
          }
          else
          {
-            log_error(LOG_LEVEL_ERROR,
+            log_error(LOG_LEVEL_CONNECT,
                "The client side of the connection on socket %d got "
                "closed without sending a complete request line.", csp->cfd);
          }
@@ -2266,7 +2266,7 @@ static jb_err receive_encrypted_request(struct client_state *csp)
       if (!is_ssl_pending(&(csp->ssl_client_attr)) &&
           !data_is_available(csp->cfd, csp->config->socket_timeout))
       {
-         log_error(LOG_LEVEL_ERROR,
+         log_error(LOG_LEVEL_CONNECT,
             "Socket %d timed out while waiting for client headers", csp->cfd);
          return JB_ERR_PARSE;
       }
