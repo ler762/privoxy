@@ -1993,7 +1993,7 @@ static jb_err get_content_length(const char *header_value, unsigned long long *l
 #if SIZEOF_LONG_LONG < 8
 #error sizeof(unsigned long long) too small
 #endif
-   if (1 != sscanf(header_value, "%I64u", length))
+   if (1 != sscanf(header_value, "%I64llu", length))
 #else
    if (1 != sscanf(header_value, "%llu", length))
 #endif
@@ -4908,7 +4908,7 @@ static void create_content_length_header(unsigned long long content_length,
 #if SIZEOF_LONG_LONG < 8
 #error sizeof(unsigned long long) too small
 #endif
-   snprintf(header, buffer_length, "Content-Length: %I64u", content_length);
+   snprintf(header, buffer_length, "Content-Length: %I64llu", content_length);
 #else
    snprintf(header, buffer_length, "Content-Length: %llu", content_length);
 #endif
