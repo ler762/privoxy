@@ -29,21 +29,55 @@ export CFLAGS="-O2"
 # note: configure.in line 155
 #         if test "X$CFLAGS" = "X "; then # if CFLAGS were unset (see above)
 #   In other words, if you set CFLAGS you need to include -O2 if you want optimization
-#   assume I'll set cflags below, so set O2 now
+#   assume I'll set cflags below, so enable optimization now
 
 export LDFLAGS=""
 # start with initially empty flags
 
+export CPPFLAGS=""
 
-CFLAGS="${CFLAGS} -fstack-protector-strong"
+#-no-# export CPPFLAGS="-D__MINGW_USE_VC2005_COMPAT"
+#?# is this is why privoxy doesn't realise the config has changed ?
+#?#   yes.  build with this commented out & no problems after changing config.txt
+# from the libressl README.windows
+#   An ABI change introduced with Microsoft Visual C++ 2005 (also known as
+#   Visual C++ 8.0) switched time_t from 32-bit to 64-bit. It is important to
+#   build LibreSSL with 64-bit time_t whenever possible, because 32-bit time_t
+#   is unable to represent times past 2038 (this is commonly known as the
+#   Y2K38 problem).
+#
+#   If LibreSSL is built with 32-bit time_t, when verifying a certificate whose
+#   expiry date is set past 19 January 2038, it will be unable to tell if the
+#   certificate has expired or not, and thus take the safe stance and reject it.
+#
+#   In order to avoid this, you need to build LibreSSL (and everything that links
+#   with it) with the -D__MINGW_USE_VC2005_COMPAT flag. This tells mingw-w64 to
+#   use the new ABI.
+#
+#   64-bit systems always have a 64-bit time_t and are not affected by this
+#   problem.
+
+CFLAGS="${CFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
 LDFLAGS="${LDFLAGS} -fstack-protector-strong"
-# enable stack checking.  NOTE: need to specify when compiling _and_ linking
+# -fstack-protector-strong:  enable stack checking.
+# NOTE: need to specify when compiling _and_ linking
 # stack-protector-strong: better balance between security and performance.
 #   This flag protects more kinds of vulnerable functions than -fstack-protector does,
 #   but not every function, providing better performance than -fstack-protector-all.
 # see : https://en.wikipedia.org/wiki/Buffer_overflow_protection
 # NOTE: needs static linking or the following in the path:
 #         /usr/i686-w64-mingw32/sys-root/mingw/bin/libssp-0.dll
+#
+# -D_FORTIFY_SOURCE:  detect some buffer overflow errors
+#     **>>> requires compiler optimization level 1 or above <<<**
+# see : https://gcc.gnu.org/legacy-ml/gcc-patches/2004-09/msg02055.html
+#   The diffence between -D_FORTIFY_SOURCE=1 and -D_FORTIFY_SOURCE=2 is e.g. for
+#     struct S { struct T { char buf[5]; int x; } t; char buf[20]; } var;
+#   With -D_FORTIFY_SOURCE=1,
+#     strcpy (&var.t.buf[1], "abcdefg");
+#   is not considered an overflow (object is whole VAR), while with -D_FORTIFY_SOURCE=2
+#     strcpy (&var.t.buf[1], "abcdefg");
+#   will be considered a buffer overflow.
 
 CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
@@ -85,38 +119,64 @@ CFLAGS="${CFLAGS} -Wall"
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
-### CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
+CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
 
-# CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"
-# CFLAGS="${CFLAGS} -Wno-unused-parameter"
+CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"
+CFLAGS="${CFLAGS} -Wno-unused-parameter"
 
-# CFLAGS="${CFLAGS} -Wconversion"
+#-no-# CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
-### CFLAGS="${CFLAGS} -Wformat-security"
+CFLAGS="${CFLAGS} -Wformat-security"
 # If -Wformat is specified, also warn about uses of format functions that represent possible security problems.
 
-### CFLAGS="${CFLAGS} -Wlogical-op"
+CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
 
 CFLAGS="${CFLAGS} -Wshadow"
 # Warn whenever a local variable or type declaration shadows
 # another variable or whenever a built-in function is shadowed.
 
-# CFLAGS="${CFLAGS} -Wwrite-strings"
+#-no-# CFLAGS="${CFLAGS} -Wwrite-strings"
 # These warnings help you find at compile time code that can try to write
 # into a string constant, but only if you have been very careful about
 # using const in declarations and prototypes.
 # >>> Otherwise, it is just a nuisance. <<<  -- this, very much this
 
-# CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
+CFLAGS="${CFLAGS} -Wimplicit-fallthrough"
 
-# mbed-tls location
-MBEDLIB="/source/mbedtls-2.16.8/library"
-MBEDINC="/source/mbedtls-2.16.8/include"
+# use mbedtls or openssl/libressl?
+MITMOPT=""
+
+# mbedtls
+MBEDINC="/source/mbedtls-2.16.9/include"
+MBEDLIB="/source/mbedtls-2.16.9/library"
 
 LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
-export CPPFLAGS="-I${MBEDINC}"
+CPPFLAGS="${CPPFLAGS} -I${MBEDINC}"
+MITMOPT="--with-mbedtls"
+
+# libressl
+## INC="/source/libressl-3.3.0/include"
+## LIB="-L/source/libressl-3.3.0/crypto/.libs/ -L/source/libressl-3.3.0/ssl/.libs -L/source/libressl-3.3.0/tls/.libs"
+## LDFLAGS="${LDFLAGS} ${LIB}"
+## CPPFLAGS="${CPPFLAGS} -I${INC}"
+## MITMOPT="--with-openssl"
+
+#?# CFLAGS="${CFLAGS} -fanalyzer"
+#?# everything it lists seems to be ok
+# https://gcc.gnu.org/gcc-10/changes.html
+#   -fanalyzer enables a new static analysis pass and associated warnings.
+#   This pass performs a time-consuming exploration of paths through the code
+#   in the hope of detecting various common errors, such as double-free bugs.
+#   This option should be regarded as experimental in this release.
+#   In particular, analysis of non-C code is unlikely to work. 
+#-no-# CFLAGS="${CFLAGS} -Wanalyzer-too-complex"
+#-no-# generates waaay too much output
+# https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Static-Analyzer-Options.html
+#   By default, the analysis silently stops if the code is too complicated for
+#   the analyzer to fully explore and it reaches an internal limit.
+#   The -Wanalyzer-too-complex option warns if this occurs. 
 
 ###
 echo "CFLAGS=${CFLAGS}"
@@ -128,12 +188,14 @@ echo "LDFLAGS=${LDFLAGS}"
 #    --host:  the system on which the generated program will run.
 #    --target: only used to build a cross-compiling toolchain.
 
+#            --disable-dynamic-pcre \
+
 ./configure  --host=i686-w64-mingw32  --enable-mingw32  --enable-zlib \
              --enable-extended-statistics \
              --enable-static-linking \
              --enable-strptime-sanity-checks \
-             --disable-pthread  --disable-dynamic-pcre \
-             --with-mbedtls \
+             --disable-pthread       \
+             ${MITMOPT} \
              --with-docbook=yes
 
 #  -- done --
