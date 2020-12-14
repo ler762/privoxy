@@ -32,8 +32,9 @@
  *
  *********************************************************************/
 
-This README is included with Privoxy 3.0.29. See https://www.privoxy.org/ for
-more information. The current code maturity level is "stable".
+This README is included with the development version of Privoxy 3.0.30. See
+https://www.privoxy.org/ for more information. The current code maturity level
+is "UNRELEASED", but seems stable to us :).
 
 -------------------------------------------------------------------------------
 
@@ -50,9 +51,9 @@ Privoxy is an associated project of Software in the Public Interest (SPI).
 
 Helping hands and donations are welcome:
 
-  * https://www.privoxy.org/faq/general.html#PARTICIPATE
+  * https://www.privoxy.org/participate
 
-  * https://www.privoxy.org/faq/general.html#DONATE
+  * https://www.privoxy.org/donate
 
 -------------------------------------------------------------------------------
 
@@ -104,16 +105,22 @@ try it with FTP or other protocols for the simple reason it does not work.
 The actions list can be configured via the web interface accessed via http://
 p.p/, as well other options.
 
+All configuration files are subject to unannounced changes during the
+development process.
+
 -------------------------------------------------------------------------------
 
 5. DOCUMENTATION
 
-There should be documentation in the 'doc' subdirectory. In particular, see the
-User Manual there, the FAQ, and those interested in Privoxy development, should
-look at developer-manual.
+There should be documentation in the 'doc' subdirectory, but it may not be
+completed at this point. In particular, see the User Manual there, the FAQ, and
+those interested in Privoxy development, should look at developer-manual.
 
-The source and configuration files are all well commented. The main
-configuration files are: 'config', 'default.action', and 'default.filter'.
+The most up to date source of information on the current development version,
+may still be either comments in the source code, or the included configuration
+files. The source and configuration files are all well commented. The main
+configuration files are: 'config', 'default.action', and 'default.filter' in
+the top-level source directory.
 
 Included documentation may vary according to platform and packager. All
 documentation is posted on https://www.privoxy.org, in case you don't have it,
@@ -275,8 +282,8 @@ and you won't see them.
 
 Please send feedback on ads that slipped through, innocent images that were
 blocked, sites that don't work properly, and other configuration related
-problem of default.action file, to https://sourceforge.net/tracker/?group_id=
-11118&atid=460288, the Actions File Tracker.
+problem of default.action file, to https://sourceforge.net/p/ijbswa/
+actionsfile-feedback/, the Actions File Tracker.
 
 -------------------------------------------------------------------------------
 
@@ -311,7 +318,7 @@ welcome on the developers list. You can find an overview of all Privoxy-related
 mailing lists, including list archives, at: https://lists.privoxy.org/mailman/
 listinfo. The lists hosted on privoxy.org have been created in 2016, the
 previously-used lists hosted at SourceForge are deprecated but the archives may
-still be useful: https://sourceforge.net/mail/?group_id=11118.
+still be useful: https://sourceforge.net/p/ijbswa/mailman/.
 
 -------------------------------------------------------------------------------
 
