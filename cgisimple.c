@@ -261,7 +261,13 @@ jb_err cgi_show_request(struct client_state *csp,
    }
 
    if (map(exports, "processed-request", 1,
-         html_encode_and_free_original(list_to_text(csp->headers)), 0))
+         html_encode_and_free_original(
+#ifdef FEATURE_HTTPS_INSPECTION
+                                       csp->http->ssl ?
+                                       list_to_text(csp->https_headers) :
+#endif
+                                       list_to_text(csp->headers)
+                                       ), 0))
    {
       free_map(exports);
       return JB_ERR_MEMORY;
@@ -2735,6 +2741,22 @@ static jb_err show_defines(struct map *exports)
       {
          "FEATURE_DYNAMIC_PCRE",
 #ifdef FEATURE_DYNAMIC_PCRE
+         1,
+#else
+         0,
+#endif
+      },
+      {
+         "FEATURE_EXTENDED_STATISTICS",
+#ifdef FEATURE_EXTENDED_STATISTICS
+         1,
+#else
+         0,
+#endif
+      },
+      {
+         "FEATURE_PCRE_HOST_PATTERNS",
+#ifdef FEATURE_PCRE_HOST_PATTERNS
          1,
 #else
          0,

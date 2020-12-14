@@ -90,11 +90,6 @@
 #else
 #include <poll.h>
 #endif /* def __GLIBC__ */
-#else
-# ifndef FD_ZERO
-#  include <select.h>
-# endif
-#warning poll() appears to be unavailable. Your platform will become unsupported in the future.
 #endif /* HAVE_POLL */
 
 #endif
@@ -2621,13 +2616,7 @@ static void handle_established_connection(struct client_state *csp)
    char *hdr;
    char *p;
    int n;
-#ifdef HAVE_POLL
    struct pollfd poll_fds[2];
-#else
-   fd_set rfds;
-   jb_socket maxfd;
-   struct timeval timeout;
-#endif
    int server_body;
    int ms_iis5_hack = 0;
    unsigned long long byte_count = 0;
@@ -2666,11 +2655,6 @@ static void handle_established_connection(struct client_state *csp)
 
    http = csp->http;
 
-#ifndef HAVE_POLL
-   maxfd = (csp->cfd > csp->server_connection.sfd) ?
-      csp->cfd : csp->server_connection.sfd;
-#endif
-
    /* pass data between the client and server
     * until one or the other shuts down the connection.
     */
@@ -2684,22 +2668,6 @@ static void handle_established_connection(struct client_state *csp)
 
    for (;;)
    {
-#ifndef HAVE_POLL
-      FD_ZERO(&rfds);
-#ifdef FEATURE_CONNECTION_KEEP_ALIVE
-      if (!watch_client_socket)
-      {
-         maxfd = csp->server_connection.sfd;
-      }
-      else
-#endif /* def FEATURE_CONNECTION_KEEP_ALIVE */
-      {
-         FD_SET(csp->cfd, &rfds);
-      }
-
-      FD_SET(csp->server_connection.sfd, &rfds);
-#endif /* ndef HAVE_POLL */
-
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
       if ((csp->flags & CSP_FLAG_CHUNKED)
          && !(csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
@@ -2743,7 +2711,6 @@ static void handle_established_connection(struct client_state *csp)
       }
 #endif  /* FEATURE_CONNECTION_KEEP_ALIVE */
 
-#ifdef HAVE_POLL
       poll_fds[0].fd = csp->cfd;
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
       if (!watch_client_socket)
@@ -2764,11 +2731,6 @@ static void handle_established_connection(struct client_state *csp)
       poll_fds[1].fd = csp->server_connection.sfd;
       poll_fds[1].events = POLLIN;
       n = poll(poll_fds, 2, csp->config->socket_timeout * 1000);
-#else
-      timeout.tv_sec = csp->config->socket_timeout;
-      timeout.tv_usec = 0;
-      n = select((int)maxfd + 1, &rfds, NULL, NULL, &timeout);
-#endif /* def HAVE_POLL */
 
       /*server or client not responding in timeout */
       if (n == 0)
@@ -2787,11 +2749,7 @@ static void handle_established_connection(struct client_state *csp)
       }
       else if (n < 0)
       {
-#ifdef HAVE_POLL
          log_error(LOG_LEVEL_ERROR, "poll() failed!: %E");
-#else
-         log_error(LOG_LEVEL_ERROR, "select() failed!: %E");
-#endif
          mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
          close_client_and_server_ssl_connections(csp);
@@ -2808,7 +2766,6 @@ static void handle_established_connection(struct client_state *csp)
        * XXX: Make sure the client doesn't use pipelining
        * behind Privoxy's back.
        */
-#ifdef HAVE_POLL
       if ((poll_fds[0].revents & (POLLERR|POLLHUP|POLLNVAL)) != 0)
       {
          log_error(LOG_LEVEL_CONNECT,
@@ -2820,9 +2777,6 @@ static void handle_established_connection(struct client_state *csp)
       }
 
       if (poll_fds[0].revents != 0)
-#else
-      if (FD_ISSET(csp->cfd, &rfds))
-#endif /* def HAVE_POLL*/
       {
          int max_bytes_to_read = (int)csp->receive_buffer_size;
 
@@ -2833,7 +2787,7 @@ static void handle_established_connection(struct client_state *csp)
             {
                /*
                 * If the next request is already waiting, we have
-                * to stop select()ing the client socket. Otherwise
+                * to stop poll()ing the client socket. Otherwise
                 * we would always return right away and get nothing
                 * else done.
                 */
@@ -2953,11 +2907,7 @@ static void handle_established_connection(struct client_state *csp)
        * If `hdr' is null, then it's the header otherwise it's the body.
        * FIXME: Does `hdr' really mean `host'? No.
        */
-#ifdef HAVE_POLL
       if (poll_fds[1].revents != 0)
-#else
-      if (FD_ISSET(csp->server_connection.sfd, &rfds))
-#endif /* HAVE_POLL */
       {
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
          /*
@@ -3772,7 +3722,7 @@ static void chat(struct client_state *csp)
       use_ssl_tunnel = 1;
    }
 
-   if (http->ssl && csp->action->flags & ACTION_IGNORE_CERTIFICATE_ERRORS)
+   if (http->ssl && (csp->action->flags & ACTION_IGNORE_CERTIFICATE_ERRORS))
    {
       csp->dont_verify_certificate = 1;
    }
@@ -5425,17 +5375,6 @@ static jb_socket bind_port_helper(const char *haddr, int hport, int backlog)
       /* shouldn't get here */
       return JB_INVALID_SOCKET;
    }
-
-#ifndef HAVE_POLL
-#ifndef _WIN32
-   if (bfd >= FD_SETSIZE)
-   {
-      log_error(LOG_LEVEL_FATAL,
-         "Bind socket number too high to use select(): %d >= %d",
-         bfd, FD_SETSIZE);
-   }
-#endif
-#endif
 
    if (haddr == NULL)
    {
