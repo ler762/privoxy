@@ -2584,8 +2584,17 @@ for-privoxy-version=3.0.11
         version into an empty directory</emphasis>. (See "Building and releasing
         packages" above).
         <!-- XXX  ??? are we still basing releases off a tarball???
+                  yes
           -->
       </para>
+      <para>
+        Get and install NSIS from
+        <ulink url="https://sourceforge.net/projects/nsis/files/NSIS%203/">
+                    https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>.
+      </para>
+      <para>
+        Update the <tt>MAKENSIS</tt> evar in <filename>windows/GNUmakefile</filename>
+        to point to the makensis.exe executable.
       <para>
         Then you can build the package.  This is fully automated, and is
         controlled by <filename>windows/GNUmakefile</filename>.
