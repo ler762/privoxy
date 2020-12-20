@@ -39,7 +39,6 @@
 
 #define LOG_LEVEL_REQUEST    0x0001
 #define LOG_LEVEL_CONNECT    0x0002
-#define LOG_LEVEL_IO         0x0004
 #define LOG_LEVEL_HEADER     0x0008
 #define LOG_LEVEL_WRITING    0x0010
 #ifdef FEATURE_FORCE_LOAD
@@ -61,6 +60,8 @@
  */
 #define LOG_LEVEL_STFU      0x20000
 #endif
+
+#define LOG_LEVEL_IO         0x400000
 
 /* Following are always on: */
 #define LOG_LEVEL_INFO    0x1000
