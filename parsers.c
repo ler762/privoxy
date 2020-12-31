@@ -299,6 +299,27 @@ long flush_iob(jb_socket fd, struct iob *iob, unsigned int delay)
 
 /*********************************************************************
  *
+ * Function    :  can_add_to_iob
+ *
+ * Description :  Checks if the given number of bytes can be added to the given iob
+ *                without exceeding the given buffer limit.
+ *
+ * Parameters  :
+ *          1  :  iob = Destination buffer.
+ *          2  :  buffer_limit = Limit to which the destination may grow
+ *          3  :  n = number of bytes to be added
+ *
+ * Returns     :  TRUE if the given iob can handle given number of bytes
+ *                FALSE buffer limit will be exceeded
+ *
+ *********************************************************************/
+int can_add_to_iob(const struct iob *iob, const size_t buffer_limit, size_t n)
+{
+   return ((size_t)(iob->eod - iob->buf) + n + 1) > buffer_limit ? FALSE : TRUE;
+}
+
+/*********************************************************************
+ *
  * Function    :  add_to_iob
  *
  * Description :  Add content to the buffer, expanding the
@@ -314,7 +335,7 @@ long flush_iob(jb_socket fd, struct iob *iob, unsigned int delay)
  *                or buffer limit reached.
  *
  *********************************************************************/
-jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, char *src, long n)
+jb_err add_to_iob(struct iob *iob, const size_t buffer_limit, const char *src, long n)
 {
    size_t used, offset, need;
    char *p;
@@ -1507,7 +1528,7 @@ static jb_err header_tagger(struct client_state *csp, char *header)
 
       if (NULL == joblist)
       {
-         log_error(LOG_LEVEL_RE_FILTER,
+         log_error(LOG_LEVEL_TAGGING,
             "Tagger %s has empty joblist. Nothing to do.", b->name);
          continue;
       }
@@ -1554,14 +1575,14 @@ static jb_err header_tagger(struct client_state *csp, char *header)
              * no one would do it intentionally.
              */
             freez(tag);
-            log_error(LOG_LEVEL_INFO,
+            log_error(LOG_LEVEL_TAGGING,
                "Tagger \'%s\' created an empty tag. Ignored.", b->name);
             continue;
          }
 
          if (list_contains_item(csp->action->multi[ACTION_MULTI_SUPPRESS_TAG], tag))
          {
-            log_error(LOG_LEVEL_HEADER,
+            log_error(LOG_LEVEL_TAGGING,
                "Tagger \'%s\' didn't add tag \'%s\': suppressed",
                b->name, tag);
             freez(tag);
@@ -1594,7 +1615,7 @@ static jb_err header_tagger(struct client_state *csp, char *header)
                   action_message = "No action bits update necessary.";
                }
 
-               log_error(LOG_LEVEL_HEADER,
+               log_error(LOG_LEVEL_TAGGING,
                   "Tagger \'%s\' added tag \'%s\'. %s",
                   b->name, tag, action_message);
             }
@@ -1602,7 +1623,7 @@ static jb_err header_tagger(struct client_state *csp, char *header)
          else
          {
             /* XXX: Is this log-worthy? */
-            log_error(LOG_LEVEL_HEADER,
+            log_error(LOG_LEVEL_TAGGING,
                "Tagger \'%s\' didn't add tag \'%s\'. Tag already present",
                b->name, tag);
          }
@@ -2022,10 +2043,7 @@ static jb_err get_content_length(const char *header_value, unsigned long long *l
  *
  * Parameters  :
  *          1  :  csp = Current client state (buffers, headers, etc...)
- *          2  :  header = On input, pointer to header to modify.
- *                On output, pointer to the modified header, or NULL
- *                to remove the header.  This function frees the
- *                original string if necessary.
+ *          2  :  header = pointer to the Content-Length header
  *
  * Returns     :  JB_ERR_OK on success, or
  *                JB_ERR_MEMORY on out-of-memory error.
@@ -2638,6 +2656,37 @@ static jb_err server_adjust_content_encoding(struct client_state *csp, char **he
 
 /*********************************************************************
  *
+ * Function    :  header_adjust_content_length
+ *
+ * Description :  Replace given header with new Content-Length header.
+ *
+ * Parameters  :
+ *          1  :  header = On input, pointer to header to modify.
+ *                On output, pointer to the modified header, or NULL
+ *                to remove the header.  This function frees the
+ *                original string if necessary.
+ *          2  :  content_length = content length value to set
+ *
+ * Returns     :  JB_ERR_OK on success, or
+ *                JB_ERR_MEMORY on out-of-memory error.
+ *
+ *********************************************************************/
+jb_err header_adjust_content_length(char **header, size_t content_length)
+{
+   const size_t header_length = 50;
+   freez(*header);
+   *header = malloc(header_length);
+   if (*header == NULL)
+   {
+      return JB_ERR_MEMORY;
+   }
+   create_content_length_header(content_length, *header, header_length);
+   return JB_ERR_OK;
+}
+
+
+/*********************************************************************
+ *
  * Function    :  server_adjust_content_length
  *
  * Description :  Adjust Content-Length header if we modified
@@ -2659,14 +2708,10 @@ static jb_err server_adjust_content_length(struct client_state *csp, char **head
    /* Regenerate header if the content was modified. */
    if (csp->flags & CSP_FLAG_MODIFIED)
    {
-      const size_t header_length = 50;
-      freez(*header);
-      *header = malloc(header_length);
-      if (*header == NULL)
+      if (JB_ERR_OK != header_adjust_content_length(header, csp->content_length))
       {
          return JB_ERR_MEMORY;
       }
-      create_content_length_header(csp->content_length, *header, header_length);
       log_error(LOG_LEVEL_HEADER,
          "Adjusted Content-Length to %llu", csp->content_length);
    }
@@ -4874,6 +4919,10 @@ static jb_err handle_conditional_hide_referrer_parameter(char **header,
       referer[hostlength+17] = '\0';
    }
    referer_url = strstr(referer, "http://");
+   if (NULL == referer_url)
+   {
+      referer_url = strstr(referer, "https://");
+   }
    if ((NULL == referer_url) || (NULL == strstr(referer_url, host)))
    {
       /* Host has changed, Referer is invalid or a https URL. */

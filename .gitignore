@@ -58,4 +58,3 @@ w32.res
 autom4te.cache
 default.action
 windows/build/
-windows/nsis-3.03/

@@ -96,7 +96,7 @@
   <listitem>
    <para>
     Whether your version of <application>Privoxy</application> is one supplied
-    by the <application>Privoxy</application> developers via SourceForge,
+    by the <application>Privoxy</application> developers,
     or if you got your copy somewhere else.
    </para>
   </listitem>
@@ -129,7 +129,7 @@
     <literallayout>debug     1 # Log the destination for each request Privoxy let through.
             #   See also debug 1024.
 debug     2 # show each connection status
-debug     4 # show I/O status
+debug     4 # show tagging-related messages
 debug     8 # show header parsing
 debug   128 # debug redirects
 debug   256 # debug GIF de-animation
@@ -181,12 +181,6 @@ debug 65536 # Log applying actions</literallayout>
  Please don't bother to add an email address when using the tracker.
  If you prefer to communicate through email, just use one of the mailing
  lists directly.
-</para>
-
-<para>
- If you are new to reporting problems, you might be interested in
-  <ulink url="https://www.chiark.greenend.org.uk/~sgtatham/bugs.html"
-  >How to Report Bugs Effectively</ulink>.
 </para>
 
 <para>

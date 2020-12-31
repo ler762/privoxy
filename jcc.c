@@ -90,6 +90,11 @@
 #else
 #include <poll.h>
 #endif /* def __GLIBC__ */
+#else
+# ifndef FD_ZERO
+#  include <select.h>
+# endif
+#warning poll() appears to be unavailable. Your platform will become unsupported in the future.
 #endif /* HAVE_POLL */
 
 #endif
@@ -2022,6 +2027,142 @@ static jb_err parse_client_request(struct client_state *csp)
 
 /*********************************************************************
  *
+ * Function    : read_http_request_body
+ *
+ * Description : Reads remaining request body from the client.
+ *
+ * Parameters  :
+ *          1  :  csp = Current client state (buffers, headers, etc...)
+ *
+ * Returns     :  0 on success, anything else is an error.
+ *
+ *********************************************************************/
+static int read_http_request_body(struct client_state *csp)
+{
+   size_t to_read = csp->expected_client_content_length;
+   int len;
+
+   assert(to_read != 0);
+
+   /* check if all data has been already read */
+   if (to_read <= (csp->client_iob->eod - csp->client_iob->cur))
+   {
+      return 0;
+   }
+
+   for (to_read -= (size_t)(csp->client_iob->eod - csp->client_iob->cur);
+        to_read > 0 && data_is_available(csp->cfd, csp->config->socket_timeout);
+        to_read -= (unsigned)len)
+   {
+      char buf[BUFFER_SIZE];
+      size_t max_bytes_to_read = to_read < sizeof(buf) ? to_read : sizeof(buf);
+
+      log_error(LOG_LEVEL_CONNECT,
+         "Waiting for up to %d bytes of request body from the client.",
+         max_bytes_to_read);
+      len = read_socket(csp->cfd, buf, (int)max_bytes_to_read);
+      if (len <= -1)
+      {
+         log_error(LOG_LEVEL_CONNECT, "Failed receiving request body from %s: %E", csp->ip_addr_str);
+         return 1;
+      }
+      if (add_to_iob(csp->client_iob, csp->config->buffer_limit, (char *)buf, len))
+      {
+         return 1;
+      }
+      assert(to_read >= len);
+   }
+
+   if (to_read != 0)
+   {
+      log_error(LOG_LEVEL_CONNECT, "Not enough request body has been read: expected %d more bytes",
+         csp->expected_client_content_length);
+      return 1;
+   }
+   log_error(LOG_LEVEL_CONNECT, "The last %d bytes of the request body have been read",
+      csp->expected_client_content_length);
+   return 0;
+}
+
+
+/*********************************************************************
+ *
+ * Function    : update_client_headers
+ *
+ * Description : Updates the HTTP headers from the client request.
+ *
+ * Parameters  :
+ *          1  :  csp = Current client state (buffers, headers, etc...)
+ *          2  :  new_content_length = new content length value to set
+ *
+ * Returns     :  0 on success, anything else is an error.
+ *
+ *********************************************************************/
+static int update_client_headers(struct client_state *csp, size_t new_content_length)
+{
+   static const char content_length[] = "Content-Length:";
+   int updated = 0;
+   struct list_entry *p;
+
+#ifndef FEATURE_HTTPS_INSPECTION
+   for (p = csp->headers->first;
+#else
+   for (p = csp->http->client_ssl ? csp->https_headers->first : csp->headers->first;
+#endif
+        !updated  && (p != NULL); p = p->next)
+   {
+      /* Header crunch()ed in previous run? -> ignore */
+      if (p->str == NULL)
+      {
+         continue;
+      }
+
+      /* Does the current parser handle this header? */
+      if (0 == strncmpic(p->str, content_length, sizeof(content_length) - 1))
+      {
+         updated = (JB_ERR_OK == header_adjust_content_length((char **)&(p->str), new_content_length));
+         if (!updated)
+         {
+            return 1;
+         }
+      }
+   }
+
+   return !updated;
+}
+
+
+/*********************************************************************
+ *
+ * Function    : can_filter_request_body
+ *
+ * Description : Checks if the current request body can be stored in
+ *               the client_iob without hitting buffer limit.
+ *
+ * Parameters  :
+ *          1  : csp = Current client state (buffers, headers, etc...)
+ *
+ * Returns     : TRUE if the current request size do not exceed buffer limit
+ *               FALSE otherwise.
+ *
+ *********************************************************************/
+static int can_filter_request_body(const struct client_state *csp)
+{
+   if (!can_add_to_iob(csp->client_iob, csp->config->buffer_limit,
+                       csp->expected_client_content_length))
+   {
+      log_error(LOG_LEVEL_INFO,
+         "Not filtering request body from %s: buffer limit %d will be exceeded "
+         "(content length %d)", csp->ip_addr_str, csp->config->buffer_limit,
+         csp->expected_client_content_length);
+      return FALSE;
+   }
+   return TRUE;
+}
+
+
+/*********************************************************************
+ *
  * Function    : send_http_request
  *
  * Description : Sends the HTTP headers from the client request
@@ -2037,6 +2178,32 @@ static int send_http_request(struct client_state *csp)
 {
    char *hdr;
    int write_failure;
+   const char *to_send;
+   size_t to_send_len;
+   int filter_client_body = csp->expected_client_content_length != 0 &&
+      client_body_filters_enabled(csp->action) && can_filter_request_body(csp);
+
+   if (filter_client_body)
+   {
+      if (read_http_request_body(csp))
+      {
+         return 1;
+      }
+      to_send_len = csp->expected_client_content_length;
+      to_send = execute_client_body_filters(csp, &to_send_len);
+      if (to_send == NULL)
+      {
+         /* just flush client_iob */
+         filter_client_body = FALSE;
+      }
+      else if (to_send_len != csp->expected_client_content_length &&
+         update_client_headers(csp, to_send_len))
+      {
+         log_error(LOG_LEVEL_HEADER, "Error updating client headers");
+         return 1;
+      }
+      csp->expected_client_content_length = 0;
+   }
 
    hdr = list_to_text(csp->headers);
    if (hdr == NULL)
@@ -2057,26 +2224,100 @@ static int send_http_request(struct client_state *csp)
    {
       log_error(LOG_LEVEL_ERROR, "Failed sending request headers to: %s: %E",
          csp->http->hostport);
+      return 1;
    }
-   else if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
+
+   if (filter_client_body)
+   {
+      write_failure = 0 != write_socket(csp->server_connection.sfd, to_send, to_send_len);
+      freez(to_send);
+      if (write_failure)
+      {
+         log_error(LOG_LEVEL_CONNECT, "Failed sending filtered request body to: %s: %E",
+            csp->http->hostport);
+         return 1;
+      }
+   }
+
+   if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
       && (flush_iob(csp->server_connection.sfd, csp->client_iob, 0) < 0))
    {
-      write_failure = 1;
       log_error(LOG_LEVEL_ERROR, "Failed sending request body to: %s: %E",
          csp->http->hostport);
+      return 1;
    }
-
-   return write_failure;
-
+   return 0;
 }
 
 
 #ifdef FEATURE_HTTPS_INSPECTION
 /*********************************************************************
  *
+ * Function    : read_https_request_body
+ *
+ * Description : Reads remaining request body from the client.
+ *
+ * Parameters  :
+ *          1  :  csp = Current client state (buffers, headers, etc...)
+ *
+ * Returns     :  0 on success, anything else is an error.
+ *
+ *********************************************************************/
+static int read_https_request_body(struct client_state *csp)
+{
+   size_t to_read = csp->expected_client_content_length;
+   int len;
+
+   assert(to_read != 0);
+
+   /* check if all data has been already read */
+   if (to_read <= (csp->client_iob->eod - csp->client_iob->cur))
+   {
+      return 0;
+   }
+
+   for (to_read -= (size_t)(csp->client_iob->eod - csp->client_iob->cur);
+        to_read > 0 && (is_ssl_pending(&(csp->ssl_client_attr)) ||
+          data_is_available(csp->cfd, csp->config->socket_timeout));
+        to_read -= (unsigned)len)
+   {
+      unsigned char buf[BUFFER_SIZE];
+      size_t max_bytes_to_read = to_read < sizeof(buf) ? to_read : sizeof(buf);
+
+      log_error(LOG_LEVEL_CONNECT,
+         "Waiting for up to %d bytes of request body from the client.",
+         max_bytes_to_read);
+      len = ssl_recv_data(&(csp->ssl_client_attr), buf,
+         (unsigned)max_bytes_to_read);
+      if (len <= 0)
+      {
+         log_error(LOG_LEVEL_CONNECT, "Failed receiving request body from %s", csp->ip_addr_str);
+         return 1;
+      }
+      if (add_to_iob(csp->client_iob, csp->config->buffer_limit, (char *)buf, len))
+      {
+         return 1;
+      }
+      assert(to_read >= len);
+   }
+
+   if (to_read != 0)
+   {
+      log_error(LOG_LEVEL_CONNECT, "Not enough request body has been read: expected %d more bytes", to_read);
+      return 1;
+   }
+
+   log_error(LOG_LEVEL_CONNECT, "The last %d bytes of the request body have been read",
+      csp->expected_client_content_length);
+   return 0;
+}
+
+
+/*********************************************************************
+ *
  * Function    : receive_and_send_encrypted_post_data
  *
- * Description : Reads remaining POST data from the client and sends
+ * Description : Reads remaining request body from the client and sends
  *               it to the server.
  *
  * Parameters  :
@@ -2101,7 +2342,7 @@ static int receive_and_send_encrypted_post_data(struct client_state *csp)
          max_bytes_to_read = (int)csp->expected_client_content_length;
       }
       log_error(LOG_LEVEL_CONNECT,
-         "Waiting for up to %d bytes of POST data from the client.",
+         "Waiting for up to %d bytes of request body from the client.",
          max_bytes_to_read);
       len = ssl_recv_data(&(csp->ssl_client_attr), buf,
          (unsigned)max_bytes_to_read);
@@ -2114,7 +2355,7 @@ static int receive_and_send_encrypted_post_data(struct client_state *csp)
          /* XXX: Does this actually happen? */
          break;
       }
-      log_error(LOG_LEVEL_CONNECT, "Forwarding %d bytes of encrypted POST data",
+      log_error(LOG_LEVEL_CONNECT, "Forwarding %d bytes of encrypted request body",
          len);
       len = ssl_send_data(&(csp->ssl_server_attr), buf, (size_t)len);
       if (len == -1)
@@ -2135,7 +2376,7 @@ static int receive_and_send_encrypted_post_data(struct client_state *csp)
       }
    }
 
-   log_error(LOG_LEVEL_CONNECT, "Done forwarding encrypted POST data");
+   log_error(LOG_LEVEL_CONNECT, "Done forwarding encrypted request body");
 
    return 0;
 
@@ -2160,6 +2401,32 @@ static int send_https_request(struct client_state *csp)
    char *hdr;
    int ret;
    long flushed = 0;
+   const char *to_send;
+   size_t to_send_len;
+   int filter_client_body = csp->expected_client_content_length != 0 &&
+      client_body_filters_enabled(csp->action) && can_filter_request_body(csp);
+
+   if (filter_client_body)
+   {
+      if (read_https_request_body(csp))
+      {
+         return 1;
+      }
+      to_send_len = csp->expected_client_content_length;
+      to_send = execute_client_body_filters(csp, &to_send_len);
+      if (to_send == NULL)
+      {
+         /* just flush client_iob */
+         filter_client_body = FALSE;
+      }
+      else if (to_send_len != csp->expected_client_content_length &&
+         update_client_headers(csp, to_send_len))
+      {
+         log_error(LOG_LEVEL_HEADER, "Error updating client headers");
+         return 1;
+      }
+      csp->expected_client_content_length = 0;
+   }
 
    hdr = list_to_text(csp->https_headers);
    if (hdr == NULL)
@@ -2184,6 +2451,18 @@ static int send_https_request(struct client_state *csp)
          csp->http->hostport);
       mark_server_socket_tainted(csp);
       return 1;
+   }
+
+   if (filter_client_body)
+   {
+      ret = ssl_send_data(&(csp->ssl_server_attr), (const unsigned char *)to_send, to_send_len);
+      freez(to_send);
+      if (ret < 0)
+      {
+         log_error(LOG_LEVEL_CONNECT, "Failed sending filtered request body to: %s",
+            csp->http->hostport);
+         return 1;
+      }
    }
 
    if (((csp->flags & CSP_FLAG_PIPELINED_REQUEST_WAITING) == 0)
@@ -2616,7 +2895,13 @@ static void handle_established_connection(struct client_state *csp)
    char *hdr;
    char *p;
    int n;
+#ifdef HAVE_POLL
    struct pollfd poll_fds[2];
+#else
+   fd_set rfds;
+   jb_socket maxfd;
+   struct timeval timeout;
+#endif
    int server_body;
    int ms_iis5_hack = 0;
    unsigned long long byte_count = 0;
@@ -2655,6 +2940,11 @@ static void handle_established_connection(struct client_state *csp)
 
    http = csp->http;
 
+#ifndef HAVE_POLL
+   maxfd = (csp->cfd > csp->server_connection.sfd) ?
+      csp->cfd : csp->server_connection.sfd;
+#endif
+
    /* pass data between the client and server
     * until one or the other shuts down the connection.
     */
@@ -2668,6 +2958,22 @@ static void handle_established_connection(struct client_state *csp)
 
    for (;;)
    {
+#ifndef HAVE_POLL
+      FD_ZERO(&rfds);
+#ifdef FEATURE_CONNECTION_KEEP_ALIVE
+      if (!watch_client_socket)
+      {
+         maxfd = csp->server_connection.sfd;
+      }
+      else
+#endif /* def FEATURE_CONNECTION_KEEP_ALIVE */
+      {
+         FD_SET(csp->cfd, &rfds);
+      }
+
+      FD_SET(csp->server_connection.sfd, &rfds);
+#endif /* ndef HAVE_POLL */
+
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
       if ((csp->flags & CSP_FLAG_CHUNKED)
          && !(csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
@@ -2711,6 +3017,7 @@ static void handle_established_connection(struct client_state *csp)
       }
 #endif  /* FEATURE_CONNECTION_KEEP_ALIVE */
 
+#ifdef HAVE_POLL
       poll_fds[0].fd = csp->cfd;
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
       if (!watch_client_socket)
@@ -2731,6 +3038,11 @@ static void handle_established_connection(struct client_state *csp)
       poll_fds[1].fd = csp->server_connection.sfd;
       poll_fds[1].events = POLLIN;
       n = poll(poll_fds, 2, csp->config->socket_timeout * 1000);
+#else
+      timeout.tv_sec = csp->config->socket_timeout;
+      timeout.tv_usec = 0;
+      n = select((int)maxfd + 1, &rfds, NULL, NULL, &timeout);
+#endif /* def HAVE_POLL */
 
       /*server or client not responding in timeout */
       if (n == 0)
@@ -2749,7 +3061,11 @@ static void handle_established_connection(struct client_state *csp)
       }
       else if (n < 0)
       {
+#ifdef HAVE_POLL
          log_error(LOG_LEVEL_ERROR, "poll() failed!: %E");
+#else
+         log_error(LOG_LEVEL_ERROR, "select() failed!: %E");
+#endif
          mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
          close_client_and_server_ssl_connections(csp);
@@ -2766,6 +3082,7 @@ static void handle_established_connection(struct client_state *csp)
        * XXX: Make sure the client doesn't use pipelining
        * behind Privoxy's back.
        */
+#ifdef HAVE_POLL
       if ((poll_fds[0].revents & (POLLERR|POLLHUP|POLLNVAL)) != 0)
       {
          log_error(LOG_LEVEL_CONNECT,
@@ -2777,6 +3094,9 @@ static void handle_established_connection(struct client_state *csp)
       }
 
       if (poll_fds[0].revents != 0)
+#else
+      if (FD_ISSET(csp->cfd, &rfds))
+#endif /* def HAVE_POLL*/
       {
          int max_bytes_to_read = (int)csp->receive_buffer_size;
 
@@ -2787,7 +3107,7 @@ static void handle_established_connection(struct client_state *csp)
             {
                /*
                 * If the next request is already waiting, we have
-                * to stop poll()ing the client socket. Otherwise
+                * to stop select()ing the client socket. Otherwise
                 * we would always return right away and get nothing
                 * else done.
                 */
@@ -2907,7 +3227,11 @@ static void handle_established_connection(struct client_state *csp)
        * If `hdr' is null, then it's the header otherwise it's the body.
        * FIXME: Does `hdr' really mean `host'? No.
        */
+#ifdef HAVE_POLL
       if (poll_fds[1].revents != 0)
+#else
+      if (FD_ISSET(csp->server_connection.sfd, &rfds))
+#endif /* HAVE_POLL */
       {
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
          /*
@@ -5206,7 +5530,10 @@ int main(int argc, char **argv)
       }
 #endif
 
-      chdir("/");
+      if (chdir("/") != 0)
+      {
+         log_error(LOG_LEVEL_FATAL, "Failed to cd into '/': %E");
+      }
 
    } /* -END- if (daemon_mode) */
 
@@ -5375,6 +5702,17 @@ static jb_socket bind_port_helper(const char *haddr, int hport, int backlog)
       /* shouldn't get here */
       return JB_INVALID_SOCKET;
    }
+
+#ifndef HAVE_POLL
+#ifndef _WIN32
+   if (bfd >= FD_SETSIZE)
+   {
+      log_error(LOG_LEVEL_FATAL,
+         "Bind socket number too high to use select(): %d >= %d",
+         bfd, FD_SETSIZE);
+   }
+#endif
+#endif
 
    if (haddr == NULL)
    {

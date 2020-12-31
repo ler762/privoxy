@@ -32,7 +32,7 @@
 @SET_MAKE@
 
 #############################################################################
-# Version number (for RPM)
+# Version number
 #############################################################################
 
 VERSION_MAJOR = @VERSION_MAJOR@
@@ -574,6 +574,7 @@ groff2html:
 dok-readme: dok-release
 	cd doc/source && $(DB_TXT)-notoc -V nochunks readme.sgml > tmp.html &&\
 	$(W3M_DUMP) tmp.html > ../../README ;\
+	$(PERL) -pi'' -e 's@doc/source/readme\.sgml@README@' ../../README;  \
 	$(DB_TXT)-notoc -V nochunks install.sgml > tmp.html &&\
 	$(W3M_DUMP) tmp.html > ../../INSTALL ;\
 	$(RM) tmp.*
@@ -589,7 +590,8 @@ dok-webserver:
 	s/\.\d\. //;\
 	s/__copy/&copy;/;\
 	s@(<SUB)@<p style="text-align: center">\1@; s@(</SUB)@\1></p@;\
-	s@(Privoxy is a non-caching)@<img src="images/privoxy.png" align="right" alt="Privoxy logo">\n\1@;' \
+	s@(Privoxy is a non-caching)@<img src="images/privoxy.png" align="right" alt="Privoxy logo">\n\1@; \
+	s@www.lalal.ai@<a href="https://www.lalal.ai/"><img src="images/sponsors/lalal.ai_logo.png" align="middle" alt="Vocal Remover by Lalal.ai"></a>\n@;' \
      doc/webserver/index.html && $(RM) doc/webserver/*.bak
 
 # privoxy-index.html for local documentation:
@@ -1018,7 +1020,6 @@ install: CONF_DEST LOG_DEST PID_DEST check_doc GROUP_T
 uninstall: CONF_DEST LOG_DEST PID_DEST check_doc
 	@$(ECHO) Starting Privoxy uninstallation
 	@# KILL privoxy if running
-	@# XXX: the chkconfig line may need a DESTDIR prefix.
 	-@test -f $(DESTDIR)$(PID_DEST)/privoxy.pid && $(ECHO) Stopping $(PROGRAM) &&\
          $(KILL) `$(CAT) $(DESTDIR)$(PID_DEST)/privoxy.pid` || :
 	-@test -f $(DESTDIR)/var/run/privoxy.pid && $(ECHO) Stopping $(PROGRAM) &&\

@@ -738,6 +738,7 @@ actionsfile
  fk 2007-11-07
 -->
 <![%config-file;[<literallayout>@@actionsfile user.action      # User customizations</literallayout>]]>
+<![%config-file;[<literallayout>@@#regression-tests.action     # Tests for privoxy-regression-test</literallayout>]]>
 </sect3>
 
 <!--   ~~~~~       New section      ~~~~~     -->
@@ -1018,7 +1019,7 @@ actionsfile
     <programlisting>
   debug     1 # Log the destination for each request. See also debug 1024.
   debug     2 # show each connection status
-  debug     4 # show I/O status
+  debug     4 # show tagging-related messages
   debug     8 # show header parsing
   debug    16 # log all data written to the network
   debug    32 # debug force feature
@@ -1269,7 +1270,7 @@ actionsfile
     They can only be used if <application>Privoxy</application> has
     been compiled with IPv6 support. If you aren't sure if your version
     supports it, have a look at
-    <literal>http://config.privoxy.org/show-status</literal>.
+    <ulink url="http://config.privoxy.org/show-status">http://config.privoxy.org/show-status</ulink>.
    </para>
    <para>
     Some operating systems will prefer IPv6 to IPv4 addresses even if the
@@ -3632,12 +3633,6 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
  <varlistentry>
   <term>Notes:</term>
   <listitem>
-   <warning>
-   <para>
-    This is an experimental feature. The syntax is likely to change
-    in future versions.
-   </para>
-   </warning>
    <para>
     Client-specific tags allow Privoxy admins to create different
     profiles and let the users chose which one they want without
@@ -3671,7 +3666,7 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
     Clients can request tags to be set by using the CGI interface <ulink
      url="http://config.privoxy.org/client-tags">http://config.privoxy.org/client-tags</ulink>.
     The specific tag description is only used on the web page and should
-    be phrased in away that the user understand the effect of the tag.
+    be phrased in away that the user understands the effect of the tag.
    </para>
   </listitem>
  </varlistentry>
@@ -3682,9 +3677,14 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
     # Define a couple of tags, the described effect requires action sections
     # that are enabled based on CLIENT-TAG patterns.
     client-specific-tag circumvent-blocks Overrule blocks but do not affect other actions
-    disable-content-filters Disable content-filters but do not affect other actions
+    client-specific-tag disable-content-filters Disable content-filters but do not affect other actions
+    client-specific-tag overrule-redirects Overrule redirect sections
+    client-specific-tag allow-cookies Do not crunch cookies in either direction
+    client-specific-tag change-tor-socks-port Change forward-socks5 settings to use a different Tor socks port (and circuits)
+    client-specific-tag no-https-inspection Disable HTTPS inspection
+    client-specific-tag no-tls-verification Don't verify certificates when http-inspection is enabled
 </screen>
-  </listitem>
+</listitem>
  </varlistentry>
 </variablelist>
 </sect3>
@@ -3718,12 +3718,6 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
  <varlistentry>
   <term>Notes:</term>
   <listitem>
-   <warning>
-   <para>
-    This is an experimental feature. The syntax is likely to change
-    in future versions.
-   </para>
-   </warning>
    <para>
     In case of some tags users may not want to enable them permanently,
     but only for a short amount of time, for example to circumvent a block
@@ -3779,12 +3773,6 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
  <varlistentry>
   <term>Notes:</term>
   <listitem>
-   <warning>
-   <para>
-    This is an experimental feature. The syntax is likely to change
-    in future versions.
-   </para>
-   </warning>
    <para>
     If clients reach Privoxy through another proxy, for example a load
     balancer, Privoxy can't tell the client's IP address from the connection.
@@ -3904,9 +3892,11 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
 <title>HTTPS Inspection (Experimental)</title>
 
 <para>
-  HTTPS inspection allows to filter encrypted requests.
+  HTTPS inspection allows to filter encrypted requests and responses.
   This is only supported when <application>Privoxy</application>
   has been built with FEATURE_HTTPS_INSPECTION.
+  If you aren't sure if your version supports it, have a look at
+  <ulink url="http://config.privoxy.org/show-status">http://config.privoxy.org/show-status</ulink>.
 </para>
 
 <!--   ~~~~~       New section      ~~~~~     -->
@@ -4083,6 +4073,9 @@ forward-socks4, forward-socks4a, forward-socks5 and forward-socks5t</title>
     This directive specifies the name of the CA key file in ".pem" format.
     The <ulink url="#CA-CERT-FILE">ca-cert-file section</ulink> contains
     a command to generate it.
+   </para>
+   <para>
+    Access to the key should be limited to Privoxy.
    </para>
   </listitem>
  </varlistentry>
@@ -4412,7 +4405,9 @@ AES128-SHA
    </para>
    <para>
     An example file can be downloaded from
-    <ulink url="https://curl.haxx.se/ca/cacert.pem">https://curl.haxx.se/ca/cacert.pem</ulink>.
+    <ulink url="https://curl.se/ca/cacert.pem">https://curl.se/ca/cacert.pem</ulink>.
+    If you want to create the file yourself, please see:
+    <ulink url="https://curl.se/docs/caextract.html">https://curl.se/docs/caextract.html</ulink>.
    </para>
   </listitem>
  </varlistentry>
