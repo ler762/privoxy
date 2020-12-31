@@ -43,7 +43,7 @@ use warnings;
 use Getopt::Long;
 
 use constant {
-    PRIVOXY_LOG_PARSER_VERSION => '0.9.1',
+    PRIVOXY_LOG_PARSER_VERSION => '0.9.2',
     # Feel free to mess with these ...
     DEFAULT_BACKGROUND => 'black',  # Choose registered colour (like 'black')
     DEFAULT_TEXT_COLOUR => 'white', # Choose registered colour (like 'black')
@@ -130,6 +130,7 @@ sub prepare_our_stuff() {
         'Re-Filter'     => 'purple',
         Connect         => 'brown',
         Request         => 'light_cyan',
+        Tagging         => 'purple',
         CGI             => 'light_green',
         Redirect        => 'cyan',
         Error           => 'light_red',
@@ -1225,6 +1226,26 @@ sub handle_loglevel_re_filter($) {
     }
 
     return $content;
+}
+
+sub handle_loglevel_tagging($) {
+
+    my $c = shift;
+
+    if ($c =~ /^Tagger \'([^\']*)\' added tag \'([^\']*)\'/ or
+        $c =~ m/^Adding tag \'([^\']*)\' created by header tagger \'([^\']*)\'/) {
+
+        # Adding tag 'GET request' created by header tagger 'method-man' (XXX: no longer used)
+        # Tagger 'revalidation' added tag 'REVALIDATION-REQUEST'. No action bit update necessary.
+        # Tagger 'revalidation' added tag 'REVALIDATION-REQUEST'. Action bits updated accordingly.
+
+        # XXX: Save tag and tagger
+
+        $c =~ s@(?<=^Tagger \')([^\']*)@$h{'tagger'}$1$h{'Standard'}@;
+        $c =~ s@(?<=added tag \')([^\']*)@$h{'tag'}$1$h{'Standard'}@;
+        $c =~ s@(?<=Action bits )(updated)@$h{'action-bits-update'}$1$h{'Standard'}@;
+    }
+    return $c;
 }
 
 sub handle_loglevel_redirect($) {
@@ -2454,6 +2475,7 @@ sub parse_loop() {
         'Fatal error'       => \&handle_loglevel_ignore,
         'Writing'           => \&handle_loglevel_ignore,
         'Received'          => \&handle_loglevel_ignore,
+        'Tagging'           => \&handle_loglevel_tagging,
         'Actions'           => \&handle_loglevel_ignore,
         'Unknown log level' => \&handle_loglevel_ignore,
     );
@@ -2551,6 +2573,7 @@ sub stats_loop() {
          'Redirect:'          => \&handle_loglevel_ignore,
          'Unknown log level:' => \&handle_loglevel_ignore,
          'Writing:'           => \&handle_loglevel_ignore,
+         'Tagging:'           => \&handle_loglevel_ignore,
     );
 
     while (<>) {

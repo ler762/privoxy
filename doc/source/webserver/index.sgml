@@ -182,12 +182,13 @@
   Hosting and development is funded in part by:
  </subscript>
  <subscript>
-  <ulink url="https://www.top10vpn.com">https://www.top10vpn.com</ulink>
+  <!-- The GNUMakefile will turn this marker into an image link -->
+  www.lalal.ai
  </subscript>
 </para>
 <para>
  <subscript>
-  <ulink url="/faq/general.html#SPONSOR">Become a sponsor</ulink>
+  <ulink url="/sponsor">Become a sponsor</ulink>
  </subscript>
 </para>
 ]]>

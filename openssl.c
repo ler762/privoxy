@@ -396,6 +396,7 @@ static int ssl_store_cert(struct client_state *csp, X509* crt)
    }
    else
    {
+      int i;
       if (bs->type == V_ASN1_NEG_INTEGER)
       {
          if (BIO_puts(bio, " (Negative)") < 0)
@@ -405,7 +406,7 @@ static int ssl_store_cert(struct client_state *csp, X509* crt)
             goto exit;
          }
       }
-      for (int i = 0; i < bs->length; i++)
+      for (i = 0; i < bs->length; i++)
       {
          if (BIO_printf(bio, "%02x%c", bs->data[i],
                ((i + 1 == bs->length) ? '\n' : ':')) <= 0)
@@ -1140,7 +1141,8 @@ extern int create_server_ssl_connection(struct client_state *csp)
    chain = SSL_get_peer_cert_chain(ssl);
    if (chain)
    {
-      for (int i = 0; i < sk_X509_num(chain); i++)
+      int i;
+      for (i = 0; i < sk_X509_num(chain); i++)
       {
          if (ssl_store_cert(csp, sk_X509_value(chain, i)) != 0)
          {
@@ -1790,6 +1792,25 @@ static int generate_webpage_certificate(struct client_state *csp)
          freez(cert_opt.subject_key);
 
          return 0;
+      }
+   }
+
+   if (file_exists(cert_opt.output_file) == 0 &&
+       file_exists(cert_opt.subject_key) == 1)
+   {
+      log_error(LOG_LEVEL_ERROR,
+         "A website key already exists but there's no matching certificate. "
+         "Removing %s before creating a new key and certificate.",
+         cert_opt.subject_key);
+      if (unlink(cert_opt.subject_key))
+      {
+         log_error(LOG_LEVEL_ERROR, "Failed to unlink %s: %E",
+            cert_opt.subject_key);
+
+         freez(cert_opt.output_file);
+         freez(cert_opt.subject_key);
+
+         return -1;
       }
    }
 
