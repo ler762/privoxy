@@ -1917,6 +1917,16 @@ jb_err cgi_show_url_info_x(struct client_state *csp,
 
 #define gofaster
 #ifdef gofaster
+  /* using an in-memory template is faster than reading the template from
+   *  disk, but much more painful to modify the in-memory template
+   *  (ie. edit templates/show-url-info-x
+   *       test
+   *   vs  edit cgisimple.c
+   *       rebuild privoxy
+   *       kill privoxy
+   *       run the new version of privoxy
+   *       test
+   */
    char body[] = \
 "<!DOCTYPE html><html><head>\n"\
 "<title>Privoxy URL Info</title>\n"\

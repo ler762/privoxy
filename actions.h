@@ -70,8 +70,8 @@ extern void init_current_action     (struct current_action_spec *dest);
 extern void free_current_action     (struct current_action_spec *src);
 extern jb_err merge_current_action  (struct current_action_spec *dest,
                                      const struct action_spec *src);
-extern jb_err merge_single_actions  (struct current_action_spec *dest,     /* -LR- */
-                                     const struct action_spec *src);       /* -LR- */
+extern jb_err merge_single_actions  (struct current_action_spec *dest,
+                                     const struct action_spec *src);
 extern char * current_action_to_html(const struct client_state *csp,
                                      const struct current_action_spec *action);
 extern char * actions_to_line_of_text(const struct current_action_spec *action);

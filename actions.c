@@ -787,9 +787,9 @@ jb_err merge_current_action (struct current_action_spec *dest,
 /*********************************************************************
  *
  * Function    :  merge_single_actions
- *      same thing as merge_current_action except
- *      skip processing of multi actions
- *      no, i have no idea what the diff is between single & multi actions
+ *      same thing as merge_current_action except skip processing of
+ *      multi actions (multi actions are things that can be applied
+ *      multiple times like filter{})
  *
  * Description :  Merge two actions together.
  *                Similar to "dest += src".
