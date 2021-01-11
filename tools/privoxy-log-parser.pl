@@ -23,7 +23,7 @@
 #         hash key as input.
 #       - Add --compress and --decompress options.
 #
-# Copyright (c) 2007-2020 Fabian Keil <fk@fabiankeil.de>
+# Copyright (c) 2007-2021 Fabian Keil <fk@fabiankeil.de>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -179,6 +179,7 @@ sub prepare_our_stuff() {
         'pcrs-delimiter'     => 'light_red',
         'ignored'            => 'light_red',
         'action-bits-update' => 'light_red',
+        'http-downgrade'     => 'light_red',
         'configuration-line' => 'red',
         'content-type'       => 'yellow',
         'HOST'               => HEADER_DEFAULT_COLOUR,
@@ -1304,6 +1305,17 @@ sub handle_loglevel_redirect($) {
 
         # Percent-encoding redirect URL: http://www.example.org/\x02
         $c = highlight_matched_url($c, '(?<=redirect URL: ).*');
+
+    } elsif ($c =~ m/^Rewrite detected:/) {
+
+        # Rewrite detected: GET http://10.0.0.2:88/blah.txt HTTP/1.1
+        # Rewrite detected: GET https://www.electrobsd.org/CommonJS/ajax/libs/jquery/3.4.1/jquery.min.js HTTP/1.1
+        $c = highlight_matched_request_line($c, '(?<=^Rewrite detected: ).*');
+
+    } elsif ($c =~ m/^Rewritten request line results in downgrade to http/) {
+
+        # Rewritten request line results in downgrade to http
+        $c =~ s@(downgrade)@$h{'http-downgrade'}$1$h{'Standard'}@;
 
     } else {
 

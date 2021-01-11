@@ -5,7 +5,7 @@
  * Purpose     :  Main file.  Contains main() method, main loop, and
  *                the main connection-handling function.
  *
- * Copyright   :  Written by and Copyright (C) 2001-2020 the
+ * Copyright   :  Written by and Copyright (C) 2001-2021 the
  *                Privoxy team. https://www.privoxy.org/
  *
  *                Based on the Internet Junkbuster originally written
@@ -968,8 +968,8 @@ static int crunch_response_triggered(struct client_state *csp, const struct crun
  *
  * Parameters  :
  *          1  :  csp = Current client state (buffers, headers, etc...)
- *          2  :  fwd = The forwarding spec used for the request
- *                XXX: Should use http->fwd instead.
+ *          2  :  fwd = The forwarding spec used for the request.
+ *                      Can be NULL.
  *          3  :  request_line = The old request line which will be replaced.
  *
  * Returns     :  Nothing. Terminates in case of memory problems.
@@ -997,7 +997,7 @@ static void build_request_line(struct client_state *csp, const struct forward_sp
    *request_line = strdup(http->gpc);
    string_append(request_line, " ");
 
-   if (fwd->forward_host && fwd->type != FORWARD_WEBSERVER)
+   if (fwd != NULL && fwd->forward_host && fwd->type != FORWARD_WEBSERVER)
    {
       string_append(request_line, http->url);
    }
@@ -1043,6 +1043,16 @@ static jb_err change_request_destination(struct client_state *csp)
    {
       log_error(LOG_LEVEL_ERROR, "Couldn't parse rewritten request: %s.",
          jb_err_to_string(err));
+   }
+   if (http->ssl && strcmpic(csp->http->gpc, "CONNECT"))
+   {
+      /*
+       * A client header filter changed the request URL from
+       * http:// to https:// which we currently don't support.
+       */
+      log_error(LOG_LEVEL_ERROR, "Changing the request destination from http "
+         "to https behind the client's back currently isn't supported.");
+      return JB_ERR_PARSE;
    }
 
    return err;
@@ -1971,7 +1981,7 @@ static jb_err parse_client_request(struct client_state *csp)
          strlen(MESSED_UP_REQUEST_RESPONSE), get_write_delay(csp));
       /* XXX: Use correct size */
       log_error(LOG_LEVEL_CLF,
-         "%s - - [%T] \"Invalid request generated\" 500 0", csp->ip_addr_str);
+         "%s - - [%T] \"Invalid request generated\" 400 0", csp->ip_addr_str);
       log_error(LOG_LEVEL_ERROR,
          "Invalid request line after applying header filters.");
       free_http_request(http);
@@ -2530,6 +2540,107 @@ static jb_err receive_encrypted_request(struct client_state *csp)
 
 /*********************************************************************
  *
+ * Function    :  change_encrypted_request_destination
+ *
+ * Description :  Parse a (rewritten) request line from an encrypted
+ *                request and regenerate the http request data.
+ *
+ * Parameters  :
+ *          1  :  csp = Current client state (buffers, headers, etc...)
+ *
+ * Returns     :  Forwards the parse_http_request() return code.
+ *                Terminates in case of memory problems.
+ *
+ *********************************************************************/
+static jb_err change_encrypted_request_destination(struct client_state *csp)
+{
+   jb_err err;
+   char *original_host = csp->http->host;
+   int original_port = csp->http->port;
+
+   log_error(LOG_LEVEL_REDIRECTS, "Rewrite detected: %s",
+      csp->https_headers->first->str);
+   csp->http->host = NULL;
+   free_http_request(csp->http);
+   err = parse_http_request(csp->https_headers->first->str, csp->http);
+   if (JB_ERR_OK != err)
+   {
+      log_error(LOG_LEVEL_ERROR, "Couldn't parse rewritten request: %s.",
+         jb_err_to_string(err));
+      freez(original_host);
+      return err;
+   }
+
+   if (csp->http->host == NULL)
+   {
+      char port_string[10];
+      /*
+       * The rewritten request line did not specify a host
+       * which means we can use the original host specified
+       * by the client.
+       */
+      csp->http->host = original_host;
+      csp->http->port = original_port;
+      log_error(LOG_LEVEL_REDIRECTS, "Keeping the original host: %s",
+         csp->http->host);
+      /*
+       * If the rewritten request line didn't contain a host
+       * it also didn't contain a port so we can reuse the host
+       * port.
+       */
+      freez(csp->http->hostport);
+      csp->http->hostport = strdup_or_die(csp->http->host);
+      snprintf(port_string, sizeof(port_string), ":%d", original_port);
+      err = string_append(&csp->http->hostport, port_string);
+      if (err != JB_ERR_OK)
+      {
+         log_error(LOG_LEVEL_ERROR, "Failed to rebuild hostport: %s.",
+            jb_err_to_string(err));
+         return err;
+      }
+
+      /*
+       * While the request line didn't mention it,
+       * we're https-inspecting and want to speak TLS
+       * with the server.
+       */
+      csp->http->server_ssl = 1;
+      csp->http->ssl = 1;
+   }
+   else
+   {
+      /* The rewrite filter added a host so we can ditch the original */
+      freez(original_host);
+      csp->http->server_ssl = csp->http->ssl;
+   }
+
+   csp->http->client_ssl = 1;
+
+   freez(csp->https_headers->first->str);
+   build_request_line(csp, NULL, &csp->https_headers->first->str);
+
+   if (!server_use_ssl(csp))
+   {
+      log_error(LOG_LEVEL_REDIRECTS,
+         "Rewritten request line results in downgrade to http");
+      /*
+       * Replace the unencryptd headers received with the
+       * CONNECT request with the ones we received securely.
+       */
+      destroy_list(csp->headers);
+      csp->headers->first = csp->https_headers->first;
+      csp->headers->last  = csp->https_headers->last;
+      csp->https_headers->first = NULL;
+      csp->https_headers->last = NULL;
+   }
+
+   return JB_ERR_OK;
+
+}
+
+
+/*********************************************************************
+ *
  * Function    :  process_encrypted_request
  *
  * Description :  Receives and parses an encrypted request.
@@ -2706,6 +2817,22 @@ static jb_err process_encrypted_request(struct client_state *csp)
          csp->ip_addr_str);
       log_error(LOG_LEVEL_CLF, "%s - - [%T] \"%s\" 400 0",
          csp->ip_addr_str, csp->http->cmd);
+      return JB_ERR_PARSE;
+   }
+
+   if ((NULL == csp->https_headers->first->str)
+      || (strcmp(csp->http->cmd, csp->https_headers->first->str) &&
+         (JB_ERR_OK != change_encrypted_request_destination(csp))))
+   {
+      ssl_send_data_delayed(&(csp->ssl_client_attr),
+         (const unsigned char *)MESSED_UP_REQUEST_RESPONSE,
+         strlen(MESSED_UP_REQUEST_RESPONSE), get_write_delay(csp));
+      log_error(LOG_LEVEL_ERROR,
+         "Invalid request line after applying header filters.");
+      /* XXX: Use correct size */
+      log_error(LOG_LEVEL_CLF,
+         "%s - - [%T] \"Invalid request generated\" 400 0", csp->ip_addr_str);
+
       return JB_ERR_PARSE;
    }
 
@@ -4156,7 +4283,7 @@ static void chat(struct client_state *csp)
       }
 #endif /* def FEATURE_CONNECTION_KEEP_ALIVE */
 #ifdef FEATURE_HTTPS_INSPECTION
-      if (http->ssl && !use_ssl_tunnel)
+      if (client_use_ssl(csp) && !use_ssl_tunnel)
       {
          int ret;
          /*

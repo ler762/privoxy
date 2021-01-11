@@ -4,7 +4,7 @@
  *
  * Purpose     :  Declares functions to parse/crunch headers and pages.
  *
- * Copyright   :  Written by and Copyright (C) 2001-2020 the
+ * Copyright   :  Written by and Copyright (C) 2001-2021 the
  *                Privoxy team. https://www.privoxy.org/
  *
  *                Based on the Internet Junkbuster originally written
@@ -1211,8 +1211,8 @@ static void enforce_header_order(struct list *headers, const struct list *ordere
    }
 
    list_remove_all(headers);
-   list_duplicate(headers, new_headers);
-   list_remove_all(new_headers);
+   headers->first = new_headers->first;
+   headers->last  = new_headers->last;
 
    return;
 }
@@ -1291,7 +1291,9 @@ jb_err sed(struct client_state *csp, int filter_server_headers)
       f++;
    }
 
-   if (!filter_server_headers && !list_is_empty(csp->config->ordered_client_headers))
+   if (!filter_server_headers &&
+       !list_is_empty(csp->config->ordered_client_headers) &&
+       csp->headers->first->str != NULL)
    {
       enforce_header_order(csp->headers, csp->config->ordered_client_headers);
    }
@@ -1346,9 +1348,11 @@ jb_err sed_https(struct client_state *csp)
    csp->flags |= CSP_FLAG_CLIENT_HEADER_PARSING_DONE;
 
    /*
-    * Update the last header which may have changed
-    * due to header additions,
+    * Update the https headers list which may have
+    * been modified due to header additions or header
+    * reordering.
     */
+   csp->https_headers->first = csp->headers->first;
    csp->https_headers->last = csp->headers->last;
 
    csp->headers->first = headers.first;
@@ -1693,7 +1697,8 @@ static jb_err filter_header(struct client_state *csp, char **header)
 
       if (NULL == joblist)
       {
-         log_error(LOG_LEVEL_RE_FILTER, "Filter %s has empty joblist. Nothing to do.", b->name);
+         log_error(LOG_LEVEL_RE_FILTER,
+            "Filter %s has empty joblist. Nothing to do.", b->name);
          continue;
       }
 
@@ -1707,7 +1712,8 @@ static jb_err filter_header(struct client_state *csp, char **header)
          if (0 < matches)
          {
             current_hits += matches;
-            log_error(LOG_LEVEL_HEADER, "Transforming \"%s\" to \"%s\"", *header, newheader);
+            log_error(LOG_LEVEL_HEADER,
+               "Transforming \"%s\" to \"%s\"", *header, newheader);
             freez(*header);
             *header = newheader;
          }
@@ -1719,7 +1725,8 @@ static jb_err filter_header(struct client_state *csp, char **header)
          else
          {
             /* RegEx failure */
-            log_error(LOG_LEVEL_ERROR, "Filtering \'%s\' with \'%s\' didn't work out: %s",
+            log_error(LOG_LEVEL_ERROR,
+               "Filtering \'%s\' with \'%s\' didn't work out: %s",
                *header, b->name, pcrs_strerror(matches));
             if (newheader != NULL)
             {
