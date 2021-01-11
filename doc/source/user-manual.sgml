@@ -35,7 +35,7 @@
 
  Purpose     :  user manual
 
- Copyright (C) 2001-2020 Privoxy Developers https://www.privoxy.org/
+ Copyright (C) 2001-2021 Privoxy Developers https://www.privoxy.org/
  See LICENSE.
 
  ========================================================================
@@ -54,7 +54,7 @@
  <subscript>
 <!-- Completely the wrong markup, but very little is allowed  -->
 <!-- in this part of an article. FIXME -->
- <link linkend="copyright">Copyright</link> &my-copy; 2001-2020 by
+ <link linkend="copyright">Copyright</link> &my-copy; 2001-2021 by
  <ulink url="https://www.privoxy.org/">Privoxy Developers</ulink>
  </subscript>
 </pubdate>
@@ -2953,6 +2953,21 @@ example.org/blocked-example-page</screen>
     If the request URI gets changed, &my-app; will detect that and use the new
     one. This can be used to rewrite the request destination behind the client's
     back, for example to specify a Tor exit relay for certain requests.
+   </para>
+   <para>
+    Note that to change the destination host for
+    <link linkend="HTTPS-INSPECTION">https-inspected</link>
+    requests a protocol and host has to be added to the URI.
+   </para>
+   <para>
+    If <link linkend="HTTPS-INSPECTION">https inspection</link>
+    is enabled, the protocol can be downgraded from https to http
+    but upgrading a request from http to https is currently not
+    supported.
+   </para>
+   <para>
+    After detecting a rewrite, &my-app; does not update the actions
+    used for the request based on the new host.
    </para>
    <para>
     Please refer to the <link linkend="filter-file">filter file chapter</link>
