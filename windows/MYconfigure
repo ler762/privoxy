@@ -117,20 +117,27 @@ CFLAGS="${CFLAGS} -Wall"
 # see: http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 #    but then plenty too many complaints by
+#      -Wimplicit-fallthrough=3
+#         too many warnings in pcre/study.c & pcre.c
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
-CFLAGS="${CFLAGS} -Wextra -Wno-missing-field-initializers -Wno-sign-compare -Wno-type-limits"
-CFLAGS="${CFLAGS} -Wno-implicit-fallthrough"
-# too many warnings in pcre/study.c & pcre.c
-CFLAGS="${CFLAGS} -Wno-unused-but-set-variable"
-CFLAGS="${CFLAGS} -Wno-unused-parameter"
+#      -Wunused-but-set-parameter
+#      -Wunused-but-set-variable
+CFLAGS="${CFLAGS} -Wextra -Wno-implicit-fallthrough -Wno-missing-field-initializers -Wno-sign-compare"
+CFLAGS="${CFLAGS} -Wno-type-limits -Wno-unused-parameter -Wno-unused-but-set-variable"
 
 #-no-# CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
 
-CFLAGS="${CFLAGS} -Wformat-security"
-# If -Wformat is specified, also warn about uses of format functions that represent possible security problems.
+#-no-# CFLAGS="${CFLAGS} -Werror"
+# Turn all warnings into errors.
+#   Privoxy still has a few warnings that *are not a problem*
+
+CFLAGS="${CFLAGS} -Wformat=2"
+# -Wformat is enabled by -Wall.
+# -Wformat=2 is equivalent to -Wformat -Wformat-nonliteral -Wformat-security -Wformat-y2k
+#   -Wformat-security : also warn about uses of format functions that represent possible security problems.
 
 CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
@@ -160,6 +167,10 @@ CFLAGS="${CFLAGS} -Wshadow"
 #   the analyzer to fully explore and it reaches an internal limit.
 #   The -Wanalyzer-too-complex option warns if this occurs. 
 
+######## what do these do ???
+# ??? CFLAGS="${CFLAGS} -Wmissing-declarations"
+# ??? CFLAGS="${CFLAGS} -Wmissing-prototypes"
+
 
 # why does the mingw library *not* include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
@@ -168,10 +179,6 @@ PCRELIB="/source/pcre-8.44/.libs"
 CPPFLAGS="${CPPFLAGS} -I${PCREINC}"
 LDFLAGS="${LDFLAGS} -L${PCRELIB}"
 
-
-# use mbedtls or openssl/libressl?
-MITMOPT=""
-
 # mbedtls
 MITMOPT="--with-mbedtls"
 MBEDINC="/source/mbedtls-2.16.9/include"
@@ -179,14 +186,13 @@ MBEDLIB="/source/mbedtls-2.16.9/library"
 CPPFLAGS="${CPPFLAGS} -I${MBEDINC}"
 LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
 
-# openssl
-## MITMOPT="--with-openssl"
-## INC="/source/libressl-3.3.0/include"
-## LIB="-L/source/libressl-3.3.0/crypto/.libs -L/source/libressl-3.3.0/ssl/.libs -L/source/libressl-3.3.0/tls/.libs"
-## LDFLAGS="${LDFLAGS} ${LIB}"
-## CPPFLAGS="${CPPFLAGS} -I${INC}"
+# brotli
+BROTLIOPT="--with-brotli"
+inc="/source/brotli-1.0.9/c/include"
+lib="/source/brotli-1.0.9/.libs"
+CPPFLAGS="${CPPFLAGS} -I${inc}"
+LDFLAGS="${LDFLAGS} -L${lib}"
 
-# STATIC=""
 STATIC="--enable-static-linking"
 
 ###
@@ -205,7 +211,8 @@ echo "LDFLAGS=${LDFLAGS}"
              --disable-pthread  \
              --enable-extended-statistics \
              --enable-strptime-sanity-checks \
-             ${MITMOPT} \
+             --with-brotli  \
+             --with-mbedtls \
              ${STATIC}  \
              --with-docbook=yes
 

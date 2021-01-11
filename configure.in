@@ -1073,13 +1073,15 @@ if test $have_pcre = "yes"; then
   if test "$use_static_pcre" = "yes"; then
     pcre_dyn=no
     AC_DEFINE(PCRE_STATIC,1,[Define to statically link to pcre library on Windows.])
-#     see pcre.h line 54
+#     see /usr/i686-w64-mingw32/sys-root/mingw/include/pcre.h line 54
 #       #if defined(_WIN32) && !defined(PCRE_STATIC)
 #       #  ifndef PCRE_EXP_DECL
 #       #    define PCRE_EXP_DECL  extern __declspec(dllimport)
 #       #  endif
-#     in other words, if PCRE_STATIC is not defined, tack on the magic string to tell
-#     the linker to pull in the .DLL library
+#     If you want to statically link a program against a PCRE library in the form of
+#     a non-dll .a file, you must define PCRE_STATIC before including pcre.h or
+#     pcrecpp.h, otherwise the pcre_malloc() and pcre_free() exported functions will
+#     be declared __declspec(dllimport), with unwanted results.
   else
     pcre_dyn=yes
     AC_DEFINE(FEATURE_DYNAMIC_PCRE,1,[Define to dynamically link to pcre.])
@@ -1094,6 +1096,7 @@ else
   # Privoxy itself no longer uses it.
   AC_DEFINE(STATIC_PCRE,1,[Define to statically link to internal outdated pcre on Windows.])
   STATIC_PCRE_ONLY=
+  # tell GNUmakefile.in to pull in the outdated pcre/*.c static PCRE code
 fi
 
 AC_DEFINE(FEATURE_CONNECTION_KEEP_ALIVE)
@@ -1217,6 +1220,7 @@ AC_HELP_STRING([--without-brotli], [Disable Brotli detection]),
 if test X"$WITH_BROTLI" != Xno; then
 
   LIBS="$LIBS -lbrotlidec"
+  LIBS="$LIBS -lbrotlicommon -lbrotlienc"
 
   AC_CHECK_LIB(brotlidec, BrotliDecoderDecompress)
 
