@@ -1274,6 +1274,15 @@ fastlane.rubiconproject.com/
 #MASTER# BLOCK-REFERRER: https://sourceforge.net/projects/ijbswa/
 # Blocked URL = https://ml314.com/utsync.ashx?pub=&adv=&et=0&eid=771&ct=js&pi=&fp=&clid=&if=1&ps=&cl=&mlt=&data=&&cp=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fijbswa%2F&pv=1607178655249_inq1swkkq&bl=en-ca&cb=1438340&return=&ht=&d=&dc=&si=1607178395284_aog287pmk&cid=&s=1366x768&rp=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fijbswa%2F
 ml314.com/
+#MASTER# BLOCK-REFERRER: https://www.ksta.de/ratgeber/digital/plattform-moodle-streikt-viele-schueler-koennen-nicht-arbeiten---gebauer-weiss-von-nichts-37913640
+# Blocked URL = https://pp.lp4.io/pl?i=512735e9d9d93e5a24000000&ct=11.384&rt=1.012&pt=12.396&pvr=0&p=https%3A%2F%2Fwww.ksta.de%2Fratgeber%2Fdigital%2Fplattform-moodle-streikt-viele-schueler-koennen-nicht-arbeiten---gebauer-weiss-von-nichts-37913640&c=desktop&t=article&s=undefined&_r=1610366562920:4.7.6:20190614-142003
+pp.lp4.io/
+#MASTER# BLOCK-REFERRER: https://www.ksta.de/ratgeber/digital/plattform-moodle-streikt-viele-schueler-koennen-nicht-arbeiten---gebauer-weiss-von-nichts-37913640
+# Blocked URL = https://ih.adscale.de/map?ssl=1&format=video&gdpr=0&nut&uu=ace89aa78df247b3bb362c35ecfd6024
+ih.adscale.de/
+#MASTER# BLOCK-REFERRER: https://www.ksta.de/ratgeber/digital/plattform-moodle-streikt-viele-schueler-koennen-nicht-arbeiten---gebauer-weiss-von-nichts-37913640
+# Blocked URL = https://api.theadex.com/collector/v1/d/285/5184/cmframe/Lw0EHAiwAxA2GAIUhAK0AXaMBA?c=4248866896491805402
+api.theadex.com/
 
 {+block{Might be a web-bug that is an image.} -handle-as-empty-document +handle-as-image}
 #MASTER# BLOCK-REFERRER: http://versiontracker.com and many others. 10/20/06
@@ -1331,6 +1340,9 @@ tag.crsspxl.com/
 #MASTER# BLOCK-REFERRER: https://www.heise.de/news/Komplettausfall-Youtube-Gmail-und-andere-Google-Dienste-nicht-erreichbar-4989007.html
 # Blocked URL = https://eu-tlp03.kameleoon.com/visit.gif?lp=1&spt=1607679917743&p=c2l0...kNvdW50PTA%3D
 eu-tlp03.kameleoon.com/
+#MASTER# BLOCK-REFERRER: https://www.ksta.de/ratgeber/digital/plattform-moodle-streikt-viele-schueler-koennen-nicht-arbeiten---gebauer-weiss-von-nichts-37913640
+# Blocked = https://lb46.s400.meetrics.net/data?/3lBMFQ7WAUkzF3MGRuQAAASVAK56BBPbAAREA/BAGAAAACfVBMAACHBA6BACxBASCACjAArCACfAA3CACfAADDACxAAPDACQAAoDACiAAAEACiAAZEAChAAlEACyAA9EACRAAKFACgAAWFACiAAiFAC8DAKFACQAA9EACRAAxEACQAAlEACgAAZEACSAAoDACRAAPDACPAADDACRAAfCAChAASCACUBAGCACyEA6BACrEAGCAC/BASCACvRA3CACQAAoDACSAAAEACRAANEACQAAxEACSAAWFACRAA6FACPAAHGACSAAfGACOAAQHACRAAoHACSAANIACRAA+IACNAAiJACQAAfKACRAA4KACRAAcLACQAA1LACRAAZMACeAAlMAC1AAyMACDTABMACiAA1LACwAAoLACzAAcLACyAAQLACiAAELACgAA4KACSAArKACSAAfKACPAATKACSAAHKACPAAuJACQAAWJACSAAKJACRAABIACOAAoHACRAAQHACRAA3GACQAArGACiAAfGACJEArGACRAA3GACQAAEHACSAAQHACQAAcHACW/AoHACCBA0HACzAABIACRAANIACNAAxIACSAAKJACRAAiJACQAAuJACQAATKACRAAELACmAA1LACLAANMACSAAyMAChAAvNACQAAgOACRAA4OACPAAQPACTAABQACRAAmQACOAA+QACRAAKRACRAAjRACRAA7RACSAAHSACRAAgSACOAAsSACSAAETACQAARTAChAAdTACoCApTACeLA1TACRAABUACzBAOUAC4CAaUAPHYATVAhWAJAAAAPnAAPVAfWAGAAAARksFAQtjF/unwTA
+.s400.meetrics.net/
 
 
 #############################################################################
@@ -2568,6 +2580,8 @@ issue.freebsdfoundation.org/
 secure.gravatar.com/
 # URL = https://cas.fsf.org/login?service=https%3A%2F%2Fdirectory.fsf.org%2Fwiki%3Ftitle%3DSpecial%3AUserLogin%26returnto%3DPrivoxy
 .fsf.org/
+# URL = https://consent2.ksta.de/wrapper/tcfv2/v1/gdpr/native-message?requestUUID=56b465b7-5da2-44f0-83aa-aa50687d364f&hasCsp=true&env=prod&consentLanguage=browserDefault&body=%7B%22accountId%22%3A995%2C%22requestUUID%22%3A%2256b465b7-5da2-44f0-83aa-aa50687d364f%22%2C%22propertyHref%22%3A%22https%3A%2F%2Fwww.ksta.de%2Fhtml%2Fdumont-consent%2Findex.html%3Fparam%3DeyJyZWRpcmVjdFVybCI6Ii9yYXRnZWJlci9kaWdpdGFsL3BsYXR0Zm9ybS1tb29kbGUtc3RyZWlrdC11bnphZWhsaWdlLXNjaHVlbGVyLWluLW5ydy1rb2VubmVuLWFtLW1vbnRhZy1uaWNodC1hcmJlaXRlbi0zNzkxMzY0MD9jYj0xNjEwMzY1Njc4NjY3IiwicmVmZXJyZXIiOiIifQ%3D%3D%22%2C%22euconsent%22%3Anull%2C%22meta%22%3A%22%7B%5C%22mmsCookies%5C%22%3A%5B%5C%22_sp_enable_dfp_personalized_ads%3Dfalse%3B%5C%22%5D%2C%5C%22resolved%5C%22%3Anull%7D%22%2C%22clientMMSOrigin%22%3A%22https%3A%2F%2Fconsent2.ksta.de%22%2C%22targetingParams%22%3A%22%7B%5C%22mode%5C%22%3A%5C%22dumont-consent-message%5C%22%7D%22%2C%22campaignEnv%22%3A%22prod%22%2C%22pubData%22%3A%7B%7D%7D
+.ksta.de/
 
 {+redirect{s@.*url=@http://@} -block}
 # Sticky Actions = +redirect -block

@@ -229,17 +229,17 @@ extern int ssl_recv_data(struct ssl_attr *ssl_attr, unsigned char *buf, size_t m
       ret = BIO_read(bio, buf, (int)max_length);
    } while (ret <= 0 && BIO_should_retry(bio));
 
+   if (BIO_get_ssl(bio, &ssl) == 1)
+   {
+      fd = SSL_get_fd(ssl);
+   }
+
    if (ret < 0)
    {
       log_ssl_errors(LOG_LEVEL_ERROR,
          "Receiving data on socket %d over TLS/SSL failed", fd);
 
       return -1;
-   }
-
-   if (BIO_get_ssl(bio, &ssl) == 1)
-   {
-      fd = SSL_get_fd(ssl);
    }
 
    log_error(LOG_LEVEL_RECEIVED, "TLS from socket %d: %N",
@@ -1647,7 +1647,7 @@ static int ssl_certificate_is_invalid(const char *cert_file)
  *          3  :  nid = OpenSSL NID
  *          4  :  value = extension value
  *
- * Returns     :   0 => Error while setting extensuon data
+ * Returns     :   0 => Error while setting extension data
  *                 1 => It worked
  *
  *********************************************************************/
