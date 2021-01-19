@@ -419,13 +419,20 @@ cd &lt;root-dir&gt;/mbedtls-2.16.NNN
 export WINDOWS_BUILD=1
 #  build for a Windows platform
 
+export SHARED=1
+#  also want the shared libraries created
+
 export CC=i686-w64-mingw32-gcc
 export LD=i686-w64-mingw32-gcc
+export CFLAGS="-O2"
 
 make lib
 
+PATH="&lt;root-dir&gt;/mbedtls-2.16.NNN/library:/usr/i686-w64-mingw32/sys-root/mingw/bin:${PATH}"
+#  so the tests are able to find the mbedtls and mingw libraries
+
 make check
-#  run the test suite
+#  run the test suite; all tests should pass
 </screen>
 
       </sect4>
