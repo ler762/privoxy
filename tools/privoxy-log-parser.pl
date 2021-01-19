@@ -1422,6 +1422,11 @@ sub handle_loglevel_crunch($) {
         #  [...]&filter... [too long, truncated]
         $content = highlight_matched_pattern($content, 'request_', '^.*(?=\.\.\. \[too long, truncated\]$)');
 
+    } elsif ($content =~ m/Certificate error:/) {
+
+        # Certificate error: ASN date error, current date after: https://expired.badssl.com/
+        $content = highlight_matched_pattern($content, 'request_', 'https://.*');
+
     } else {
 
         # Blocked: http://ads.example.org/
@@ -1823,6 +1828,16 @@ sub handle_loglevel_connect($) {
         # The client socket 16 has become unusable while the server socket 24 is still open.
         $c =~ s@(?<=client socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
         $c =~ s@(?<=server socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^The last \d+ bytes of the request body have been read/) {
+
+        # The last 12078 bytes of the request body have been read
+        $c =~ s@(?<=The last )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^Flushed \d+ bytes of request body/) {
+
+        # Flushed 3153 bytes of request body
+        $c =~ s@(?<=Flushed )(\d+)@$h{'Number'}$1$h{'Standard'}@;
 
     } elsif ($c =~ m/^Looks like we / or
              $c =~ m/^Unsetting keep-alive flag/ or

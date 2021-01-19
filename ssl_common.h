@@ -45,7 +45,6 @@
 #define CERT_PARAM_COUNTRY_FCODE          "C"
 #define CERT_PARAM_COUNTRY_CODE           "CZ"
 #define CERT_SUBJECT_PASSWORD            ""
-#define CERT_INFO_PREFIX                 ""
 
 /*
  * Properties of cert for generating
@@ -74,5 +73,6 @@ extern unsigned long get_certificate_serial(struct client_state *csp);
 extern int get_certificate_valid_from_date(char *buffer, size_t buffer_size, const char *fmt);
 extern int get_certificate_valid_to_date(char *buffer, size_t buffer_size, const char *fmt);
 extern int host_is_ip_address(const char *host);
+extern int enforce_sane_certificate_state(const char *certificate, const char *key);
 
 #endif /* ndef SSL_COMMON_H_INCLUDED */
