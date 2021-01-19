@@ -3525,7 +3525,7 @@ static void handle_established_connection(struct client_state *csp)
                   if (NULL == p)
                   {
                      csp->content_length = (size_t)(csp->iob->eod - csp->iob->cur);
-                     log_error(LOG_LEVEL_CONNECT,
+                     log_error(LOG_LEVEL_RE_FILTER,
                                "No matches in content filters: len=%llu", csp->content_length);
                   }
 #ifdef FEATURE_COMPRESSION
@@ -3569,8 +3569,8 @@ static void handle_established_connection(struct client_state *csp)
                               (const unsigned char *) ((p != NULL) ? p : csp->iob->cur),
                               csp->content_length, get_write_delay(csp)) < 0))
                      {
-                        log_error(LOG_LEVEL_ERROR, "write modified content to "
-                           "client over TLS/SSL failed");
+                        log_error(LOG_LEVEL_ERROR,
+                          "write modified content to client over TLS/SSL failed");
                         freez(hdr);
                         freez(p);
                         mark_server_socket_tainted(csp);
