@@ -88,7 +88,7 @@ static mbedtls_ctr_drbg_context ctr_drbg;
 static mbedtls_entropy_context  entropy;
 static int rng_seeded;
 
-static int generate_webpage_certificate(struct client_state *csp);
+static int generate_host_certificate(struct client_state *csp);
 static int host_to_hash(struct client_state *csp);
 static int ssl_verify_callback(void *data, mbedtls_x509_crt *crt, int depth, uint32_t *flags);
 static void free_client_ssl_structures(struct client_state *csp);
@@ -325,11 +325,11 @@ extern int create_client_ssl_connection(struct client_state *csp)
     */
    privoxy_mutex_lock(&certificate_mutex);
 
-   ret = generate_webpage_certificate(csp);
+   ret = generate_host_certificate(csp);
    if (ret < 0)
    {
       log_error(LOG_LEVEL_ERROR,
-         "Generate_webpage_certificate failed: %d", ret);
+         "generate_host_certificate failed: %d", ret);
       privoxy_mutex_unlock(&certificate_mutex);
       ret = -1;
       goto exit;
@@ -1257,7 +1257,7 @@ exit:
 
 /*********************************************************************
  *
- * Function    :  generate_webpage_certificate
+ * Function    :  generate_host_certificate
  *
  * Description :  Creates certificate file in presetted directory.
  *                If certificate already exists, no other certificate
@@ -1273,7 +1273,7 @@ exit:
  *                >0 => Length of created certificate.
  *
  *********************************************************************/
-static int generate_webpage_certificate(struct client_state *csp)
+static int generate_host_certificate(struct client_state *csp)
 {
    mbedtls_x509_crt issuer_cert;
    mbedtls_pk_context loaded_issuer_key, loaded_subject_key;
@@ -1307,6 +1307,15 @@ static int generate_webpage_certificate(struct client_state *csp)
    if (cert_opt.subject_key == NULL)
    {
       freez(cert_opt.output_file);
+      return -1;
+   }
+
+   if (enforce_sane_certificate_state(cert_opt.output_file,
+         cert_opt.subject_key))
+   {
+      freez(cert_opt.output_file);
+      freez(cert_opt.subject_key);
+
       return -1;
    }
 
@@ -1345,25 +1354,6 @@ static int generate_webpage_certificate(struct client_state *csp)
          freez(cert_opt.subject_key);
 
          return 0;
-      }
-   }
-
-   if (file_exists(cert_opt.output_file) == 0 &&
-       file_exists(cert_opt.subject_key) == 1)
-   {
-      log_error(LOG_LEVEL_ERROR,
-         "A website key already exists but there's no matching certificate. "
-         "Removing %s before creating a new key and certificate.",
-         cert_opt.subject_key);
-      if (unlink(cert_opt.subject_key))
-      {
-         log_error(LOG_LEVEL_ERROR, "Failed to unlink %s: %E",
-            cert_opt.subject_key);
-
-         freez(cert_opt.output_file);
-         freez(cert_opt.subject_key);
-
-         return -1;
       }
    }
 
@@ -1750,6 +1740,7 @@ static int ssl_verify_callback(void *csp_void, mbedtls_x509_crt *crt,
    {
       char buf[CERT_INFO_BUF_SIZE];
       char *encoded_text;
+#define CERT_INFO_PREFIX                 ""
 
       mbedtls_x509_crt_info(buf, sizeof(buf), CERT_INFO_PREFIX, crt);
       encoded_text = html_encode(buf);
@@ -1891,7 +1882,16 @@ extern int ssl_base64_encode(unsigned char *dst, size_t dlen, size_t *olen,
  *********************************************************************/
 extern void ssl_crt_verify_info(char *buf, size_t size, struct client_state *csp)
 {
-   mbedtls_x509_crt_verify_info(buf, size, " ", csp->server_cert_verification_result);
+   char *last_byte;
+
+   mbedtls_x509_crt_verify_info(buf, size, "",
+      csp->server_cert_verification_result);
+   last_byte = buf + strlen(buf)-1;
+   if (*last_byte == '\n')
+   {
+      /* Overwrite trailing new line character */
+      *last_byte = '\0';
+   }
 }
 
 

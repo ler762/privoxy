@@ -7,7 +7,7 @@
  *                not depend on particular TLS/SSL library.
  *
  * Copyright   :  Written by and Copyright (c) 2017 Vaclav Svec. FIT CVUT.
- *                Copyright (C) 2018-2020 by Fabian Keil <fk@fabiankeil.de>
+ *                Copyright (C) 2018-2021 by Fabian Keil <fk@fabiankeil.de>
  *
  *                This program is free software; you can redistribute it
  *                and/or modify it under the terms of the GNU General
@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include <ctype.h>
+#include <unistd.h>
 #include "config.h"
 #include "project.h"
 #include "miscutil.h"
@@ -696,5 +697,54 @@ extern int host_is_ip_address(const char *host)
     * assume that is an IPv4 address.
     */
    return 1;
+
+}
+
+
+/*********************************************************************
+ *
+ * Function    :  enforce_sane_certificate_state
+ *
+ * Description :  Makes sure the certificate state is sane.
+ *
+ * Parameters  :
+ *          1  :  certificate = Path to the potentionally existing certifcate.
+ *          2  :  key = Path to the potentionally existing key.
+ *
+ * Returns     :   -1 => Error
+ *                 0 => Certificate state is sane
+ *
+ *********************************************************************/
+extern int enforce_sane_certificate_state(const char *certificate, const char *key)
+{
+   const int certificate_exists = file_exists(certificate);
+   const int key_exists = file_exists(key);
+
+   if (!certificate_exists && key_exists)
+   {
+      log_error(LOG_LEVEL_ERROR,
+         "A website key already exists but there's no matching certificate. "
+         "Removing %s before creating a new key and certificate.", key);
+      if (unlink(key))
+      {
+         log_error(LOG_LEVEL_ERROR, "Failed to unlink %s: %E", key);
+
+         return -1;
+      }
+   }
+   if (certificate_exists && !key_exists)
+   {
+      log_error(LOG_LEVEL_ERROR,
+         "A certificate exists but there's no matching key. "
+         "Removing %s before creating a new key and certificate.", certificate);
+      if (unlink(certificate))
+      {
+         log_error(LOG_LEVEL_ERROR, "Failed to unlink %s: %E", certificate);
+
+         return -1;
+      }
+   }
+
+   return 0;
 
 }

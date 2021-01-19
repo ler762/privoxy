@@ -58,7 +58,7 @@
 #define VALID_DATETIME_FMT                       "%y%m%d%H%M%SZ"
 #define VALID_DATETIME_BUFLEN                    16
 
-static int generate_webpage_certificate(struct client_state *csp);
+static int generate_host_certificate(struct client_state *csp);
 static void free_client_ssl_structures(struct client_state *csp);
 static void free_server_ssl_structures(struct client_state *csp);
 static int ssl_store_cert(struct client_state *csp, X509* crt);
@@ -308,7 +308,7 @@ static int ssl_store_cert(struct client_state *csp, X509* crt)
     */
    if (!PEM_write_bio_X509(bio, crt))
    {
-      log_ssl_errors(LOG_LEVEL_ERROR, "PEM_write_X509() failed");
+      log_ssl_errors(LOG_LEVEL_ERROR, "PEM_write_bio_X509() failed");
       ret = -1;
       goto exit;
    }
@@ -783,11 +783,11 @@ extern int create_client_ssl_connection(struct client_state *csp)
     */
    privoxy_mutex_lock(&certificate_mutex);
 
-   ret = generate_webpage_certificate(csp);
+   ret = generate_host_certificate(csp);
    if (ret < 0)
    {
       log_error(LOG_LEVEL_ERROR,
-         "Generate_webpage_certificate failed: %d", ret);
+         "generate_host_certificate failed: %d", ret);
       privoxy_mutex_unlock(&certificate_mutex);
       ret = -1;
       goto exit;
@@ -1287,7 +1287,7 @@ extern int ssl_base64_encode(unsigned char *dst, size_t dlen, size_t *olen,
                              const unsigned char *src, size_t slen)
 {
    *olen = 4 * ((slen/3)  + ((slen%3) ? 1 : 0)) + 1;
-   if (*olen < dlen)
+   if (*olen > dlen)
    {
       return ENOBUFS;
    }
@@ -1472,11 +1472,30 @@ exit:
 static int generate_key(struct client_state *csp, char **key_buf)
 {
    int ret = 0;
-   char* key_file_path = NULL;
-   BIGNUM *exp = BN_new();
-   RSA *rsa = RSA_new();
-   EVP_PKEY *key = EVP_PKEY_new();
+   char* key_file_path;
+   BIGNUM *exp;
+   RSA *rsa;
+   EVP_PKEY *key;
 
+   key_file_path = make_certs_path(csp->config->certificate_directory,
+      (char *)csp->http->hash_of_host_hex, KEY_FILE_TYPE);
+   if (key_file_path == NULL)
+   {
+      return -1;
+   }
+
+   /*
+    * Test if key already exists. If so, we don't have to create it again.
+    */
+   if (file_exists(key_file_path) == 1)
+   {
+      freez(key_file_path);
+      return 0;
+   }
+
+   exp = BN_new();
+   rsa = RSA_new();
+   key = EVP_PKEY_new();
    if (exp == NULL || rsa == NULL || key == NULL)
    {
       log_ssl_errors(LOG_LEVEL_ERROR, "RSA key memory allocation failure");
@@ -1488,23 +1507,6 @@ static int generate_key(struct client_state *csp, char **key_buf)
    {
       log_ssl_errors(LOG_LEVEL_ERROR, "Setting RSA key exponent failed");
       ret = -1;
-      goto exit;
-   }
-
-   key_file_path = make_certs_path(csp->config->certificate_directory,
-      (char *)csp->http->hash_of_host_hex, KEY_FILE_TYPE);
-   if (key_file_path == NULL)
-   {
-      ret = -1;
-      goto exit;
-   }
-
-   /*
-    * Test if key already exists. If so, we don't have to create it again.
-    */
-   if (file_exists(key_file_path) == 1)
-   {
-      ret = 0;
       goto exit;
    }
 
@@ -1616,8 +1618,6 @@ static int ssl_certificate_is_invalid(const char *cert_file)
 
    if (!(cert = ssl_certificate_load(cert_file)))
    {
-      log_ssl_errors(LOG_LEVEL_ERROR,
-         "Error reading certificate file %s", cert_file);
       return 1;
    }
 
@@ -1709,7 +1709,7 @@ static int set_subject_alternative_name(X509 *cert, X509 *issuer, const char *ho
 
 /*********************************************************************
  *
- * Function    :  generate_webpage_certificate
+ * Function    :  generate_host_certificate
  *
  * Description :  Creates certificate file in presetted directory.
  *                If certificate already exists, no other certificate
@@ -1725,7 +1725,7 @@ static int set_subject_alternative_name(X509 *cert, X509 *issuer, const char *ho
  *                 1 => Certificate created
  *
  *********************************************************************/
-static int generate_webpage_certificate(struct client_state *csp)
+static int generate_host_certificate(struct client_state *csp)
 {
    char *key_buf = NULL;    /* Buffer for created key */
    X509 *issuer_cert = NULL;
@@ -1764,6 +1764,15 @@ static int generate_webpage_certificate(struct client_state *csp)
       return -1;
    }
 
+   if (enforce_sane_certificate_state(cert_opt.output_file,
+         cert_opt.subject_key))
+   {
+      freez(cert_opt.output_file);
+      freez(cert_opt.subject_key);
+
+      return -1;
+   }
+
    if (file_exists(cert_opt.output_file) == 1)
    {
       /* The file exists, but is it valid? */
@@ -1799,25 +1808,6 @@ static int generate_webpage_certificate(struct client_state *csp)
          freez(cert_opt.subject_key);
 
          return 0;
-      }
-   }
-
-   if (file_exists(cert_opt.output_file) == 0 &&
-       file_exists(cert_opt.subject_key) == 1)
-   {
-      log_error(LOG_LEVEL_ERROR,
-         "A website key already exists but there's no matching certificate. "
-         "Removing %s before creating a new key and certificate.",
-         cert_opt.subject_key);
-      if (unlink(cert_opt.subject_key))
-      {
-         log_error(LOG_LEVEL_ERROR, "Failed to unlink %s: %E",
-            cert_opt.subject_key);
-
-         freez(cert_opt.output_file);
-         freez(cert_opt.subject_key);
-
-         return -1;
       }
    }
 
@@ -1942,7 +1932,7 @@ static int generate_webpage_certificate(struct client_state *csp)
    serial_num = BN_new();
    if (!serial_num)
    {
-      log_error(LOG_LEVEL_ERROR, "generate_webpage_certificate: memory error");
+      log_error(LOG_LEVEL_ERROR, "generate_host_certificate: memory error");
       ret = -1;
       goto exit;
    }
