@@ -132,7 +132,7 @@ CFLAGS="${CFLAGS} -Wno-type-limits -Wno-unused-parameter -Wno-unused-but-set-var
 
 #-no-# CFLAGS="${CFLAGS} -Werror"
 # Turn all warnings into errors.
-#   Privoxy still has a few warnings that *are not a problem*
+#   Privoxy still has a few warnings that are not a problem
 
 CFLAGS="${CFLAGS} -Wformat=2"
 # -Wformat is enabled by -Wall.
@@ -167,26 +167,24 @@ CFLAGS="${CFLAGS} -Wshadow"
 #   the analyzer to fully explore and it reaches an internal limit.
 #   The -Wanalyzer-too-complex option warns if this occurs. 
 
-######## what do these do ???
-# ??? CFLAGS="${CFLAGS} -Wmissing-declarations"
-# ??? CFLAGS="${CFLAGS} -Wmissing-prototypes"
-
-
 # why does the mingw library *not* include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
-PCREINC="/source/pcre-8.44/"
-PCRELIB="/source/pcre-8.44/.libs"
-CPPFLAGS="${CPPFLAGS} -I${PCREINC}"
-LDFLAGS="${LDFLAGS} -L${PCRELIB}"
+# Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
+inc="/source/pcre-8.44/"
+lib="/source/pcre-8.44/.libs"
+CPPFLAGS="${CPPFLAGS} -I${inc}"
+LDFLAGS="${LDFLAGS} -L${lib}"
 
 # mbedtls
+# Get the 2.16.x mbedtls library from  https://github.com/ARMmbed/mbedtls/tags
 MITMOPT="--with-mbedtls"
-MBEDINC="/source/mbedtls-2.16.9/include"
-MBEDLIB="/source/mbedtls-2.16.9/library"
-CPPFLAGS="${CPPFLAGS} -I${MBEDINC}"
-LDFLAGS="${LDFLAGS} -L${MBEDLIB}"
+inc="/source/mbedtls-2.16.9/include"
+lib="/source/mbedtls-2.16.9/library"
+CPPFLAGS="${CPPFLAGS} -I${inc}"
+LDFLAGS="${LDFLAGS} -L${lib}"
 
 # brotli
+# Get the brotli library from  https://github.com/google/brotli/releases
 BROTLIOPT="--with-brotli"
 inc="/source/brotli-1.0.9/c/include"
 lib="/source/brotli-1.0.9/.libs"
