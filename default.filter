@@ -4,7 +4,7 @@
 #
 #  Purpose     :  Rules to process the content of web pages
 #
-#  Copyright   :  Written by and Copyright (C) 2001-2020 the
+#  Copyright   :  Written by and Copyright (C) 2001-2021 the
 #                 Privoxy team. https://www.privoxy.org/
 #
 #                 This program is free software; you can redistribute it
@@ -116,7 +116,6 @@ s/(open\s*\([^\)]+always(?:raised|lowered)=)(["']?)(?:yes|1)\2/$1$2no$2/sigU
 s/(open\s*\([^\)]+z-?lock=)(["']?)(?:yes|1)\2/$1$2no$2/sigU
 s/(open\s*\([^\)]+hotkeys=)(["']?)(?:yes|1)\2/$1$2no$2/sigU
 s/(open\s*\([^\)]+titlebar=)(["']?)(?:no|0)\2/$1$2yes$2/sigU
-s/(open\s*\([^\)]+always(?:raised|lowered)=)(["']?)(?:yes|1)\2/$1$2no$2/sigU
 
 
 #################################################################################
@@ -460,16 +459,17 @@ FILTER: crude-parental Crude parental filtering. Note that this filter doesn't w
 # (Note #2: Is 'sex' a rude word?!)
 
 s%^.*(?<!middle)(?<!sus)(?<!es)sex.*$%<html><head><title>Blocked</title></head><body>\
-<h3>Blocked by <a href="http://p.p/">Privoxy's</a> crude-parental filter due to possible adult content.</h3></body></html>%is
+<h3>Blocked by <a href="http://p.p/">Privoxy's</a> crude-parental filter due to possible adult content.</h3></body></html>\n%is
 
-s+^.*warez.*$+<html><head><title>No Warez</title></head><body><h3>You're not searching for illegal stuff, are you?</h3></body></html>+is
+s+^.*warez.*$+<html><head><title>No Warez</title></head><body><h3>You're not searching for illegal stuff, are you?</h3></body></html>\n+is
 
 # Remove by description
 s@^.*\
 (?:(suck|lick|tongue|rub|fuck|fingering|finger|chicks?)\s*)?\
 (?:(her|your|my|hard|with|big|wet|tight|pink|hot|moist|young|teen)\s*)+\
 (dicks?|penis|cocks?|balls?|tits?|pussy|cunt|clit|ass|mouth).*$\
-@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental content filter\
+@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental \
+content filter based on the description.\n\
 @is
 
 #Remove by link text
@@ -477,19 +477,22 @@ s@^.*\
 (download|broadband|view|watch|free|get|extreem)?\s*\
 (sex|xxx|porn|cumshot|fuck(ing|s)?|anal|ass|asian|adult|Amateur|org(y|ies)|close ups?|hand?job|nail(ed)?)+\s*\
 (movies?|pics?|videos?|dvds?|dvd's|links?).*$\
-@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental content filter\
+@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental \
+content filter based on link text.\n\
 @is
 
 #Remove by age disclaimer
 s@^.*\
 (models?|chicks?|girls?|women|persons)\s*\
 (who|are|were)+ (over|at least) (16|18|21) years (old|of age).*$\
-@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental content filter\
+@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental \
+content filter because of an age disclaimer.\n\
 @is
 
 #Remove by regulations
 s@^.*(Section 2257|18 U.?S.?C.? 2257).*$\
-@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental content filter\
+@This page has been blocked by <a href="http://p.p/">Privoxy's</a> crude-parental \
+content filter because of an regulations text.\n\
 @is
 
 
@@ -581,6 +584,27 @@ s@(<a(?:rea)?[^>]*?)\sping=(['"]?)([^"'>]+)\2([>\s]?)@\
 FILTER: allow-autocompletion Changes autocomplete="off" on form and input fields to "on" to allow autocompletion.
 
 s@(<(?:input|form|select|textarea)\s[^>]+autocomplete=)(['"]?)(?:off|0)\2@$1$2on$2@igsU
+
+#################################################################################
+#
+# github: Removes the annoying "Sign-Up" banner and the Cookie disclaimer.
+#
+#################################################################################
+FILTER: github Removes the annoying "Sign-Up" banner and the Cookie disclaimer.
+
+s@<signup-prompt.*</signup-prompt>@@Uis
+s@(<div) (class="hx_cookie-banner)@$1 style="display:none;" $2@
+
+#################################################################################
+#
+# imdb: Removes some ads on IMDb.
+#
+#################################################################################
+FILTER: imdb Removes some ads on IMDb.
+
+s@(<div id="top_ad_wrapper")@$1 style="display:none"@
+s@<iframe[^>]*id="top_ad"[^>]*>.*</iframe>@<!-- Iframe removed by Privoxy's imdb filter -->@
+s@<iframe[^>]*onload="doWithAds.call[^>]*></iframe>@<!-- Iframe removed by Privoxy's imdb filter -->@g
 
 #################################################################################
 #
@@ -696,6 +720,19 @@ s@(background:\#[a-f\d]{3})( url\(\"http://www.blogblog.com/rounders[^\"]*\"\).*
 # Do the feed filtering magic as described above.
 s@<title(?:\s+type=\'text\')?>([^<]*)(?:\.\.\.)?\s*</title>\s*\
 (<content(?:\s+type=\'(?:html|text)\')?>\s*\1)@<title></title>$2@ig
+
+#################################################################################
+#
+# sourceforge: Reduces the amount of ads for proprietary software on SourceForge.
+#
+#################################################################################
+FILTER: sourceforge Reduces the amount of ads for proprietary software on SourceForge.
+
+s@<div id="banner-sterling"@$0 style="display:none;"@
+s@<section id="nels"@$0 style="display:none;"@
+s@<aside class="m-wide-widget m-wide-projects-widget "@$0 style="display:none;"@
+s@<div id="newsletter-floating"@$0 style="display:none;"@
+s@<div class="sterling" id="banner-sterling"@$0 style="display:none;"@
 
 #################################################################################
 #
