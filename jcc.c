@@ -376,7 +376,8 @@ static void sig_handler(int the_signal)
           * We shouldn't be here, unless we catch signals
           * in main() that we can't handle here!
           */
-         log_error(LOG_LEVEL_FATAL, "sig_handler: exiting on unexpected signal %d", the_signal);
+         log_error(LOG_LEVEL_FATAL,
+            "sig_handler: exiting on unexpected signal %d", the_signal);
    }
    return;
 
@@ -1552,7 +1553,8 @@ static jb_err receive_chunked_client_request_body(struct client_state *csp)
       len = read_socket(csp->cfd, buf, sizeof(buf) - 1);
       if (len <= 0)
       {
-         log_error(LOG_LEVEL_ERROR, "Read the client body failed: %E");
+         log_error(LOG_LEVEL_ERROR,
+            "Reading the client body failed: %E");
          break;
       }
       if (add_to_iob(csp->client_iob, csp->config->buffer_limit, buf, len))
@@ -1860,7 +1862,7 @@ static jb_err receive_client_request(struct client_state *csp)
           * elsewhere failed or Privoxy is configured
           * to only accept proxy requests.
           *
-          * An error response has already been send
+          * An error response has already been sent
           * and we're done here.
           */
          return JB_ERR_PARSE;
@@ -6182,14 +6184,9 @@ static void listen_loop(void)
 
    /* NOTREACHED unless FEATURE_GRACEFUL_TERMINATION is defined */
 
-#ifdef FEATURE_HTTPS_INSPECTION
-   /* Clean up.  Aim: free all memory (no leaks) */
-   ssl_release();
-#endif
-
 #ifdef FEATURE_GRACEFUL_TERMINATION
 
-   log_error(LOG_LEVEL_INFO, "Graceful termination requested");
+   log_error(LOG_LEVEL_INFO, "Graceful termination requested.");
 
    unload_current_config_file();
    unload_current_actions_file();
@@ -6209,7 +6206,8 @@ static void listen_loop(void)
 
       if (i <= 0)
       {
-         log_error(LOG_LEVEL_ERROR, "Graceful termination failed - still some live clients after 1 minute wait.");
+         log_error(LOG_LEVEL_ERROR, "Graceful termination failed "
+            "- still some live clients after 1 minute wait.");
       }
    }
    sweep();
@@ -6218,6 +6216,19 @@ static void listen_loop(void)
 #if defined(unix)
    freez(basedir);
 #endif
+
+#ifdef FEATURE_HTTPS_INSPECTION
+   /*
+    * Only release TLS backed resources if there
+    * are no active connections left.
+    */
+   if (clients->next == NULL)
+   {
+      ssl_release();
+   }
+#endif
+
+   log_error(LOG_LEVEL_INFO, "Exiting gracefully.");
 
 #if defined(_WIN32) && !defined(_WIN_CONSOLE)
    /* Cleanup - remove taskbar icon etc. */

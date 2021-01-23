@@ -15,10 +15,10 @@
 <!entity config SYSTEM "p-config.sgml">
 <!entity changelog SYSTEM "changelog.sgml">
 <!entity p-version "3.0.30">
-<!entity p-status "UNRELEASED">
+<!entity p-status "stable">
 <!entity % p-authors-formal "INCLUDE"> <!-- include additional text, etc  -->
-<!entity % p-not-stable "INCLUDE">
-<!entity % p-stable "IGNORE">
+<!entity % p-not-stable "IGNORE">
+<!entity % p-stable "INCLUDE">
 <!entity % p-text "IGNORE">        <!-- define we are not a text only doc -->
 <!entity % p-doc "INCLUDE">        <!-- and we are a formal doc           -->
 <!entity % p-readme "IGNORE">
@@ -4299,9 +4299,17 @@ problem-host.example.com</screen>
    </para>
     <screen>+filter{no-ping}             # Removes non-standard ping attributes in &lt;a&gt; and &lt;area&gt; tags.</screen>
    <para>
+    <anchor id="filter-github">
+   </para>
+    <screen>+filter{github}              # Removes the annoying "Sign-Up" banner and the Cookie disclaimer.</screen>
+   <para>
     <anchor id="filter-google">
    </para>
     <screen>+filter{google}              # CSS-based block for Google text ads. Also removes a width limitation and the toolbar advertisement.</screen>
+   <para>
+    <anchor id="filter-imdb">
+   </para>
+    <screen>+filter{imdb}                # Removes some ads on IMDb.</screen>
    <para>
     <anchor id="filter-yahoo">
    </para>
@@ -4314,6 +4322,10 @@ problem-host.example.com</screen>
     <anchor id="filter-blogspot">
    </para>
     <screen>+filter{blogspot}            # Cleans up some Blogspot blogs. Read the fine print before using this.</screen>
+   <para>
+    <anchor id="filter-sourceforge">
+   </para>
+    <screen>+filter{sourceforge}         # Reduces the amount of ads for proprietary software on SourceForge.</screen>
   </listitem>
  </varlistentry>
 </variablelist>

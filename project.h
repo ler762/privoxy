@@ -335,11 +335,10 @@ struct http_request
    char *version;  /**< Protocol version */
    int status;     /**< HTTP Status */
 
-   char *host;     /**< Host part of URL */
    int   port;     /**< Port of URL or 80 (default) */
+   char *host;     /**< Host part of URL */
    char *path;     /**< Path of URL */
    char *hostport; /**< host[:port] */
-   int   ssl;      /**< Flag if protocol is https */
 
    char *host_ip_addr_str; /**< String with dotted decimal representation
                                 of host's IP. NULL before connect_to() */
@@ -354,6 +353,7 @@ struct http_request
    unsigned char hash_of_host_hex[(HASH_OF_HOST_BUF_SIZE * 2) + 1]; /**< chars for hash in hex string and one for '\0'       */
    unsigned char hash_of_host[HASH_OF_HOST_BUF_SIZE+1];             /**< chars for bytes of hash and one for '\0'            */
 #endif
+   short int   ssl;      /**< Flag if protocol is https */
 };
 
 
@@ -411,9 +411,9 @@ struct url_spec
    regex_t *host_regex;/**< Regex for host matching                          */
    enum host_regex_type { VANILLA_HOST_PATTERN, PCRE_HOST_PATTERN } host_regex_type;
 #endif /* defined FEATURE_PCRE_HOST_PATTERNS */
+   int    dcount;      /**< How many parts to this domain? (length of dvec)   */
    char  *dbuffer;     /**< Buffer with '\0'-delimited domain name, or NULL to match all hosts. */
    char **dvec;        /**< List of pointers to the strings in dbuffer.       */
-   int    dcount;      /**< How many parts to this domain? (length of dvec)   */
    int    unanchored;  /**< Bitmap - flags are ANCHOR_LEFT and ANCHOR_RIGHT.  */
 
    char  *port_list;   /**< List of acceptable ports, or NULL to match all ports */
@@ -764,13 +764,14 @@ struct reusable_connection
    char *host;
    int  port;
    enum forwarder_type forwarder_type;
-   char *gateway_host;
+   char *forward_host;
+   int  forward_port;
+
    int  gateway_port;
+   char *gateway_host;
    char *auth_username;
    char *auth_password;
 
-   char *forward_host;
-   int  forward_port;
 };
 
 
@@ -1004,6 +1005,9 @@ struct client_state
    /** Multi-purpose flag container, see CSP_FLAG_* above */
    unsigned int flags;
 
+   /** MIME-Type key, see CT_* above */
+   unsigned int content_type;
+
    /** Client PC's IP address, as reported by the accept() function.
        As a string. */
    char *ip_addr_str;
@@ -1069,9 +1073,6 @@ struct client_state
    char *client_address;
 #endif
 
-   /** MIME-Type key, see CT_* above */
-   unsigned int content_type;
-
    /** Actions files associated with this client */
    struct file_list *actions_list[MAX_AF_FILES];
 
@@ -1134,8 +1135,8 @@ struct client_state
     * Thanks to this flags, we can call function to close both connections
     * and we don't have to care about more details.
     */
-   int ssl_with_server_is_opened;
-   int ssl_with_client_is_opened;
+   short int ssl_with_server_is_opened;
+   short int ssl_with_client_is_opened;
 
    /*
     * Server certificate chain of trust including strings with certificates
@@ -1263,11 +1264,11 @@ struct forward_spec
    /** Connection type.  Must be SOCKS_NONE, SOCKS_4, SOCKS_4A or SOCKS_5. */
    enum forwarder_type type;
 
-   /** SOCKS server hostname.  Only valid if "type" is SOCKS_4 or SOCKS_4A. */
-   char *gateway_host;
-
    /** SOCKS server port. */
    int   gateway_port;
+
+   /** SOCKS server hostname.  Only valid if "type" is SOCKS_4 or SOCKS_4A. */
+   char *gateway_host;
 
    /** SOCKS5 username. */
    char *auth_username;
@@ -1357,7 +1358,7 @@ struct access_control_list
    struct access_control_addr src[1];  /**< Client IP address */
    struct access_control_addr dst[1];  /**< Website or parent proxy IP address */
 #ifdef HAVE_RFC2553
-   int wildcard_dst;                   /** < dst address is wildcard */
+   short wildcard_dst;                 /** < dst address is wildcard */
 #endif
 
    short action;                       /**< ACL_PERMIT or ACL_DENY */
@@ -1434,6 +1435,9 @@ struct configuration_spec
 
    /** Bitmask of features that can be controlled through the config file. */
    unsigned feature_flags;
+
+   /** Nonzero if we need to bind() to the new port. */
+   int need_bind;
 
    /** The log file name. */
    const char *logfile;
@@ -1565,9 +1569,6 @@ struct configuration_spec
 
    /** List of loaders */
    int (*loaders[NLOADERS])(struct client_state *);
-
-   /** Nonzero if we need to bind() to the new port. */
-   int need_bind;
 
 #ifdef FEATURE_HTTPS_INSPECTION
    /** Password for proxy ca file **/

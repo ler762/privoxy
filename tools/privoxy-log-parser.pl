@@ -1078,6 +1078,17 @@ sub handle_loglevel_re_filter($) {
         $c .= $req{$t}{'content_size_change'} . $h{'Standard'} . ")";
         $content = $c;
 
+    } elsif ($c =~ m/^filtering request body from client /) {
+
+        # filtering request body from client 127.0.0.1 (size 958) with 'null-filter' produced 0 hits (new size 958).
+
+        $c =~ s@(?<=from client )([^\s]+)@$h{'ip-address'}$1$h{'Standard'}@;
+        $c =~ s@(?<=\(size )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+        $c =~ s@([^\s]+?)(\'? produced)@$h{'filter'}$1$h{'Standard'}$2@;
+        $c =~ s@(?<=\(new size )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+        $c =~ s@(?<=produced )(\d+)(?= hits)@$h{'Number'}$1$h{'Standard'}@;
+        $content = $c;
+
   } elsif ($c =~ /\.{3}$/
         and $c =~ m/^(?:re_)?filtering \'?(.*?)\'? \(size (\d*)\) with (?:filter )?\'?([^\s]*?)\'? ?\.{3}$/) {
 
@@ -1245,7 +1256,22 @@ sub handle_loglevel_tagging($) {
         $c =~ s@(?<=^Tagger \')([^\']*)@$h{'tagger'}$1$h{'Standard'}@;
         $c =~ s@(?<=added tag \')([^\']*)@$h{'tag'}$1$h{'Standard'}@;
         $c =~ s@(?<=Action bits )(updated)@$h{'action-bits-update'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ /^Enlisting tag/) {
+
+        # Enlisting tag 'forward-directly' for client 127.0.0.1.
+
+        $c =~ s@(?<=tag \')([^\']*)@$h{'tag'}$1$h{'Standard'}@;
+        $c = highlight_matched_host($c, '[^\s]+(?=\.$)');
+
+    } elsif ($c =~ /^Client tag/) {
+
+        # Client tag 'forward-directly' matches
+
+        $c =~ s@(?<=tag \')([^\']*)@$h{'tag'}$1$h{'Standard'}@;
+
     }
+
     return $c;
 }
 
@@ -2072,6 +2098,19 @@ sub handle_loglevel_error($) {
 
         # Didn't receive data in time: a.fsdn.com:443
         $c =~ s@(?<=in time: )(.*)@$h{'destination'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^Sending data on socket \d+ over TLS/) {
+
+        # Sending data on socket 33 over TLS/SSL failed: no TLS/SSL errors detected
+        $c =~ s@(?<=on socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^Chunk size \d+ exceeds buffered data left/) {
+
+        # Chunk size 291 exceeds buffered data left. Already digested 69894 of 69957 buffered bytes.
+        $c =~ s@(?<=size )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+        $c =~ s@(?<=digested )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+        $c =~ s@(?<=of )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
     }
 
     # XXX: There are probably more messages that deserve highlighting.
@@ -2808,7 +2847,7 @@ It does not escape any input!
 [B<--keep-date>] Don't remove the date when printing highlighted log messages.
 Useful when parsing multiple log files at once.
 
-[B<--no-msecs>] Don't expect milisecond resolution
+[B<--no-msecs>] Don't expect millisecond resolution
 
 [B<--no-syntax-highlighting>] Disable syntax-highlighting. Useful when
 the filtered output is piped into less in which case the ANSI control
@@ -2897,7 +2936,7 @@ Many settings can't be controlled through command line options yet.
 
 =head1 SEE ALSO
 
-privoxy(1)
+privoxy(8)
 
 =head1 AUTHOR
 
