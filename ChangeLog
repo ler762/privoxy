@@ -17,14 +17,19 @@ ChangeLog for Privoxy
     This unbreaks (at least) https://config.privoxy.org/client-tags whose
     buttons would previously use a http:// URL resulting in browser warnings.
   - Support using https-inspection and client-header-order at the same time.
-    Privously Privoxy would crash.
+    Previously Privoxy would crash.
     Reported by: Kai Raven
   - Properly reject rewrites from http to https as they currently
     aren't supported. Previously Privoxy would wait for the client
     to establish an encrypted connection which obviously would not happen.
+  - When https inspection is enabled and Privoxy has been compiled with
+    FEATURE_GRACEFUL_TERMINATION (not recommended for production builds),
+    the TLS backend resources are free'd later on and only if no active
+    connections are left. Prevents crashes when exiting "gracefully" at the
+    wrong time.
 
 - General improvements:
-  - Allow to rewrite the request destination for https-intercepted
+  - Allow to rewrite the request destination for https-inspected
     requests behind the client's back. The documentation already sort
     of claimed that it was supported by not especially mentioning that
     it didn't work for https-inspected requests.
@@ -52,12 +57,11 @@ ChangeLog for Privoxy
     fatal error so the regression tests can be used with and
     without FEATURE_PCRE_HOST_PATTERNS.
   - The code compiles with older C compilers again.
-  - Check the chdir() return code to fix a compiler warning.
-  - Let the crude-parental filter insert a link to Privoxy's webinterface.
-  - Remove the packages feed from the source tarball.
+  - The chdir() return code is checked to fix a compiler warning.
+  - The packages feed has been removed from the source tarball.
     It's usually out of date when the source tarball is generated
     for the release.
-  - Fix harmless compiler warnings from GCC9 with -D_FORTIFY_SOURCE=2.
+  - Fixed harmless compiler warnings from GCC9 with -D_FORTIFY_SOURCE=2.
   - windows: Remove obsolete '$(DEST)/doc/images' target.
   - windows: Install the images referenced in the user manual.
   - Remove obsolete 'gnu_regex.@OBJEXT@' target.
@@ -65,11 +69,8 @@ ChangeLog for Privoxy
     directory which is no longer used. The images were relocated to
     the user-manual directory years ago.
   - Add new FEATURES to the show-status page and resort list.
-  - OpenSSL create_client_ssl_connection(): Remove unused variable.
+  - Remove unused variable in the OpenSSL-specific code.
   - Update bug tracker URL in cgi_error_unknown().
-  - Properly deal with host certificates without keys and keys without
-    host certificate which may be left over from a previous Privoxy run
-    with incorrect configuration.
   - Saved a couple of memory allocations when sorting client headers.
   - Improved a couple of error messages.
   - Saved memory allocations when using OpenSSL and checking if a
@@ -77,25 +78,37 @@ ChangeLog for Privoxy
   - The configure script will bail out if OpenSSL and mbedTLS are
     enabled at the same time.
   - Log a message right before exiting gracefully.
+  - A couple of structure have been rearranged to require slightly
+    less memory.
+  - When HTTPS inspection is enabled and the certificate is invalid
+    the error message is now sent with status code 403 instead of 200.
+  - The Slackware rc script template has been renamed to
+    slackware/rc.privoxy.in to silence complaints when building
+    Debian packages.
+  - When building with MbedTLS support, mbedtls_md5_ret() is used
+    instead of mbedtls_md5() which is deprecated and causes a warning
+    on Debian GNU/Linux.
+  - The man page has been moved from section 1 to man section 8.
 
 - Action file improvements:
   - Block requests to eu-tlp03.kameleoon.com/.
   - Unblock metrics.sr.ht/.
   - Disable fast-redirects for .fsf.org/.
   - Disable fast-redirects for .gravater.com/.
-  - Disable fast-redirects for .ksta.de/
+  - Disable fast-redirects for .ksta.de/.
   - Block requests to tag.crsspxl.com/.
   - Block requests to analytics.slashdotmedia.com/.
   - Block requests to ml314.com/.
   - Block requests to .adroll.com/.
   - Block requests to fastlane.rubiconproject.com/.
-  - Block requests to api.theadex.com/
-  - Block requests to ih.adscale.de/
-  - Block requests to .s400.meetrics.net/
-  - Block requests for pp.lp4.io/
+  - Block requests to api.theadex.com/.
+  - Block requests to ih.adscale.de/.
+  - Block requests to .s400.meetrics.net/.
+  - Block requests for pp.lp4.io/.
+  - Block requests for trc-events.taboola.com/.
 
 - Filter file improvements:
-  - Added new 'allow-autocompletion' filter which changes
+  - A allow-autocompletion filter has been added which changes
     autocomplete="off" to "on" on input fields to allow autocompletion.
     Requested by Jamie Zawinski in #370.
     Filter based on a submission by Aaron Linville.
@@ -104,22 +117,23 @@ ChangeLog for Privoxy
     for proprietary software.
   - Added a github filter that removes the annoying "Sign-Up"
     banner and the Cookie disclaimer.
+  - Removed a duplicated pcrs command from the js-annoyances filter.
+  - The crude-parental filter now provides a short reason when blocking,
+    inserts a link to Privoxy's webinterface and adds a new line at
+    the end of the generated page.
 
 - privoxy-log-parser:
-  - Highlight 'Rewritten request line results in downgrade to http'.
-  - Highlight 'Rewrite detected: ...' messages again.
+  - Highlight a few more messages.
   - Add a handler for tagging messages.
   - Bump version to 0.9.2.
   - Properly deal with 'Certificate error' crunches
     Previously the error description was highlighted as 'host'.
-  - Highlight: 'Flushed 3153 bytes of request body'
-  - Highlight 'The last 12078 bytes of the request body have been read'
-  - Highlight 'Sending data on socket 33 over TLS/SSL failed: ...'
   - Log truncated LOG_LEVEL_CLF messages more gracefully
-    and note that the statistics will be inprecise.
+    and note that the statistics will be imprecise.
+  - Fixed perldoc typo.
 
 - privoxy-regression-test:
-  - Use http://127.0.0.1:8118/ as default privoxy address
+  - Use http://127.0.0.1:8118/ as default Privoxy address
     unless http_proxy is set through the environment.
   - Add a --privoxy-cgi-prefix option that specifies the prefix
     to use when building URLs that are supposed to reach Privoxy's
@@ -143,15 +157,15 @@ ChangeLog for Privoxy
     "TAG:^(application|text)/(x-)?javascript$".
   - When get_cgi_page_or_else() fails, include the URL of the
     requested page in the log message.
-  - privoxy-regression-test: Bump version to 0.7.2
+  - Bumped version to 0.7.2
 
 - uagen:
   - Update example output.
   - Recommend the use of the https-inspection action in the documentation.
   - Upgrade a couple of URLs to https://.
   - Add ElectroBSD to the list of operating systems.
-  - Bump generated Firefox version to 78 (ESR).
-  - Bump version to 1.2.2.
+  - Bumped generated Firefox version to 78 (ESR).
+  - Bumped version to 1.2.2.
 
  - User Documentation:
   - Remove reference to 'How to Report Bugs Effectively'.
