@@ -80,7 +80,7 @@ LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 #     strcpy (&var.t.buf[1], "abcdefg");
 #   will be considered a buffer overflow.
 
-CFLAGS="${CFLAGS} -march=native"
+### CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
 #   Generate instructions for the machine type cpu-type.  In contrast to -mtune=cpu-type, which merely tunes the
 #   generated code for the specified cpu-type, -march=cpu-type allows GCC to generate code that may not run at all on
@@ -113,7 +113,7 @@ LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 #  ??? WHY ???  profiling doesn't work if ASLR is enabled
 
 
-CFLAGS="${CFLAGS} -Wall"
+### CFLAGS="${CFLAGS} -Wall"
 # see: http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 #    but then plenty too many complaints by
@@ -124,8 +124,8 @@ CFLAGS="${CFLAGS} -Wall"
 #      -Wtype-limits
 #      -Wunused-but-set-parameter
 #      -Wunused-but-set-variable
-CFLAGS="${CFLAGS} -Wextra -Wno-implicit-fallthrough -Wno-missing-field-initializers -Wno-sign-compare"
-CFLAGS="${CFLAGS} -Wno-type-limits -Wno-unused-parameter -Wno-unused-but-set-variable"
+### CFLAGS="${CFLAGS} -Wextra -Wno-implicit-fallthrough -Wno-missing-field-initializers -Wno-sign-compare"
+### CFLAGS="${CFLAGS} -Wno-type-limits -Wno-unused-parameter -Wno-unused-but-set-variable"
 
 #-no-# CFLAGS="${CFLAGS} -Wconversion"
 #   way too many warnings for things that don't look like a problem
@@ -134,12 +134,12 @@ CFLAGS="${CFLAGS} -Wno-type-limits -Wno-unused-parameter -Wno-unused-but-set-var
 # Turn all warnings into errors.
 #   Privoxy still has a few warnings that are not a problem
 
-CFLAGS="${CFLAGS} -Wformat=2"
+### CFLAGS="${CFLAGS} -Wformat=2"
 # -Wformat is enabled by -Wall.
 # -Wformat=2 is equivalent to -Wformat -Wformat-nonliteral -Wformat-security -Wformat-y2k
 #   -Wformat-security : also warn about uses of format functions that represent possible security problems.
 
-CFLAGS="${CFLAGS} -Wlogical-op"
+### CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
 
 CFLAGS="${CFLAGS} -Wshadow"
