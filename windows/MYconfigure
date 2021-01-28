@@ -167,7 +167,7 @@ CFLAGS="${CFLAGS} -Wshadow"
 #   the analyzer to fully explore and it reaches an internal limit.
 #   The -Wanalyzer-too-complex option warns if this occurs. 
 
-# why does the mingw library *not* include .a files for libpcre?
+# why does the mingw library _not_ include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
 # Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
 inc="/source/pcre-8.44/"
@@ -191,8 +191,6 @@ lib="/source/brotli-1.0.9/.libs"
 CPPFLAGS="${CPPFLAGS} -I${inc}"
 LDFLAGS="${LDFLAGS} -L${lib}"
 
-STATIC="--enable-static-linking"
-
 ###
 echo "CFLAGS=${CFLAGS}"
 echo "CPPFLAGS=${CPPFLAGS}"
@@ -203,15 +201,14 @@ echo "LDFLAGS=${LDFLAGS}"
 #    --host:  the system on which the generated program will run.
 #    --target: only used to build a cross-compiling toolchain.
 
-#            --disable-dynamic-pcre \
-
 ./configure  --host=i686-w64-mingw32  --enable-mingw32  --enable-zlib \
+             --enable-static-linking \
+             --enable-strptime-sanity-checks \
              --disable-pthread  \
              --enable-extended-statistics \
-             --enable-strptime-sanity-checks \
+             --enable-pcre-host-patterns  \
              --with-brotli  \
              --with-mbedtls \
-             ${STATIC}  \
              --with-docbook=yes
 
 #  -- done --
