@@ -59,7 +59,7 @@ exec_prefix  = @exec_prefix@
 CONF_BASE    = @sysconfdir@
 SBIN_DEST    = @sbindir@
 MAN_DIR      = @mandir@
-MAN_DEST     = $(MAN_DIR)/man1
+MAN_DEST     = $(MAN_DIR)/man8
 MAN_PAGE     = privoxy.8
 SHARE_DEST   = @datadir@
 DOC_DEST     = $(SHARE_DEST)/doc/privoxy
@@ -1039,8 +1039,8 @@ uninstall: CONF_DEST LOG_DEST PID_DEST check_doc
 		done ;\
 	fi
 	@$(ECHO) Removing $(PROGRAM) config files
-	-@for i in $(DESTDIR)$(CONFIGS); do \
-		test -f $(CONF_DEST)/$$i && $(ECHO) Removing $$i ;\
+	-@for i in $(CONFIGS); do \
+		test -f $(DESTDIR)$(CONF_DEST)/$$i && $(ECHO) Removing $$i ;\
 		$(RM) $(DESTDIR)$(CONF_DEST)/$$i $(DESTDIR)$(CONF_DEST)/$$i~ $(DESTDIR)$(CONF_DEST)/$$i.new ;\
 	done
 	-@test -d $(DESTDIR)$(CONF_DEST)/templates && $(RM) -r $(DESTDIR)$(CONF_DEST)/templates &&\
