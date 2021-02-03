@@ -2907,6 +2907,7 @@ static void continue_https_chat(struct client_state *csp)
 
    if (JB_ERR_OK != process_encrypted_request(csp))
    {
+      csp->flags &= ~CSP_FLAG_CLIENT_CONNECTION_KEEP_ALIVE;
       return;
    }
 
@@ -3941,8 +3942,8 @@ static void handle_established_connection(struct client_state *csp)
                   if ((ssl_send_data_delayed(&(csp->ssl_client_attr),
                           (const unsigned char *)hdr, strlen(hdr),
                           get_write_delay(csp)) < 0)
-                     || (len = ssl_flush_socket(&(csp->ssl_client_attr),
-                            csp->iob) < 0))
+                     || ((len = ssl_flush_socket(&(csp->ssl_client_attr),
+                            csp->iob)) < 0))
                   {
                      log_error(LOG_LEVEL_CONNECT, "Write header to client failed");
 
