@@ -2586,23 +2586,77 @@ for-privoxy-version=3.0.11
         Note that the docbook generated files might need some hand editing,
         so the Windows build makefile does not rebuild the docs.
       </para>
-
       <para>
         First, <emphasis>make sure that you have freshly exported the right
         version into an empty directory</emphasis>. (See "Building and releasing
         packages" above).
-        <!-- XXX  ??? are we still basing releases off a tarball???
-                  yes
+        <!-- XXX  releases are still based off a tarball, so give
+                  instructions for doing tar xvf <downloaded filename> 
           -->
       </para>
       <para>
         Get and install NSIS from
         <ulink url="https://sourceforge.net/projects/nsis/files/NSIS%203/">
-                    https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>.
+                    https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>
       </para>
       <para>
-        Update the <tt>MAKENSIS</tt> evar in <filename>windows/GNUmakefile</filename>
-        to point to the makensis.exe executable.
+        Update the <computeroutput>MAKENSIS</computeroutput> evar in
+        <computeroutput>windows/GNUmakefile</computeroutput>
+        to point to the makensis.exe executable.  e.g.
+<programlisting>
+# Path to NSIS
+MAKENSIS = /source/nsis-3.03/makensis.exe
+</programlisting>
+      </para>
+      <para>
+        Get the latest 8.x PCRE code from
+        <ulink url="https://ftp.pcre.org/pub/pcre/">
+                    https://ftp.pcre.org/pub/pcre/</ulink>
+        and build the static libraries with
+        <programlisting>
+X X X X X
+</programlisting>
+      </para>
+      <para>
+        Get the latest 2.16.x mbedtls library from
+        <ulink url="https://github.com/ARMmbed/mbedtls/tags">
+                    https://github.com/ARMmbed/mbedtls/tags</ulink>
+        and build the static libraries with
+        <programlisting>
+X X X X X
+</programlisting>
+      </para>
+      <para>
+        Get the brotli library from
+        <ulink url="https://github.com/google/brotli/releases">
+                    https://github.com/google/brotli/releases</ulink>
+        and build the static libraries with
+        <programlisting>
+X X X X X
+</programlisting>
+      </para>
+      <para>
+        Make sure that <computeroutput>windows/MYconfigure</computeroutput>
+        has the correct links to the libraries
+        <programlisting>
+  # Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
+  inc="/source/pcre-8.44/"
+  lib="/source/pcre-8.44/.libs"
+
+     . . .
+
+  # Get the 2.16.x mbedtls library from  https://github.com/ARMmbed/mbedtls/tags
+  inc="/source/mbedtls-2.16.9/include"
+  lib="/source/mbedtls-2.16.9/library"
+
+     . . .
+
+  # Get the brotli library from  https://github.com/google/brotli/releases
+  inc="/source/brotli-1.0.9/c/include"
+  lib="/source/brotli-1.0.9/.libs"
+</programlisting>
+      </para>
+
       <para>
         Then you can build the package.  This is fully automated, and is
         controlled by <filename>windows/GNUmakefile</filename>.
@@ -2620,13 +2674,12 @@ for-privoxy-version=3.0.11
         GPG sign the installer and zip file,
       </para>
       <programlisting>
-  $ gpg --armor --detach --sign <filename>privoxy_setup_X.Y.Z.exe</filename>
-  $ gpg --armor --detach --sign <filename>privoxy_X.Y.Z.zip</filename>
+  gpg --armor --detach --sign <filename>privoxy_setup_X.Y.Z.exe</filename>
+  gpg --armor --detach --sign <filename>privoxy_X.Y.Z.zip</filename>
 </programlisting>
       <para>
         and upload the files to SourceForge.
       </para>
-
       <para>
         When releasing the package on SourceForge, use the release notes
         and Change Log from the source tarball package.
