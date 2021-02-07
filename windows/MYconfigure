@@ -140,13 +140,13 @@ CFLAGS="${CFLAGS} -Wshadow"
 #   This pass performs a time-consuming exploration of paths through the code
 #   in the hope of detecting various common errors, such as double-free bugs.
 #   This option should be regarded as experimental in this release.
-#   In particular, analysis of non-C code is unlikely to work. 
+#   In particular, analysis of non-C code is unlikely to work.
 #-no-# CFLAGS="${CFLAGS} -Wanalyzer-too-complex"
 #-no-# generates waaay too much output
 # https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Static-Analyzer-Options.html
 #   By default, the analysis silently stops if the code is too complicated for
 #   the analyzer to fully explore and it reaches an internal limit.
-#   The -Wanalyzer-too-complex option warns if this occurs. 
+#   The -Wanalyzer-too-complex option warns if this occurs.
 
 # why does the mingw library _not_ include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
@@ -158,17 +158,17 @@ LDFLAGS="${LDFLAGS} -L${lib}"
 
 # mbedtls
 # Get the 2.16.x mbedtls library from  https://github.com/ARMmbed/mbedtls/tags
-MITMOPT="--with-mbedtls"
 inc="/source/mbedtls-2.16.9/include"
 lib="/source/mbedtls-2.16.9/library"
+MITMOPT="--with-mbedtls"
 CPPFLAGS="${CPPFLAGS} -I${inc}"
 LDFLAGS="${LDFLAGS} -L${lib}"
 
 # brotli
 # Get the brotli library from  https://github.com/google/brotli/releases
-BROTLIOPT="--with-brotli"
 inc="/source/brotli-1.0.9/c/include"
 lib="/source/brotli-1.0.9/.libs"
+BROTLIOPT="--with-brotli"
 CPPFLAGS="${CPPFLAGS} -I${inc}"
 LDFLAGS="${LDFLAGS} -L${lib}"
 
