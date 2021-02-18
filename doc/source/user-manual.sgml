@@ -28,7 +28,7 @@
 <!entity  my-copy "&copy;">         <!-- kludge for docbook2man           -->
 <!entity % draft "IGNORE">          <!-- WIP stuff    -->
 <!entity % seealso-extra "INCLUDE"> <!-- extra stuff from seealso.sgml    -->
-<!entity  my-app "<application>Privoxy</application>">
+<!entity  my-app "<application>Privoxy</application>">  <!-- add quote to fix vim syntax hilighting " -->
 ]>
 <!--
  File        :  doc/source/user-manual.sgml
@@ -68,7 +68,7 @@ copyright/license declarations will be in their own sgml.
 
 Hal.
 
-
+'
 -->
 
 
