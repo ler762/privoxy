@@ -439,7 +439,7 @@ https://www.privoxy.org/donate
 169) Preserve all relevant copyright and license statements in binary
      packages we distribute.
 
-170) Serve the ca-cert-file through the CGI interface so client's
+170) Serve the ca-cert-file through the CGI interface so clients
      can conveniently import it (insecurely).
 
 171) Create a "view page using Privoxy" website where users can input
@@ -495,6 +495,21 @@ https://www.privoxy.org/donate
      right after
        # Copyright ...
        #
+
+189) Bring back binary packages for macOS, preferably for both Intel and M1.
+     The first step would be getting at least one build system, either
+     donated or bought with donations earmarked for this.
+     Interested donors: 0.
+
+190) The socks5 authentication code should send user name an password
+     seperately or we should increase the cbuf size to allow longer
+     user names and passwords.
+
+191) The cipher-list directive should be split into cipher-list-server
+     and cipher-list-client.
+
+192) The client TLS contexts should probably be shared among threads
+     to spend less time and memory loading the root certificates.
 
 ##########################################################################
 
