@@ -398,12 +398,12 @@ How to install the binary packages depends on your operating system:
             <!-- FIXME:  which version(s) are known to work? -->
         <ulink url="https://sourceforge.net/projects/nsis/files/NSIS%203/">
                     https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>
-        and extract the NSIS directory to <literal>privoxy/windows</literal>.
+        and extract the NSIS directory to <literal>/&lt;root-dir>/nsis/</literal>.
         Then edit the windows/GNUmakefile to set the location of the NSIS executable - eg:
       </para>
       <screen>
 # Path to NSIS
-MAKENSIS = ./nsis/makensis.exe
+MAKENSIS = /&lt;root-dir>/nsis/makensis.exe
 </screen>
 
       <para>
@@ -411,7 +411,7 @@ MAKENSIS = ./nsis/makensis.exe
         MBED-TLS source code from
         <ulink url="https://tls.mbed.org/download">
                     https://tls.mbed.org/download</ulink>
-        extract the tar file into &lt;root-dir&gt; and build the software:
+        extract the tar file into <literal>&lt;root-dir&gt;</literal> and build the software:
       </para>
 
       <screen>
@@ -424,16 +424,48 @@ export SHARED=1
 
 export CC=i686-w64-mingw32-gcc
 export LD=i686-w64-mingw32-gcc
-export CFLAGS="-O2"
+export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 
 make lib
+#  build the libraries
 
-PATH="&lt;root-dir&gt;/mbedtls-2.16.NNN/library:/usr/i686-w64-mingw32/sys-root/mingw/bin:${PATH}"
+PATH="&lt;root-dir>/mbedtls-2.16.NNN/library:/usr/i686-w64-mingw32/sys-root/mingw/bin:${PATH}"
 #  so the tests are able to find the mbedtls and mingw libraries
 
 make check
 #  run the test suite; all tests should pass
 </screen>
+
+      <para>
+        You should also get the brotli library so that Privoxy can filter html from sites using brotli compression.
+      </para>
+
+      <para>
+        Get the source code from
+        <ulink url="https://github.com/google/brotli/releases">
+                    https://github.com/google/brotli/releases
+        extract the source code into <literal>&lt;root-dir&gt;</literal> and build the software:
+      </para>
+
+      <screen>
+cd &lt;root-dir>/brotli-x.x.x
+./bootstrap
+#  to create the GNU autotools files
+
+autoconf
+
+export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
+
+./configure  --host=i686-w64-mingw32 \
+             --prefix=/usr/local/i686-w64-mingw32 \
+             --enable-static   \
+             --disable-shared  \
+             --with-gnu-ld     \
+             --disable-silent-rules \
+  && make
+      </screen>
 
       </sect4>
 
@@ -468,7 +500,6 @@ make check
   --enable-zlib
   --enable-static-linking
   --disable-pthread
-  --disable-dynamic-pcre
 </literallayout>
 
       <para>
