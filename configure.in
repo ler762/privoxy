@@ -1105,6 +1105,8 @@ else
   # Privoxy itself no longer uses it.
   AC_DEFINE(STATIC_PCRE,1,[Define to statically link to internal outdated pcre on Windows.])
   STATIC_PCRE_ONLY=
+  exit 1
+# do not use the internal pcre code
 fi
 
 AC_DEFINE(FEATURE_CONNECTION_KEEP_ALIVE)
