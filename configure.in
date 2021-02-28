@@ -81,11 +81,11 @@ dnl release and no new release is near.
 VERSION_MAJOR=3
 VERSION_MINOR=0
 VERSION_POINT=32
-CODE_STATUS="UNRELEASED"
+CODE_STATUS="stable"
 
 dnl Timestamp (date +%s) used by the mtree-spec target.
 dnl Should be updated before releases but forgetting it isn't critical.
-SOURCE_DATE_EPOCH=1605695571
+SOURCE_DATE_EPOCH=1613992573
 
 dnl =================================================================
 dnl Substitute the version numbers
@@ -156,6 +156,11 @@ AC_ARG_WITH(debug,
             fi
         ]
 )
+
+AC_ARG_WITH(assertions, [  --with-assertions       Enable assertions])
+if test "x$with_assertions" != "xyes"; then
+    CFLAGS="$CFLAGS -DNDEBUG"
+fi
 
 dnl =================================================================
 dnl Check for user and group validity
@@ -1100,6 +1105,7 @@ if test $have_pcre = "yes"; then
 else
   AC_MSG_WARN([You are using the static PCRE code which is out of date and scheduled for removal, for details see:
     https://sourceforge.net/p/ijbswa/mailman/ijbswa-developers/thread/20080511195555.2dc6cfdc@fabiankeil.de/])
+  AC_MSG_WARN([The removal will likely occur before the 3.0.33 release.])
   pcre_dyn=no
   # STATIC_PCRE is a name pcre needs to statically link on Windows.
   # Privoxy itself no longer uses it.

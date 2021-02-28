@@ -686,6 +686,10 @@ void log_error(int loglevel, const char *fmt, ...)
 #ifdef FUZZ
       if (debug == LOG_LEVEL_STFU)
       {
+         if (loglevel == LOG_LEVEL_FATAL)
+         {
+            exit(1);
+         }
          return;
       }
 #endif
@@ -818,7 +822,10 @@ void log_error(int loglevel, const char *fmt, ...)
                   int ret = snprintf(outbuf + length,
                      log_buffer_size - length - 2, "\\x%.2x", (unsigned char)*sval);
                   assert(ret == 4);
-                  length += 4;
+                  if (ret == 4)
+                  {
+                     length += 4;
+                  }
                }
                sval++;
             }

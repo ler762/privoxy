@@ -622,8 +622,16 @@ jb_err decompress_iob(struct client_state *csp)
              * XXX: this code is untested and should probably be removed.
              */
             int skip_bytes;
+
+            if (cur + 2 >= csp->iob->eod)
+            {
+               log_error(LOG_LEVEL_ERROR,
+                  "gzip extra field flag set but insufficient data available.");
+               return JB_ERR_COMPRESS;
+            }
+
             skip_bytes = *cur++;
-            skip_bytes += *cur++ << 8;
+            skip_bytes += (unsigned char)*cur++ << 8;
 
             /*
              * The number of bytes to skip should be positive
@@ -648,14 +656,14 @@ jb_err decompress_iob(struct client_state *csp)
          if (flags & GZIP_FLAG_FILE_NAME)
          {
             /* A null-terminated string is supposed to follow. */
-            while (*cur++ && (cur < csp->iob->eod));
+            while ((cur < csp->iob->eod) && *cur++);
          }
 
          /* Skip the comment if necessary. */
          if (flags & GZIP_FLAG_COMMENT)
          {
             /* A null-terminated string is supposed to follow. */
-            while (*cur++ && (cur < csp->iob->eod));
+            while ((cur < csp->iob->eod) && *cur++);
          }
 
          /* Skip the CRC if necessary. */
@@ -794,8 +802,9 @@ jb_err decompress_iob(struct client_state *csp)
       }
       else
       {
+#ifndef NDEBUG
          char *oldnext_out = (char *)zstr.next_out;
-
+#endif
          /*
           * Update the fields for inflate() to use the new
           * buffer, which may be in a location different from
