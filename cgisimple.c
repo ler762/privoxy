@@ -1230,14 +1230,6 @@ jb_err cgi_show_status(struct client_state *csp,
    assert(rsp);
    assert(parameters);
 
-   /*
-    *  make sure config files are current
-    */
-   if (run_loader(csp)) {
-      log_error(LOG_LEVEL_FATAL, "a loader failed - must exit");
-      /* Never get here - LOG_LEVEL_FATAL causes program exit */
-   }
-
    if ('\0' != *(lookup(parameters, "file")))
    {
       return cgi_show_file(csp, rsp, parameters);
