@@ -479,7 +479,8 @@ https://www.privoxy.org/donate
      when https inspecting while using a forwarding proxy.
 
 184) Add support for wolfSSL. Work in progress, expected to be
-     committed after the 3.0.30 release.
+     committed after the 3.0.32 release. Funded with donations
+     made to the Privoxy project.
 
 185) The mbedTLS and OpenSSL versions of generate_host_certificate()
      should only be called when necessary and the check should be
@@ -510,6 +511,24 @@ https://www.privoxy.org/donate
 
 192) The client TLS contexts should probably be shared among threads
      to spend less time and memory loading the root certificates.
+
+193) Use SHA256 instead of MD5 for the host hash used when generating file
+     names for host certificates and keys.
+
+194) There should be a way to force gif deanimation if the server does not
+     declare the content as gif.
+
+195) We should probably cache the server TLS contexts.
+
+196) Investigate if it's worth adding an optional mutex for the CGI handler.
+     Could reduce memory use and increase performance on single core systems
+     for some tests.
+
+197) Investigate if parts of Privoxy should get optional replacements
+     written in Rust.
+
+198) Add a config directive that prevent's IP addresses from being logged
+     (when logging is enabled).
 
 ##########################################################################
 
