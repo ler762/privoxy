@@ -123,21 +123,6 @@ CFLAGS="${CFLAGS} -Wshadow"
 # using const in declarations and prototypes.
 # >>> Otherwise, it is just a nuisance. <<<  -- this, very much this
 
-#-?-# CFLAGS="${CFLAGS} -fanalyzer"
-#-?-# everything it lists seems to be ok
-# https://gcc.gnu.org/gcc-10/changes.html
-#   -fanalyzer enables a new static analysis pass and associated warnings.
-#   This pass performs a time-consuming exploration of paths through the code
-#   in the hope of detecting various common errors, such as double-free bugs.
-#   This option should be regarded as experimental in this release.
-#   In particular, analysis of non-C code is unlikely to work.
-#-no-# CFLAGS="${CFLAGS} -Wanalyzer-too-complex"
-#-no-# generates waaay too much output
-# https://gcc.gnu.org/onlinedocs/gcc-10.1.0/gcc/Static-Analyzer-Options.html
-#   By default, the analysis silently stops if the code is too complicated for
-#   the analyzer to fully explore and it reaches an internal limit.
-#   The -Wanalyzer-too-complex option warns if this occurs.
-
 # why does the mingw library _not_ include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
 # Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
