@@ -925,7 +925,8 @@ the differences?</title>
 #
 { <literal>fragile</literal> }
 # Gmail is ...
-mail.google.com</screen>
+mail.google.com
+</screen>
  <para>
   Be sure to flush your browser's caches whenever making these kinds of
   changes, just to make sure the changes <quote>take</quote>.
@@ -1359,7 +1360,7 @@ and thus avoid individual browser configuration?</title>
   To disable all cookie actions, so that cookies are allowed unrestricted,
   both in and out, for <literal>example.com</literal>:
 </para>
-<screen>
+ <screen>
 { -crunch-incoming-cookies -crunch-outgoing-cookies -session-cookies-only -filter{content-cookies} }
 .example.com
 </screen>

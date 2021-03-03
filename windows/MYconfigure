@@ -76,6 +76,10 @@ LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 LDFLAGS="${LDFLAGS} -Wl,--nxcompat"
 # https://en.wikipedia.org/wiki/Data_Execution_Prevention
 #   Enable DEP with -Wl,--nxcompat
+# also called NX or nxcompat for "no execute"  see: https://en.wikipedia.org/wiki/NX_bit
+#   $ peflags -v privoxy.exe
+#   privoxy.exe: coff(0x0106[+executable_image,+line_nums_stripped,+32bit_machine]) pe(0x0140[+dynamicbase,+nxcompat])
+
 
 LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 # https://en.wikipedia.org/wiki/Address_space_layout_randomization
@@ -109,6 +113,8 @@ CFLAGS="${CFLAGS} -Wformat=2"
 # -Wformat is enabled by -Wall.
 # -Wformat=2 is equivalent to -Wformat -Wformat-nonliteral -Wformat-security -Wformat-y2k
 #   -Wformat-security : also warn about uses of format functions that represent possible security problems.
+#   -Wformat-nonliteral: warn about the format not being a string literal
+CFLAGS="${CFLAGS} -Wno-format-nonliteral"
 
 CFLAGS="${CFLAGS} -Wlogical-op"
 # Warn about suspicious uses of logical operators in expressions.
@@ -116,6 +122,8 @@ CFLAGS="${CFLAGS} -Wlogical-op"
 CFLAGS="${CFLAGS} -Wshadow"
 # Warn whenever a local variable or type declaration shadows
 # another variable or whenever a built-in function is shadowed.
+
+CFLAGS="${CFLAGS} -Wuninitialized -Winit-self"
 
 #-no-# CFLAGS="${CFLAGS} -Wwrite-strings"
 # These warnings help you find at compile time code that can try to write

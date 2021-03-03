@@ -3388,7 +3388,7 @@ static void handle_established_connection(struct client_state *csp)
                /* LR  work on socket_is_still_usable - it'd be nice not to special-case win32 */
 #else
             log_error(LOG_LEVEL_CONNECT,
-               "The server still wants to talk, but client socket %d hung up on us.", csp->cfd);
+               "The server still wants to talk, but the client hung up on us.");
             mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
             close_client_and_server_ssl_connections(csp);
