@@ -399,7 +399,8 @@ make && make install
         <ulink url="https://sourceforge.net/projects/nsis/files/NSIS%203/">
                     https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>
         and extract the NSIS directory to <literal>/&lt;root-dir>/nsis/</literal>.
-        Then edit the windows/GNUmakefile to set the location of the NSIS executable - eg:
+        Then edit the <filename>windows/GNUmakefile</filename> to set the location
+        of the NSIS executable - eg:
       </para>
       <screen>
 # Path to NSIS
@@ -407,20 +408,45 @@ MAKENSIS = /&lt;root-dir>/nsis/makensis.exe
 </screen>
 
       <para>
-        If you want to be able to have Privoxy do TLS Inspection, get the latest
-        MBED-TLS source code from
-        <ulink url="https://tls.mbed.org/download">
-                    https://tls.mbed.org/download</ulink>
-        extract the tar file into <literal>&lt;root-dir&gt;</literal> and build the software:
+        Get the latest 8.x PCRE code from
+        <ulink url="https://ftp.pcre.org/pub/pcre/">PCRE
+                    https://ftp.pcre.org/pub/pcre/</ulink>
+        and build the static PCRE libraries with
+
+        <screen>
+export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+export LDFLAGS="-fstack-protector-strong"
+export CPPFLAGS="-DPCRE_STATIC"
+
+./configure  --host=i686-w64-mingw32 \
+             --prefix=/usr/local/i686-w64-mingw32 \
+             --enable-utf  --enable-unicode-properties \
+             --enable-jit \
+             --enable-newline-is-anycrlf \
+             --enable-pcre16 \
+             --enable-pcre32 \
+             --disable-pcregrep-libbz2 \
+             --disable-pcregrep-libz \
+             --disable-pcretest-libreadline \
+             --disable-stack-for-recursion  \
+             --enable-static --disable-shared \
+  &&  make
+</screen>
       </para>
 
-      <screen>
-cd &lt;root-dir&gt;/mbedtls-2.16.NNN
+
+      <para>
+        If you want to be able to have Privoxy do TLS Inspection, get the latest
+        2.16.x MBED-TLS library source code from
+        <ulink url="https://github.com/ARMmbed/mbedtls/tags">
+                    https://github.com/ARMmbed/mbedtls/tags</ulink>,
+        extract the tar file into <literal>&lt;root-dir&gt;</literal>
+        and build the static libraries with
+        <programlisting>
 export WINDOWS_BUILD=1
 #  build for a Windows platform
 
-export SHARED=1
-#  also want the shared libraries created
+unset DEBUG
 
 export CC=i686-w64-mingw32-gcc
 export LD=i686-w64-mingw32-gcc
@@ -429,21 +455,16 @@ export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 
 make lib
 #  build the libraries
-</screen>
-
-      <para>
-        You should also get the brotli library so that Privoxy can filter html from sites using brotli compression.
+</programlisting>
       </para>
 
+
       <para>
-        Get the source code from
+        Get the brotli library from
         <ulink url="https://github.com/google/brotli/releases">
                     https://github.com/google/brotli/releases</ulink>
-        extract the source code into <literal>&lt;root-dir&gt;</literal> and build the software:
-      </para>
-
-      <screen>
-cd &lt;root-dir>/brotli-x.x.x
+        and build the static libraries with
+        <programlisting>
 ./bootstrap
 #  to create the GNU autotools files
 
@@ -459,7 +480,10 @@ export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
              --with-gnu-ld     \
              --disable-silent-rules \
   && make
-      </screen>
+</programlisting>
+      </para>
+
+
 
       </sect4>
 
@@ -493,7 +517,9 @@ make        [options]   # builds the program
   --enable-mingw32
   --enable-zlib
   --enable-static-linking
-  --disable-pthread
+  --disable-pthread 
+  --with-brotli
+  --with-mbedtls
 </literallayout>
 
       <para>

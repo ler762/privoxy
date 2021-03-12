@@ -2613,98 +2613,22 @@ make tarball-dist
         First, <emphasis>make sure that you have freshly exported the right
         version into an empty directory</emphasis>. (See "Building and releasing
         packages" above).
-        <!-- XXX  ??? are we still basing releases off a tarball???
-          -->
       </para>
+
       <para>
-        Get and install NSIS from
+        Check that you have the current versions of the
         <ulink url="https://sourceforge.net/projects/nsis/files/NSIS%203/">
-                    https://sourceforge.net/projects/nsis/files/NSIS%203/</ulink>
-      </para>
-      <para>
-        Update the <computeroutput>MAKENSIS</computeroutput> evar in
-        <computeroutput>windows/GNUmakefile</computeroutput>
-        to point to the makensis.exe executable.  e.g.
-<programlisting>
-# Path to NSIS
-MAKENSIS = /source/nsis-3.03/makensis.exe
-</programlisting>
-      </para>
-
-      <para>
-        Get the latest 8.x PCRE code from
-        <ulink url="https://ftp.pcre.org/pub/pcre/">
-                    https://ftp.pcre.org/pub/pcre/</ulink>
-        and build the static libraries with
-        <programlisting>
-export PATH=${PATH}:/usr/i686-w64-mingw32/sys-root/mingw/bin
-#  need the mingw lib/binaries in the path for make test
-
-export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
-export LDFLAGS="-fstack-protector-strong"
-export CPPFLAGS="-DPCRE_STATIC"
-staticlib="--enable-static --disable-shared"
-
-./configure  --host=i686-w64-mingw32 \
-             --prefix=/usr/local/i686-w64-mingw32 \
-             --enable-utf  --enable-unicode-properties \
-             --enable-jit \
-             --enable-newline-is-anycrlf \
-             --enable-pcre16 \
-             --enable-pcre32 \
-             --disable-pcregrep-libbz2 \
-             --disable-pcregrep-libz \
-             --disable-pcretest-libreadline \
-             --disable-stack-for-recursion  \
-             --enable-static --disable-shared \
-  &&  make  \
-  &&  make test
-</programlisting>
-      </para>
-
-      <para>
-        Get the latest 2.16.x mbedtls library from
-        <ulink url="https://github.com/ARMmbed/mbedtls/tags">
-                    https://github.com/ARMmbed/mbedtls/tags</ulink>
-        and build the static libraries with
-        <programlisting>
-export WINDOWS_BUILD=1
-#  build for a Windows platform
-
-unset DEBUG
-
-export CC=i686-w64-mingw32-gcc
-export LD=i686-w64-mingw32-gcc
-export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
-export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
-
-make lib
-#  build the libraries
-</programlisting>
-      </para>
-
-      <para>
-        Get the brotli library from
+                    NSIS installer</ulink>,
+        <ulink url="https://ftp.pcre.org/pub/pcre/">PCRE library</ulink>,
+        <ulink url="https://tls.mbed.org/download">MBED TLS library</ulink>,
         <ulink url="https://github.com/google/brotli/releases">
-                    https://github.com/google/brotli/releases</ulink>
-        and build the static libraries with
-        <programlisting>
-./bootstrap
-#  to create the GNU autotools files
-
-autoconf
-
-export CFLAGS="-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2"
-export LDFLAGS="${LDFLAGS} -fstack-protector-strong"
-
-./configure  --host=i686-w64-mingw32 \
-             --prefix=/usr/local/i686-w64-mingw32 \
-             --enable-static   \
-             --disable-shared  \
-             --with-gnu-ld     \
-             --disable-silent-rules \
-  && make
-</programlisting>
+                    Brotli library</ulink>,
+        and that the <emphasis>MAKENSIS</emphasis> evar in
+        <filename>windows/GNUMakefile</filename>
+        points to the NSIS installer program.  (See the
+        <ulink url="../user-manual/installation.html#WINBUILD-CYGWIN">
+        <emphasis>Building from Source / Windows</emphasis></ulink>
+        section of the User Manual for details.)
       </para>
 
       <para>
@@ -2776,9 +2700,9 @@ git rm debian/patches/XX_patchname.patch
        If the patch needs modification, you can apply, edit and update it with
       </para>
       <programlisting>
-  quilt push -f
-  quilt edit some_file
-  quilt refresh
+quilt push -f
+quilt edit some_file
+quilt refresh
 </programlisting>
       <para>
        until
