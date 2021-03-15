@@ -1031,7 +1031,9 @@ adlibris.
 # ada*.
 adainitiative*.
 # URL = https://www.adrianschmutzler.net/
-adrian*.
+.adrian*.
+# URL = https://adguard.com/
+.adguard.com/
 
 #### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
 
@@ -2379,6 +2381,8 @@ belco24.de/
 .tagesschau.de/
 # URL = https://metrics.sr.ht/graph
 metrics.sr.ht/
+# URL = https://nlnet.nl/logo/banner.png
+nlnet.nl/
 
 
 #############################################################################
