@@ -1036,6 +1036,7 @@ adainitiative*.
 .adguard.com/
 
 #### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
+####
 
 # URL = https://advocacy.mozilla.org/
 advocacy.
@@ -1043,6 +1044,8 @@ advocacy.
 # URL = http://countermeasures.trendmicro.eu/diginotar-iran-certificates-and-you/
 countermeasures.
 
+####
+#### LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ## LR ###
 
 #############################################################################
 # Generic block patterns by path:
@@ -2640,7 +2643,7 @@ liveupdate.symantecliveupdate.com
 .bookmarklets.com
 # URL = http://www.squarefree.com/bookmarklets/
 .squarefree.com/bookmarklets/
-#MASTER# REMARKS: Used by Mac OSX's automatic software update feature
+#MASTER# REMARKS: Used by Mac OSX's automatic software update feature  '
 swquery.apple.com
 swscan.apple.com
 #MASTER# REMARKS: These are various US DSL speed tests sites, where MIME is wrong
