@@ -60,7 +60,7 @@ LDFLAGS="${LDFLAGS} -fstack-protector-strong"
 #     strcpy (&var.t.buf[1], "abcdefg");
 #   will be considered a buffer overflow.
 
-### CFLAGS="${CFLAGS} -march=native"
+CFLAGS="${CFLAGS} -march=native"
 # -march=cpu-type
 #   Generate instructions for the machine type cpu-type.  In contrast to -mtune=cpu-type, which merely tunes the
 #   generated code for the specified cpu-type, -march=cpu-type allows GCC to generate code that may not run at all on
