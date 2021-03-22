@@ -1,4 +1,4 @@
-#        Sample Configuration File for Privoxy 3.0.32
+#        Sample Configuration File for Privoxy 3.0.33
 #
 # Copyright (C) 2001-2021 Privoxy Developers https://www.privoxy.org/
 #
@@ -112,10 +112,9 @@
 #        user-manual  /usr/share/doc/privoxy/user-manual
 #
 #      The User Manual is then available to anyone with access to
-#      Privoxy, by following the built-in URL:
-#        http://config.privoxy.org/user-manual/
-#      or the shortcut:
-#        http://p.p/user-manual/
+#      Privoxy, by following the built-in URL: http://
+#      config.privoxy.org/user-manual/ (or the shortcut: http://p.p/
+#      user-manual/).
 #
 #      If the documentation is not on the local system, it can be
 #      accessed from a remote server, as:
@@ -405,8 +404,8 @@ actionsfile user.action      # User customizations
 #
 #  Effect if unset:
 #
-#      No textual content filtering takes place, i.e. all +filter{name}
-#      actions in the actions files are turned neutral.
+#      No textual content filtering takes place, i.e. all +filter{
+#      name} actions in the actions files are turned neutral.
 #
 #  Notes:
 #
@@ -464,8 +463,8 @@ filterfile user.filter      # User customizations
 #
 #      Depending on the debug options below, the logfile may be a
 #      privacy risk if third parties can get access to it. As most
-#      users will never look at it, Privoxy only logs fatal errors
-#      by default.
+#      users will never look at it, Privoxy only logs fatal errors by
+#      default.
 #
 #      For most troubleshooting purposes, you will have to change
 #      that, please refer to the debugging section for details.
@@ -558,7 +557,8 @@ logfile logfile
 #
 #  Default value:
 #
-#      0 (i.e.: only fatal errors (that cause Privoxy to exit) are logged)
+#      0 (i.e.: only fatal errors (that cause Privoxy to exit) are
+#      logged)
 #
 #  Effect if unset:
 #
@@ -578,7 +578,7 @@ logfile logfile
 #        debug   128 # debug redirects
 #        debug   256 # debug GIF de-animation
 #        debug   512 # Common Log Format
-#        debug  1024 # Log the destination for each request Privoxy didn't let through, and the reason why.
+#        debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
 #        debug  2048 # CGI user interface
 #        debug  4096 # Startup banner and warnings.
 #        debug  8192 # Non-fatal errors
@@ -610,7 +610,8 @@ logfile logfile
 #      you read the log messages, you may even be able to solve the
 #      problem on your own.
 #
-#debug     1 # Log the destination for each request.
+#debug     1 # Log the destination for each request Privoxy
+#   let through.
 #debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
 #debug  4096 # Startup banner and warnings
 #debug  8192 # Non-fatal errors
@@ -1312,7 +1313,8 @@ enable-proxy-authentication-forwarding 0
 #      denote "all URLs". http_parent[:port] is the DNS name or IP
 #      address of the parent HTTP proxy through which the requests
 #      should be forwarded, optionally followed by its listening port
-#      (default: 8000). Use a single dot (.) to denote "no forwarding".
+#      (default: 8000). Use a single dot (.) to denote "no
+#      forwarding".
 #
 #  Default value:
 #
@@ -2089,10 +2091,10 @@ socket-timeout 300
 #
 #      This directive was added as a work-around for Firefox bug
 #      492459: "Websites are no longer rendered if SSL requests for
-#      JavaScripts are blocked by a proxy."
-#      (https://bugzilla.mozilla.org/show_bug.cgi?id=492459), the bug
-#      has been fixed for quite some time, but this directive is also
-#      useful to make it harder for websites to detect whether or not
+#      JavaScripts are blocked by a proxy." ( https://
+#      bugzilla.mozilla.org/show_bug.cgi?id=492459), the bug has been
+#      fixed for quite some time, but this directive is also useful
+#      to make it harder for websites to detect whether or not
 #      resources are being blocked.
 #
 #handle-as-empty-doc-returns-ok 1
@@ -2168,18 +2170,18 @@ socket-timeout 300
 #
 #  Examples:
 #
-#          # Best speed (compared to the other levels)
-#          compression-level 1
+#        # Best speed (compared to the other levels)
+#        compression-level 1
 #
-#          # Best compression
-#          compression-level 9
+#        # Best compression
+#        compression-level 9
 #
-#          # No compression. Only useful for testing as the added header
-#          # slightly increases the amount of data that has to be sent.
-#          # If your benchmark shows that using this compression level
-#          # is superior to using no compression at all, the benchmark
-#          # is likely to be flawed.
-#          compression-level 0
+#        # No compression. Only useful for testing as the added header
+#        # slightly increases the amount of data that has to be sent.
+#        # If your benchmark shows that using this compression level
+#        # is superior to using no compression at all, the benchmark
+#        # is likely to be flawed.
+#        compression-level 0
 #
 #compression-level 1
 #
@@ -2295,6 +2297,7 @@ socket-timeout 300
 #          client-specific-tag change-tor-socks-port Change forward-socks5 settings to use a different Tor socks port (and circuits)
 #          client-specific-tag no-https-inspection Disable HTTPS inspection
 #          client-specific-tag no-tls-verification Don't verify certificates when http-inspection is enabled
+#
 #
 #  6.17. client-tag-lifetime
 #  ==========================
@@ -2496,8 +2499,8 @@ socket-timeout 300
 #      Privoxy clients should import the certificate so that they can
 #      validate the generated certificates.
 #
-#      The file can be generated with:
-#      openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.crt -days 3650
+#      The file can be generated with: openssl req -new -x509
+#      -extensions v3_ca -keyout cakey.pem -out cacert.crt -days 3650
 #
 #  Example:
 #
@@ -2663,63 +2666,60 @@ socket-timeout 300
 #  Examples:
 #
 #          # Explicitly set a couple of ciphers with names used by MbedTLS
-#          cipher-list cipher-list TLS-ECDHE-RSA-WITH-CHACHA20-POLY1305-SHA256:\
-#          TLS-ECDHE-ECDSA-WITH-CHACHA20-POLY1305-SHA256:\
-#          TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256:\
-#          TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256:\
-#          TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384:\
-#          TLS-ECDHE-ECDSA-WITH-AES-256-CCM:\
-#          TLS-ECDHE-ECDSA-WITH-AES-256-CCM-8:\
-#          TLS-ECDHE-ECDSA-WITH-AES-128-CCM:\
-#          TLS-ECDHE-ECDSA-WITH-AES-128-CCM-8:\
-#          TLS-ECDHE-ECDSA-WITH-CAMELLIA-128-GCM-SHA256:\
-#          TLS-ECDHE-ECDSA-WITH-CAMELLIA-256-GCM-SHA384:\
-#          TLS-ECDHE-RSA-WITH-AES-128-GCM-SHA256:\
-#          TLS-ECDHE-RSA-WITH-AES-256-GCM-SHA384:\
-#          TLS-ECDHE-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
-#          TLS-ECDHE-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
-#          TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:\
-#          TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:\
-#          TLS-DHE-RSA-WITH-AES-256-CCM:\
-#          TLS-DHE-RSA-WITH-AES-256-CCM-8:\
-#          TLS-DHE-RSA-WITH-AES-128-CCM:\
-#          TLS-DHE-RSA-WITH-AES-128-CCM-8:\
-#          TLS-DHE-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
-#          TLS-DHE-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
-#          TLS-ECDH-RSA-WITH-AES-128-GCM-SHA256:\
-#          TLS-ECDH-RSA-WITH-AES-256-GCM-SHA384:\
-#          TLS-ECDH-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
-#          TLS-ECDH-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
-#          TLS-ECDH-ECDSA-WITH-AES-128-GCM-SHA256:\
-#          TLS-ECDH-ECDSA-WITH-AES-256-GCM-SHA384:\
-#          TLS-ECDH-ECDSA-WITH-CAMELLIA-128-GCM-SHA256:\
-#          TLS-ECDH-ECDSA-WITH-CAMELLIA-256-GCM-SHA384
-#
+#        cipher-list cipher-list TLS-ECDHE-RSA-WITH-CHACHA20-POLY1305-SHA256:\
+#        TLS-ECDHE-ECDSA-WITH-CHACHA20-POLY1305-SHA256:\
+#        TLS-DHE-RSA-WITH-CHACHA20-POLY1305-SHA256:\
+#        TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256:\
+#        TLS-ECDHE-ECDSA-WITH-AES-256-GCM-SHA384:\
+#        TLS-ECDHE-ECDSA-WITH-AES-256-CCM:\
+#        TLS-ECDHE-ECDSA-WITH-AES-256-CCM-8:\
+#        TLS-ECDHE-ECDSA-WITH-AES-128-CCM:\
+#        TLS-ECDHE-ECDSA-WITH-AES-128-CCM-8:\
+#        TLS-ECDHE-ECDSA-WITH-CAMELLIA-128-GCM-SHA256:\
+#        TLS-ECDHE-ECDSA-WITH-CAMELLIA-256-GCM-SHA384:\
+#        TLS-ECDHE-RSA-WITH-AES-128-GCM-SHA256:\
+#        TLS-ECDHE-RSA-WITH-AES-256-GCM-SHA384:\
+#        TLS-ECDHE-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
+#        TLS-ECDHE-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
+#        TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:\
+#        TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:\
+#        TLS-DHE-RSA-WITH-AES-256-CCM:\
+#        TLS-DHE-RSA-WITH-AES-256-CCM-8:\
+#        TLS-DHE-RSA-WITH-AES-128-CCM:\
+#        TLS-DHE-RSA-WITH-AES-128-CCM-8:\
+#        TLS-DHE-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
+#        TLS-DHE-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
+#        TLS-ECDH-RSA-WITH-AES-128-GCM-SHA256:\
+#        TLS-ECDH-RSA-WITH-AES-256-GCM-SHA384:\
+#        TLS-ECDH-RSA-WITH-CAMELLIA-128-GCM-SHA256:\
+#        TLS-ECDH-RSA-WITH-CAMELLIA-256-GCM-SHA384:\
+#        TLS-ECDH-ECDSA-WITH-AES-128-GCM-SHA256:\
+#        TLS-ECDH-ECDSA-WITH-AES-256-GCM-SHA384:\
+#        TLS-ECDH-ECDSA-WITH-CAMELLIA-128-GCM-SHA256:\
+#        TLS-ECDH-ECDSA-WITH-CAMELLIA-256-GCM-SHA384
 #
 #          # Explicitly set a couple of ciphers with names used by OpenSSL
-#          cipher-list ECDHE-RSA-AES256-GCM-SHA384:\
-#          ECDHE-ECDSA-AES256-GCM-SHA384:\
-#          DH-DSS-AES256-GCM-SHA384:\
-#          DHE-DSS-AES256-GCM-SHA384:\
-#          DH-RSA-AES256-GCM-SHA384:\
-#          DHE-RSA-AES256-GCM-SHA384:\
-#          ECDH-RSA-AES256-GCM-SHA384:\
-#          ECDH-ECDSA-AES256-GCM-SHA384:\
-#          ECDHE-RSA-AES128-GCM-SHA256:\
-#          ECDHE-ECDSA-AES128-GCM-SHA256:\
-#          DH-DSS-AES128-GCM-SHA256:\
-#          DHE-DSS-AES128-GCM-SHA256:\
-#          DH-RSA-AES128-GCM-SHA256:\
-#          DHE-RSA-AES128-GCM-SHA256:\
-#          ECDH-RSA-AES128-GCM-SHA256:\
-#          ECDH-ECDSA-AES128-GCM-SHA256:\
-#          ECDHE-RSA-AES256-GCM-SHA384:\
-#          AES128-SHA
-#
+#        cipher-list ECDHE-RSA-AES256-GCM-SHA384:\
+#        ECDHE-ECDSA-AES256-GCM-SHA384:\
+#        DH-DSS-AES256-GCM-SHA384:\
+#        DHE-DSS-AES256-GCM-SHA384:\
+#        DH-RSA-AES256-GCM-SHA384:\
+#        DHE-RSA-AES256-GCM-SHA384:\
+#        ECDH-RSA-AES256-GCM-SHA384:\
+#        ECDH-ECDSA-AES256-GCM-SHA384:\
+#        ECDHE-RSA-AES128-GCM-SHA256:\
+#        ECDHE-ECDSA-AES128-GCM-SHA256:\
+#        DH-DSS-AES128-GCM-SHA256:\
+#        DHE-DSS-AES128-GCM-SHA256:\
+#        DH-RSA-AES128-GCM-SHA256:\
+#        DHE-RSA-AES128-GCM-SHA256:\
+#        ECDH-RSA-AES128-GCM-SHA256:\
+#        ECDH-ECDSA-AES128-GCM-SHA256:\
+#        ECDHE-RSA-AES256-GCM-SHA384:\
+#        AES128-SHA
 #
 #          # Use keywords instead of explicitly naming the ciphers (Does not work with MbedTLS)
-#          cipher-list ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
-#
+#        cipher-list ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
 #
 #
 #  7.7. trusted-cas-file
@@ -2816,4 +2816,5 @@ socket-timeout 300
 #  disconnect from and hide the command console.
 #
 #hide-console
+#
 #
