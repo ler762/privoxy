@@ -4132,7 +4132,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 3515");
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 4135");
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
       close_client_and_server_ssl_connections(csp);
@@ -4155,7 +4155,7 @@ static void handle_established_connection(struct client_state *csp)
    if ((csp->flags & CSP_FLAG_CONTENT_LENGTH_SET)
       && (csp->expected_content_length != byte_count))
    {
-      log_error(LOG_LEVEL_ERROR,
+      log_error(LOG_LEVEL_INFO,
          "Received %llu bytes while expecting %llu.",
          byte_count, csp->expected_content_length);
       mark_server_socket_tainted(csp);
