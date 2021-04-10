@@ -1917,11 +1917,9 @@ socket-timeout 300
 #
 #      128
 #
-#  Effect if unset:
+#  Notes:
 #
 #      Connections are served until a resource limit is reached.
-#
-#  Notes:
 #
 #      Privoxy creates one thread (or process) for every incoming
 #      client connection that isn't rejected based on the access
