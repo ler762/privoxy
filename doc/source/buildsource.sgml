@@ -77,17 +77,13 @@ git clone https://www.privoxy.org/git/privoxy.git
  <filename>/etc/passwd</filename> might then look like:
 </para>
 
-<screen>
-privoxy:*:7777:7777:privoxy proxy:/no/home:/no/shell
-</screen>
+<screen>privoxy:*:7777:7777:privoxy proxy:/no/home:/no/shell</screen>
 
 <para>
  And then <filename>/etc/group</filename>, like:
 </para>
 
-<screen>
-privoxy:*:7777:
-</screen>
+<screen>privoxy:*:7777:</screen>
 
 <para>
  Some binary packages may do this for you.
@@ -156,8 +152,7 @@ make
 </para>
 
 <screen>
-make -s install  USER=privoxy GROUP=privoxy
-</screen>
+make -s install  USER=privoxy GROUP=privoxy</screen>
 
 <para>
  The default installation path for <command>make install</command> is

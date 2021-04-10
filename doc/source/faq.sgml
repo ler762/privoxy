@@ -910,8 +910,7 @@ the differences?</title>
   for them in the <filename>user.action</filename> file. An example for yahoo might
   look like:
  </para>
-  <screen>
-# Allow all cookies for Yahoo login:
+  <screen># Allow all cookies for Yahoo login:
 #
 { -<ulink url="../user-manual/actions-file.html#CRUNCH-INCOMING-COOKIES">crunch-incoming-cookies</ulink> -<ulink url="../user-manual/actions-file.html#CRUNCH-OUTGOING-COOKIES">crunch-outgoing-cookies</ulink> -<ulink url="../user-manual/actions-file.html#SESSION-COOKIES-ONLY">session-cookies-only</ulink> }
 .login.yahoo.com</screen>
@@ -923,7 +922,7 @@ the differences?</title>
   url="../user-manual/actions-file.html#ALIASES">alias</ulink> just for such
   sticky situations:
  </para>
-  <screen>
+ <screen>
 # Gmail is a _fragile_ site:
 #
 { <literal>fragile</literal> }
@@ -1515,7 +1514,7 @@ the <emphasis>BLOCKED</emphasis> page?</title>
  available as compile-time options. You should
  <command>configure</command> the sources as follows:
 </para>
- <screen>
+<screen>
 ./configure  --disable-toggle  --disable-editor  --disable-force
 </screen>
 <para>
@@ -3012,13 +3011,12 @@ browsing has slowed to a crawl. What gives? </title>
  <!--  show how to check permissions? -->
  On Windows you can use the windows equivalent of sudo:
 </para>
-<screen>runas /user:administrator "notepad \privoxy\config.txt"</screen>
+ <screen>runas /user:administrator "notepad \privoxy\config.txt"</screen>
 
 <para>
  or fix the file permissions:
 </para>
-<screen>
-C:\Privoxy>icacls config.txt
+<screen>C:\Privoxy>icacls config.txt
 config.txt BUILTIN\Administrators:(I)(F)
            NT AUTHORITY\SYSTEM:(I)(F)
            BUILTIN\Users:(I)(RX)
@@ -3039,8 +3037,7 @@ config.txt I3668\Lee:(F)
 
 Successfully processed 1 files; Failed processing 0 files
 
-C:\Privoxy>
-</screen>
+C:\Privoxy></screen>
 
 <para>
  or try to point-n-click your way through adjusting the file

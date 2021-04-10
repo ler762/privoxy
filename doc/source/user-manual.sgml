@@ -517,7 +517,7 @@ make        [options]   # builds the program
   --enable-mingw32
   --enable-zlib
   --enable-static-linking
-  --disable-pthread 
+  --disable-pthread
   --with-brotli
   --with-mbedtls
 </literallayout>
@@ -1558,25 +1558,25 @@ for details.
 <!-- Needs to be put in a table and colorized  -->
 <screen><!-- want the background color that goes with screen -->
  <msgtext>
- <bridgehead renderas="sect2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Privoxy Menu</bridgehead>
+ <bridgehead renderas="sect2">&nbsp;&nbsp;&nbsp;&nbsp;Privoxy Menu</bridgehead>
  <simplelist>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-status">View & change the current configuration</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-status">View & change the current configuration</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/client-tags">View or toggle the tags that can be set based on the client's address</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/client-tags">View or toggle the tags that can be set based on the client's address</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-request">View the request headers.</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-request">View the request headers.</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-url-info">Look up which actions apply to a URL and why</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/show-url-info">Look up which actions apply to a URL and why</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/toggle">Toggle Privoxy on or off</ulink>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink url="http://config.privoxy.org/toggle">Toggle Privoxy on or off</ulink>
  </member>
  <member>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&squf;&nbsp;&nbsp;<ulink
   url="https://www.privoxy.org/&p-version;/user-manual/">Documentation</ulink>
  </member>
  </simplelist>
@@ -2583,8 +2583,7 @@ CLIENT-TAG:^circumvent-blocks$
 # This section is not overruled because it's located after
 # the previous one.
 {+block{Nobody is supposed to request this.}}
-example.org/blocked-example-page
-</screen>
+example.org/blocked-example-page</screen>
 
 </sect3>
 
@@ -2772,8 +2771,7 @@ example.org/blocked-example-page
  <varlistentry>
   <term>Example usage:</term>
   <listitem>
-     <screen>
-# Add a DNT ("Do not track") header to all requests,
+     <screen># Add a DNT ("Do not track") header to all requests,
 # event to those that already have one.
 #
 # This is just an example, not a recommendation.
@@ -2782,8 +2780,7 @@ example.org/blocked-example-page
 # about the DNT header and depending on the User-Agent, adding the
 # header may make user-tracking easier.
 {+add-header{DNT: 1}}
-/
-</screen>
+/</screen>
   </listitem>
  </varlistentry>
 </variablelist>
@@ -3351,8 +3348,7 @@ TAG:^IP-ADDRESS: 10\.0\.0\.1$
  <varlistentry>
   <term>Example usage (sections):</term>
   <listitem>
-     <screen>
-# Check if www.example.net/ really uses valid XHTML
+     <screen># Check if www.example.net/ really uses valid XHTML
 { +content-type-overwrite{application/xml} }
 www.example.net/
 
@@ -3439,8 +3435,7 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-# Block the non-existent "Privacy-Violation:" client header
+     <screen># Block the non-existent "Privacy-Violation:" client header
 { +crunch-client-header{Privacy-Violation:} }
 /
 </screen>
@@ -3520,13 +3515,11 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-# Let the browser revalidate cached documents but don't
+     <screen># Let the browser revalidate cached documents but don't
 # allow the server to use the revalidation headers for user tracking.
 {+hide-if-modified-since{-60} \
  +overwrite-last-modified{randomize} \
- +crunch-if-none-match \
-}
+ +crunch-if-none-match}
 /
 </screen>
   </listitem>
@@ -3673,8 +3666,7 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-# Crunch server headers that try to prevent caching
+     <screen># Crunch server headers that try to prevent caching
 { +crunch-server-header{no-cache} }
 /
 </screen>
@@ -3952,10 +3944,8 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-{+downgrade-http-version}
-problem-host.example.com
-</screen>
+     <screen>{+downgrade-http-version}
+problem-host.example.com</screen>
   </listitem>
  </varlistentry>
 
@@ -4712,8 +4702,7 @@ new action
  <varlistentry>
   <term>Example usage:</term>
   <listitem>
-     <screen>
-# Block all documents on example.org that end with ".js",
+     <screen># Block all documents on example.org that end with ".js",
 # but send an empty document instead of the usual HTML message.
 {+block{Blocked JavaScript} +handle-as-empty-document}
 example.org/.*\.js$
@@ -4792,8 +4781,7 @@ example.org/.*\.js$
  <varlistentry>
   <term>Example usage (sections):</term>
   <listitem>
-     <screen>
-# Generic image extensions:
+     <screen># Generic image extensions:
 #
 {+handle-as-image}
 /.*\.(gif|jpg|jpeg|png|bmp|ico)$
@@ -4883,8 +4871,7 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-# Pretend to use Canadian language settings.
+     <screen># Pretend to use Canadian language settings.
 {+hide-accept-language{en-ca} \
 +hide-user-agent{Mozilla/5.0 (X11; U; OpenBSD i386; en-CA; rv:1.8.0.4) Gecko/20060628 Firefox/1.5.0.4} \
 }
@@ -5063,14 +5050,11 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-# Let the browser revalidate but make tracking based on the time less likely.
+     <screen># Let the browser revalidate but make tracking based on the time less likely.
 {+hide-if-modified-since{-60} \
  +overwrite-last-modified{randomize} \
- +crunch-if-none-match \
-}
-/
-</screen>
+ +crunch-if-none-match}
+/</screen>
   </listitem>
  </varlistentry>
 </variablelist>
@@ -5396,10 +5380,8 @@ new action
  <varlistentry>
   <term>Example usage (section):</term>
   <listitem>
-     <screen>
-{+https-inspection}
-www.example.com
-</screen>
+     <screen>{+https-inspection}
+www.example.com</screen>
   </listitem>
  </varlistentry>
 
@@ -5549,13 +5531,11 @@ www.example.com
    <!-- I had trouble getting the spacing to look right in my browser -->
    <!-- I probably have the wrong font setup, bollocks. -->
    <!-- Apparently the emphasis tag uses a proportional font no matter what -->
-     <screen>
-+limit-connect{443}                   # Port 443 is OK.
+     <screen>+limit-connect{443}                   # Port 443 is OK.
 +limit-connect{80,443}                # Ports 80 and 443 are OK.
 +limit-connect{-3, 7, 20-100, 500-}   # Ports less than 3, 7, 20 to 100 and above 500 are OK.
 +limit-connect{-}                     # All ports are OK
-+limit-connect{,}                     # No HTTPS/SSL traffic is allowed
-</screen>
++limit-connect{,}                     # No HTTPS/SSL traffic is allowed</screen>
   </listitem>
  </varlistentry>
 </variablelist>
@@ -5979,8 +5959,7 @@ jvauzb4sb3bwlsnc.onion/
 # Redirect remote requests for this manual
 # to the local version delivered by Privoxy
 {+redirect{s@^http://www@http://config@}}
-www.privoxy.org/user-manual/
-</screen>
+www.privoxy.org/user-manual/</screen>
   </listitem>
  </varlistentry>
 
@@ -6622,8 +6601,7 @@ hal stop here
 # Settings -- Don't change! For internal Privoxy use ONLY.
 ##########################################################################
 {{settings}}
-for-privoxy-version=3.0.11
-</screen>
+for-privoxy-version=3.0.11</screen>
 
 <para>
  After that comes the (optional) alias section. We'll use the example
@@ -6649,8 +6627,7 @@ for-privoxy-version=3.0.11
  # that are useful for certain types of sites:
  #
  fragile     = -<link linkend="BLOCK">block</link> -<link linkend="FILTER">filter</link> -crunch-all-cookies -<link linkend="FAST-REDIRECTS">fast-redirects</link> -<link linkend="HIDE-REFERER">hide-referrer</link>
- shop        = -crunch-all-cookies -<link linkend="FILTER-ALL-POPUPS">filter{all-popups}</link>
-</screen>
+ shop        = -crunch-all-cookies -<link linkend="FILTER-ALL-POPUPS">filter{all-popups}</link></screen>
 
 <para>
  The first of our specialized sections is concerned with <quote>fragile</quote>
@@ -6671,8 +6648,7 @@ for-privoxy-version=3.0.11
 { fragile }
 .office.microsoft.com           # surprise, surprise!
 .windowsupdate.microsoft.com
-mail.google.com
-</screen>
+mail.google.com</screen>
 
 <para>
  Shopping sites are not as fragile, but they typically
@@ -6687,8 +6663,7 @@ mail.google.com
 .quietpc.com
 .worldpay.com   # for quietpc.com
 .jungle.com
-.scan.co.uk
-</screen>
+.scan.co.uk</screen>
 
 <para>
  The <literal><link linkend="FAST-REDIRECTS">fast-redirects</link></literal>
@@ -6703,8 +6678,7 @@ edit.*.yahoo.com
 .google.com
 .altavista.com/.*(like|url|link):http
 .altavista.com/trans.*urltext=http
-.nytimes.com
-</screen>
+.nytimes.com</screen>
 
 <para>
  It is important that <application>Privoxy</application> knows which
@@ -6728,8 +6702,7 @@ edit.*.yahoo.com
 # blocked further down this file:
 #
 { +<link linkend="HANDLE-AS-IMAGE">handle-as-image</link> }
-/.*\.(gif|jpe?g|png|bmp|ico)$
-</screen>
+/.*\.(gif|jpe?g|png|bmp|ico)$</screen>
 
 <para>
  And then there are known banner sources. They often use scripts to
@@ -6756,8 +6729,7 @@ ar.atwola.com
 .a.yimg.com/(?:(?!/i/).)*$
 .a[0-9].yimg.com/(?:(?!/i/).)*$
 bs*.gsanet.com
-.qkimg.net
-</screen>
+.qkimg.net</screen>
 
 <para>
  One of the most important jobs of <application>Privoxy</application>
@@ -6794,8 +6766,7 @@ count*.
 
 # Site-specific patterns (abbreviated):
 #
-.hitbox.com
-</screen>
+.hitbox.com</screen>
 
 <para>
  It's quite remarkable how many advertisers actually call their banner
@@ -6847,8 +6818,7 @@ ad[ud]*.   # (adult.* and add.*)
 # Site-specific:
 #
 www.globalintersec.com/adv # (adv = advanced)
-www.ugu.com/sui/ugu/adv
-</screen>
+www.ugu.com/sui/ugu/adv</screen>
 
 <para>
  Filtering source code can have nasty side effects,
@@ -6866,8 +6836,7 @@ www.ugu.com/sui/ugu/adv
 bugzilla.
 developer.
 wiki.
-.sourceforge.net
-</screen>
+.sourceforge.net</screen>
 
 <para>
  The actual <filename>default.action</filename> is of course much more
@@ -6902,8 +6871,7 @@ wiki.
 <!-- brief sample user.action here -->
 
  <screen>
-# My user.action file. &lt;fred@example.com&gt;
-</screen>
+# My user.action file. &lt;fred@example.com&gt;</screen>
 
 <para>
  As <link linkend="aliases">aliases</link> are local to the actions
@@ -6939,8 +6907,7 @@ allow-ads   = -block -filter{banners-by-size} -filter{banners-by-link}
 
 # Alias for specific file types that are text, but might have conflicting
 # MIME types. We want the browser to force these to be text documents.
-handle-as-text = -<link linkend="FILTER">filter</link> +-<link linkend="content-type-overwrite">content-type-overwrite{text/plain}</link> +-<link linkend="FORCE-TEXT-MODE">force-text-mode</link> -<link linkend="HIDE-CONTENT-DISPOSITION">hide-content-disposition</link>
-</screen>
+handle-as-text = -<link linkend="FILTER">filter</link> +-<link linkend="content-type-overwrite">content-type-overwrite{text/plain}</link> +-<link linkend="FORCE-TEXT-MODE">force-text-mode</link> -<link linkend="HIDE-CONTENT-DISPOSITION">hide-content-disposition</link></screen>
 
 <para>
  Say you have accounts on some sites that you visit regularly, and
@@ -6982,8 +6949,7 @@ sourceforge.net
 # And this stupid host sends streaming video with a wrong MIME type,
 # so that Privoxy thinks it is getting HTML and starts filtering:
 #
-stupid-server.example.com/
-</screen>
+stupid-server.example.com/</screen>
 
 <para>
  Example of a simple <link linkend="BLOCK">block</link> action. Say you've
@@ -7106,8 +7072,7 @@ webmail.example.com
 
 <screen>
 { +<link linkend="set-image-blocker">set-image-blocker{blank}</link> }
-/ # ALL sites
-</screen>
+/ # ALL sites</screen>
 
 </sect3>
 </sect2>
@@ -7303,10 +7268,8 @@ webmail.example.com
  Our complete filter now looks like this:
 </para>
 
- <screen>
-FILTER: foo Replace all "foo" with "bar"
-s/foo/bar/g
-</screen>
+ <screen>FILTER: foo Replace all "foo" with "bar"
+s/foo/bar/g</screen>
 
 <para>
  Let's look at some real filters for more interesting examples. Here you see
@@ -7320,8 +7283,7 @@ FILTER: js-annoyances Get rid of particularly annoying JavaScript abuse
 
 # Get rid of JavaScript referrer tracking. Test page: http://www.randomoddness.com/untitled.htm
 #
-s|(&lt;script.*)document\.referrer(.*&lt;/script&gt;)|$1"Not Your Business!"$2|Usg
-</screen>
+s|(&lt;script.*)document\.referrer(.*&lt;/script&gt;)|$1"Not Your Business!"$2|Usg</screen>
 
 <para>
  Following the header line and a comment, you see the job. Note that it uses
@@ -7406,8 +7368,7 @@ s|(&lt;script.*)document\.referrer(.*&lt;/script&gt;)|$1"Not Your Business!"$2|U
  <screen>
 # The status bar is for displaying link targets, not pointless blahblah
 #
-s/window\.status\s*=\s*(['"]).*?\1/dUmMy=1/ig
-</screen>
+s/window\.status\s*=\s*(['"]).*?\1/dUmMy=1/ig</screen>
 
 <para>
  <literal>\s</literal> stands for whitespace characters (space, tab, newline,
@@ -7433,8 +7394,7 @@ s/window\.status\s*=\s*(['"]).*?\1/dUmMy=1/ig
  <screen>
 # Kill OnUnload popups. Yummy. Test: http://www.zdnet.com/zdsubs/yahoo/tree/yfs.html
 #
-s/(&lt;body [^&gt;]*)onunload(.*&gt;)/$1never$2/iU
-</screen>
+s/(&lt;body [^&gt;]*)onunload(.*&gt;)/$1never$2/iU</screen>
 
 <para>
  Including the
@@ -7460,8 +7420,7 @@ FILTER: fun Fun text replacements
 
 # Spice the daily news:
 #
-s/microsoft(?!\.com)/MicroSuck/ig
-</screen>
+s/microsoft(?!\.com)/MicroSuck/ig</screen>
 
 <para>
  Note the <literal>(?!\.com)</literal> part (a so-called negative lookahead)
@@ -7485,8 +7444,7 @@ s* industry[ -]leading \
 |  unparalleled \
 |  unrivalled \
 *&lt;font color="red"&gt;&lt;b&gt;BINGO!&lt;/b&gt;&lt;/font&gt; \
-*igx
-</screen>
+*igx</screen>
 
 <para>
  The <literal>x</literal> option in this job turns on extended syntax, and allows for
@@ -8106,8 +8064,7 @@ EXTERNAL-FILTER: citation-needed Adds a "[citation needed]" tag to an image. The
 
   ... beta warning HTML code goes here ...
 
-&lt;!-- if-unstable-end@ --&gt;
-</screen>
+&lt;!-- if-unstable-end@ --&gt;</screen>
 
 <para>
  If the "unstable" symbol is set, everything in between and including

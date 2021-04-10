@@ -610,8 +610,7 @@ logfile logfile
 #      you read the log messages, you may even be able to solve the
 #      problem on your own.
 #
-#debug     1 # Log the destination for each request Privoxy
-#   let through.
+#debug     1 # Log the destination for each request Privoxy let through.
 #debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
 #debug  4096 # Startup banner and warnings
 #debug  8192 # Non-fatal errors
@@ -1472,7 +1471,7 @@ enable-proxy-authentication-forwarding 0
 #      network by using their names, you will need additional
 #      exceptions that look like this:
 #
-#       forward           localhost/     .
+#        forward           localhost/     .
 #
 #
 #  5.3. forwarded-connect-retries

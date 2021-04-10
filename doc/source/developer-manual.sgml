@@ -839,8 +839,7 @@ if (this_variable == that_variable)
 if (this_variable == that_variable) /* this may not either */
 {
    do_something_very_important();
-}
-</programlisting>
+}</programlisting>
 
     <para><emphasis>Exception:</emphasis></para>
 
@@ -1000,8 +999,7 @@ if (1 == X)
 
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
-int ms_iis5_hack = 0;
-</programlisting>
+int ms_iis5_hack = 0;</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1026,8 +1024,7 @@ int msiis5hack = 0; int msIis5Hack = 0;
 
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
-int load_some_file(struct client_state *csp)
-</programlisting>
+int load_some_file(struct client_state *csp)</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1051,8 +1048,7 @@ int loadSomeFile(struct client_state *csp)
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
 (.h) extern int load_aclfile(struct client_state *csp);
-(.c) int load_aclfile(struct client_state *csp)
-</programlisting>
+(.c) int load_aclfile(struct client_state *csp)</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 <programlisting>
@@ -1076,8 +1072,7 @@ int loadSomeFile(struct client_state *csp)
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
 (enumeration) : enum Boolean {FALSE, TRUE};
-(#define) : #define DEFAULT_SIZE 100;
-</programlisting>
+(#define) : #define DEFAULT_SIZE 100;</programlisting>
 
     <para><emphasis>Note:</emphasis> We have a standard naming scheme for #defines
     that toggle a feature in the preprocessor: FEATURE_>, where
@@ -1108,8 +1103,7 @@ int loadSomeFile(struct client_state *csp)
 
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
-#define USE_IMAGE_LIST 1
-</programlisting>
+#define USE_IMAGE_LIST 1</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1146,8 +1140,7 @@ int loadSomeFile(struct client_state *csp)
 if (this == that)
 {
    ...
-}
-</programlisting>
+}</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1193,8 +1186,7 @@ if (this == that)
 {
    do_something();
    do_something_else();
-}
-</programlisting>
+}</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1219,8 +1211,7 @@ if (this == that)
 
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
-structure->flag = (condition);
-</programlisting>
+structure->flag = (condition);</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1271,8 +1262,7 @@ int this_variable = 0;
 <programlisting>
 a_struct->a_member;
 a_struct.a_member;
-function_name();
-</programlisting>
+function_name();</programlisting>
 
     <para><emphasis>Instead of:</emphasis> a_struct -> a_member; a_struct . a_member;
     function_name ();</para>
@@ -1373,8 +1363,7 @@ int function1( ... )
 <programlisting>
 short a_short = 0;
 float a_float  = 0;
-struct *ptr = NULL;
-</programlisting>
+struct *ptr = NULL;</programlisting>
 
     <para><emphasis>Note:</emphasis> It is much easier to debug a SIGSEGV if the
     message says you are trying to access memory address 00000000
@@ -1436,8 +1425,7 @@ is_web_page_blank();
 for (size_t cnt = 0; cnt &lt; block_list_length(); cnt++)
 {
    ....
-}
-</programlisting>
+}</programlisting>
 
     <para><emphasis>Note:</emphasis> Unfortunately, this makes a function call for
     each and every iteration. This increases the overhead in the
@@ -1460,8 +1448,7 @@ size_t len = block_list_length();
 for (size_t cnt = 0; cnt &lt; len; cnt++)
 {
    ....
-}
-</programlisting>
+}</programlisting>
 
     <para><emphasis>Exceptions:</emphasis> if the value of block_list_length()
     *may* change or could *potentially* change, then you must code the
@@ -1602,8 +1589,7 @@ extern "C"
  * We're avoiding an include statement here!
  *********************************************************************/
 struct file_list;
-extern file_list *xyz;
-</programlisting>
+extern file_list *xyz;</programlisting>
 
     <para><emphasis>Note:</emphasis> If you declare "file_list xyz;" (without the
     pointer), then including the proper header file is necessary.
@@ -1659,8 +1645,7 @@ switch (hash_string(cmd))
       ... anomaly code goes here ...
       continue; / break; / exit( 1 ); / etc ...
 
-} /* end switch (hash_string(cmd)) */
-</programlisting>
+} /* end switch (hash_string(cmd)) */</programlisting>
 
     <para><emphasis>Note:</emphasis> If you already have a default condition, you
     are obviously exempt from this point. Of note, most of the
@@ -1729,8 +1714,7 @@ switch (hash_string(cmd))
 <programlisting>
 long a = 0;
 long b = 0;
-long c = 0;
-</programlisting>
+long c = 0;</programlisting>
 
     <para><emphasis>Instead of:</emphasis></para>
 
@@ -1787,8 +1771,7 @@ list, then it should definitely be allocated via `malloc'.
     <para><emphasis>Example:</emphasis></para>
 <programlisting>
 int load_re_filterfile(struct client_state *csp) { ... }
-static void unload_re_filterfile(void *f) { ... }
-</programlisting>
+static void unload_re_filterfile(void *f) { ... }</programlisting>
 
     <para><emphasis>Exceptions:</emphasis></para>
 
