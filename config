@@ -611,9 +611,16 @@ logfile logfile
 #      problem on your own.
 #
 #debug     1 # Log the destination for each request Privoxy let through.
+#debug     2 # show each connection status
+#debug     4 # show tagging-related messages
+#debug     8 # show header parsing
+#debug   128 # debug redirects
+#debug   256 # debug GIF de-animation
+#debug   512 # Common Log Format
 #debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
 #debug  4096 # Startup banner and warnings
 #debug  8192 # Non-fatal errors
+#debug 65536 # Log applying actions
 #
 #  3.2. single-threaded
 #  =====================

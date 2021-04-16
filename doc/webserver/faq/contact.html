@@ -80,24 +80,23 @@
           <a href="../user-manual/config.html#LOGFILE" target="_top">logfile directive</a> is being used and the
           following <a href="../user-manual/config.html#DEBUG" target="_top">debug options</a> are enabled (all of
           them):</p>
-          <p class="LITERALLAYOUT">
-          debug&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;#&nbsp;Log&nbsp;the&nbsp;destination&nbsp;for&nbsp;each&nbsp;request&nbsp;Privoxy&nbsp;let&nbsp;through.<br>
-
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;See&nbsp;also&nbsp;debug&nbsp;1024.<br>
-
-          debug&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;#&nbsp;show&nbsp;each&nbsp;connection&nbsp;status<br>
-          debug&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;#&nbsp;show&nbsp;tagging-related&nbsp;messages<br>
-          debug&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;#&nbsp;show&nbsp;header&nbsp;parsing<br>
-          debug&nbsp;&nbsp;&nbsp;128&nbsp;#&nbsp;debug&nbsp;redirects<br>
-          debug&nbsp;&nbsp;&nbsp;256&nbsp;#&nbsp;debug&nbsp;GIF&nbsp;de-animation<br>
-          debug&nbsp;&nbsp;&nbsp;512&nbsp;#&nbsp;Common&nbsp;Log&nbsp;Format<br>
-          debug&nbsp;&nbsp;1024&nbsp;#&nbsp;Log&nbsp;the&nbsp;destination&nbsp;for&nbsp;requests&nbsp;Privoxy&nbsp;didn't&nbsp;let&nbsp;through,<br>
-
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;&nbsp;and&nbsp;the&nbsp;reason&nbsp;why.<br>
-
-          debug&nbsp;&nbsp;4096&nbsp;#&nbsp;Startup&nbsp;banner&nbsp;and&nbsp;warnings.<br>
-          debug&nbsp;&nbsp;8192&nbsp;#&nbsp;Non-fatal&nbsp;errors<br>
-          debug&nbsp;65536&nbsp;#&nbsp;Log&nbsp;applying&nbsp;actions</p>
+          <table border="0" bgcolor="#E0E0E0" width="90%">
+            <tr>
+              <td>
+                <pre class="PROGRAMLISTING">  debug     1 # Log the destination for each request.  See also debug 1024.
+  debug     2 # show each connection status
+  debug     4 # show tagging-related messages
+  debug     8 # show header parsing
+  debug   128 # debug redirects
+  debug   256 # debug GIF de-animation
+  debug   512 # Common Log Format
+  debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
+  debug  4096 # Startup banner and warnings.
+  debug  8192 # Non-fatal errors
+  debug 65536 # Log applying actions</pre>
+              </td>
+            </tr>
+          </table>
           <p>If you are having trouble with a filter, please additionally enable</p>
           <p class="LITERALLAYOUT">
           debug&nbsp;&nbsp;&nbsp;&nbsp;64&nbsp;#&nbsp;debug&nbsp;regular&nbsp;expression&nbsp;filters</p>
