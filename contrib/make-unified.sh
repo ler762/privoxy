@@ -8,8 +8,6 @@
 
 SCRIPT="block-test_new.awk"
 
-cd /cygdrive/c/MyProgs/Privoxy.307
-
 set -x
 
 # get the new hosts file
