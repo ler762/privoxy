@@ -610,7 +610,7 @@ logfile logfile
 #      you read the log messages, you may even be able to solve the
 #      problem on your own.
 #
-#debug     1 # Log the destination for each request Privoxy let through.
+#debug     1 # Log the destination for each request.
 #debug     2 # show each connection status
 #debug     4 # show tagging-related messages
 #debug     8 # show header parsing
@@ -2750,9 +2750,10 @@ socket-timeout 300
 #      This directive specifies the trusted CAs file that is used
 #      when validating certificates for intercepted TLS/SSL requests.
 #
-#      An example file can be downloaded from https://curl.se/ca/cacert.pem.
-#      If you want to create the file yourself, please
-#      see: https://curl.se/docs/caextract.html.
+#      An example file can be downloaded from
+#        https://curl.se/ca/cacert.pem
+#      If you want to create the file yourself, please see:
+#        https://curl.se/docs/caextract.html
 #
 #  Example:
 #

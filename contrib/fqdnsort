@@ -1,0 +1,34 @@
+#!/usr/bin/gawk -f
+# gnu awk script to sort by domain name
+# requires the gawk extension PROCINFO["sorted_in"] for array sorting
+#
+{
+  sub("\r", "", $0)        # fix DOS line ending
+  sub("#.*", "", $0)       # remove trailing comments
+  sub("^[ \t]+", "", $0)   # remove leading whitespace
+  n = index($0, "/")
+  if ( n > 0 ) { # remove path info
+     url = substr($0, 1, n-1) # everything to the left of the /
+  } else {
+     url = $0
+  }
+  sub("[ \t]+$", "", url)  # remove trailing whitespace
+  sub("[./]+$",  "", url)  # remove trailing periods + slashes
+  if ( url == "" ) next
+  url = tolower(url)       # make the name all lowercase chars
+  n = split(url, a, ".");  rev = "";
+  # if ( n == 1 ) next     # drop names with no dots
+  #   ??? google chrome dns hijack query test ???
+  for ( i = n; i > 0; i-- ) { rev = rev a[i] "!" }
+    # sort order is " ", "!", ... , "-", "."
+    # I want "example.com" sorting before "example-foo.com" so
+    # use ! as the name separator instead of .
+  fqdn[rev] = url
+}
+
+END {
+  PROCINFO["sorted_in"] = "@ind_str_asc"
+    # Order by indices in ascending order compared as strings
+  for (s in fqdn )
+    printf("%s\n", fqdn[s] )
+}

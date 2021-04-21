@@ -198,12 +198,12 @@ requesting support:
 
     If you are having trouble with a filter, please additionally enable
 
-    debug    64 # debug regular expression filters
+      debug    64 # debug regular expression filters
 
     If you suspect that Privoxy interprets the request or the response
     incorrectly, please enable additionally
 
-    debug 32768 # log all data read from the network
+      debug 32768 # log all data read from the network
 
     It's easy for us to ignore log messages that aren't relevant but missing
     log messages may make it impossible to investigate a problem. If you aren't
