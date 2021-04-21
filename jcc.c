@@ -4971,7 +4971,7 @@ static void serve(struct client_state *csp)
       {
          continue_chatting = 0;
          config_file_change_detected = 1;
-         log_error(LOG_LEVEL_CONNECT, "continue_chatting cleared, config_file_change_detected set");
+         log_error(LOG_LEVEL_INFO, "continue_chatting cleared, config_file_change_detected set");
       }
 #ifdef FEATURE_HTTPS_INSPECTION
       if (continue_chatting && client_use_ssl(csp) &&
