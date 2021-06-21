@@ -6,14 +6,16 @@
 #    https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt
 # de-duplicate, and save as lightswitch-hosts.txt
 
-TIMING="no"
-#  just do a timing run?  (vs. create a new action file)
-
 SCRIPT="block-test_new.awk"
 # SCRIPT="block-test_new.awk  --profile=lightswitchProfile.txt"
 
 ########################################################################
-if [ $TIMING != "yes" ]; then
+if [ "$1" == "time" ]; then
+   # just want a timing run (vs. d/l a new file and creating a new action file)
+   TIMING="yes"
+fi
+
+if [ "$TIMING" != "yes" ]; then
 
 set -x
 
@@ -76,9 +78,10 @@ mv config-original.txt config.txt
 # so how long did it take?
 gawk -f elapsed.awk timestamp.txt
 
-if [ $TIMING != "yes" ]; then
-
-/cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  lightswitch-hosts.new  lightswitch-hosts.action
-
-fi # endif $TIMING != "yes"
+if [ $TIMING == "yes" ]; then
+  grep '^  print "GET http://config.privoxy.org' $SCRIPT >> timing.txt
+  gawk -f elapsed.awk timestamp.txt                      >> timing.txt
+else
+  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  lightswitch-hosts.new  lightswitch-hosts.action
+fi # endif $TIMING
 
