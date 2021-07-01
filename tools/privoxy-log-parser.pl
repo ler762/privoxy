@@ -2410,7 +2410,7 @@ sub print_stats() {
         ")\n";
     print "Client connections: " .  $stats{'closed-client-connections'} . "\n";
     if ($stats{'content-size-total'}) {
-        print "Bytes of content transfered to the client: " .  $stats{'content-size-total'} . "\n";
+        print "Bytes of content transferred to the client: " .  $stats{'content-size-total'} . "\n";
     }
     my $lines_printed = 0;
     print "Client requests per connection distribution:\n";
@@ -2449,7 +2449,7 @@ sub print_stats() {
         print "HTTP version distribution unknown. No CLF message parsed yet. Is 'debug 512' enabled?\n";
     }
     if (exists $stats{'status-code'}) {
-        print "HTTP status codes:\n";
+        print "HTTP status codes according to 'debug 512' (status codes sent by the server may differ):\n";
         foreach my $status_code (sort {$stats{'status-code'}{$b} <=> $stats{'status-code'}{$a}} keys %{$stats{'status-code'}}) {
             printf "%8d : %-8d\n",  $stats{'status-code'}{$status_code}, $status_code;
         }
@@ -2655,7 +2655,7 @@ sub parse_loop() {
 
 sub stats_loop() {
 
-    my ($day, $time_stamp, $msecs, $thread, $log_level, $content);
+    my ($day, $time_stamp, $thread, $log_level, $content);
     my $strict_checks = cli_option_is_set('strict-checks');
     my %log_level_handlers = (
          'Connect:'           => \&gather_loglevel_connect_stats,
