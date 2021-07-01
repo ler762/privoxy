@@ -168,6 +168,7 @@ echo "LDFLAGS=${LDFLAGS}"
 ./configure  --host=i686-w64-mingw32  --enable-mingw32  --enable-zlib \
              --enable-static-linking \
              --enable-strptime-sanity-checks \
+             --enable-pcre-jit-compilation \
              --disable-pthread  \
              --enable-extended-statistics \
              --enable-pcre-host-patterns \
