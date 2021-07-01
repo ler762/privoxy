@@ -62,7 +62,7 @@
 #define LOG_LEVEL_STFU      0x20000
 #endif
 
-#define LOG_LEVEL_IO       0x400000
+#define LOG_LEVEL_IO       0x1000000
 
 /* Following are always on: */
 #define LOG_LEVEL_INFO    0x1000
