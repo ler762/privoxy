@@ -1974,7 +1974,10 @@ static int *get_ciphersuites_from_string(const char *parameter_string)
    size_t count = 2;
    int index = 0;
    const char separator = ':';
-   size_t parameter_len = strlen(parameter_string);
+   size_t parameter_len = strlen(parameter_string)+1;
+     /* -LR- strlen returns the length of the string ***not counting the terminating null***
+      *      so add 1 to account for C "null terminated string" nonsense.
+      */
 
    ciphersuites_string = zalloc_or_die(parameter_len + 1);
    strncpy(ciphersuites_string, parameter_string, parameter_len);
