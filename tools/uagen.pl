@@ -39,7 +39,7 @@ use Getopt::Long;
 
 use constant {
 
-   UAGEN_VERSION       => 'uagen 1.2.2',
+   UAGEN_VERSION       => 'uagen 1.2.3',
 
    UAGEN_LOGFILE       => '/var/log/uagen.log',
    ACTION_FILE         => '/etc/privoxy/user-agent.action',
@@ -59,8 +59,8 @@ use constant {
    # are too lazy to check, but want to change them anyway, take the values you
    # see in the "Help/About Mozilla Firefox" menu.
 
-   BROWSER_VERSION                   => "78.0",
-   BROWSER_REVISION                  => '78.0',
+   BROWSER_VERSION                   => "91.0",
+   BROWSER_REVISION                  => '71.0',
    BROWSER_RELEASE_DATE              => '20100101',
 };
 

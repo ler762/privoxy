@@ -4648,7 +4648,10 @@ static jb_err parse_time_header(const char *header, time_t *result)
     * through sed() which requires a header name followed by
     * a colon.
     */
-   assert(header_time != NULL);
+   if (header_time == NULL)
+   {
+      return JB_ERR_PARSE;
+   }
 
    header_time++;
    if (*header_time == ' ')
