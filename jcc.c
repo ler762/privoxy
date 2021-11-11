@@ -2080,12 +2080,13 @@ static int read_http_request_body(struct client_state *csp)
 
    if (to_read != 0)
    {
-      log_error(LOG_LEVEL_CONNECT, "Not enough request body has been read: expected %llu more bytes",
-         csp->expected_client_content_length);
+      log_error(LOG_LEVEL_CONNECT,
+         "Not enough request body has been read: expected %lu more bytes",
+         to_read);
       return 1;
    }
-   log_error(LOG_LEVEL_CONNECT, "The last %llu bytes of the request body have been read",
-      csp->expected_client_content_length);
+   log_error(LOG_LEVEL_CONNECT,
+      "The last %d bytes of the request body have been read", len);
    return 0;
 }
 
@@ -2520,9 +2521,10 @@ static int send_https_request(struct client_state *csp)
 
 /*********************************************************************
  *
- * Function    :  receive_encrypted_request
+ * Function    :  receive_encrypted_request_headers
  *
- * Description :  Receives an encrypted request.
+ * Description :  Receives the encrypted request headers when
+ *                https-inspecting.
  *
  * Parameters  :
  *          1  :  csp = Current client state (buffers, headers, etc...)
@@ -2531,7 +2533,7 @@ static int send_https_request(struct client_state *csp)
  *                JB_ERR_PARSE or JB_ERR_MEMORY otherwise
  *
  *********************************************************************/
-static jb_err receive_encrypted_request(struct client_state *csp)
+static jb_err receive_encrypted_request_headers(struct client_state *csp)
 {
    char buf[BUFFER_SIZE];
    int len;
@@ -2539,7 +2541,7 @@ static jb_err receive_encrypted_request(struct client_state *csp)
 
    do
    {
-      log_error(LOG_LEVEL_HEADER, "Reading encrypted headers");
+      log_error(LOG_LEVEL_HEADER, "Waiting for encrypted client headers");
       if (!is_ssl_pending(&(csp->ssl_client_attr)) &&
           !data_is_available(csp->cfd, csp->config->socket_timeout))
       {
@@ -2675,9 +2677,10 @@ static jb_err change_encrypted_request_destination(struct client_state *csp)
 
 /*********************************************************************
  *
- * Function    :  process_encrypted_request
+ * Function    :  process_encrypted_request_headers
  *
- * Description :  Receives and parses an encrypted request.
+ * Description :  Receives and parses the encrypted headers send
+ *                by the client when https-inspecting.
  *
  * Parameters  :
  *          1  :  csp = Current client state (buffers, headers, etc...)
@@ -2686,7 +2689,7 @@ static jb_err change_encrypted_request_destination(struct client_state *csp)
  *                JB_ERR_PARSE or JB_ERR_MEMORY otherwise
  *
  *********************************************************************/
-static jb_err process_encrypted_request(struct client_state *csp)
+static jb_err process_encrypted_request_headers(struct client_state *csp)
 {
    char *p;
    char *request_line;
@@ -2703,7 +2706,7 @@ static jb_err process_encrypted_request(struct client_state *csp)
       csp->flags |= CSP_FLAG_CLIENT_CONNECTION_KEEP_ALIVE;
    }
 #endif
-   err = receive_encrypted_request(csp);
+   err = receive_encrypted_request_headers(csp);
    if (err != JB_ERR_OK)
    {
       if (csp->client_iob->cur == NULL ||
@@ -2870,7 +2873,7 @@ static jb_err process_encrypted_request(struct client_state *csp)
       return JB_ERR_PARSE;
    }
 
-   log_error(LOG_LEVEL_HEADER, "Encrypted request processed");
+   log_error(LOG_LEVEL_HEADER, "Encrypted request headers processed");
    log_error(LOG_LEVEL_REQUEST, "https://%s%s", csp->http->hostport,
       csp->http->path);
 
@@ -2936,7 +2939,7 @@ static void continue_https_chat(struct client_state *csp)
 {
    const struct forward_spec *fwd;
 
-   if (JB_ERR_OK != process_encrypted_request(csp))
+   if (JB_ERR_OK != process_encrypted_request_headers(csp))
    {
       csp->flags &= ~CSP_FLAG_CLIENT_CONNECTION_KEEP_ALIVE;
       return;
@@ -4318,7 +4321,7 @@ static void chat(struct client_state *csp)
             "Failed to open a secure connection with the client");
          return;
       }
-      if (JB_ERR_OK != process_encrypted_request(csp))
+      if (JB_ERR_OK != process_encrypted_request_headers(csp))
       {
          close_client_ssl_connection(csp);
          return;
@@ -4338,13 +4341,14 @@ static void chat(struct client_state *csp)
    }
 #endif
 
+   log_applied_actions(csp->action);
+
    /* decide how to route the HTTP request */
    fwd = forward_url(csp, http);
 
    freez(csp->headers->first->str);
    build_request_line(csp, fwd, &csp->headers->first->str);
 
-   log_applied_actions(csp->action);
    if (fwd->forward_host)
    {
       log_error(LOG_LEVEL_CONNECT, "via [%s]:%d to: %s",
@@ -6271,6 +6275,8 @@ static void listen_loop(void)
 #ifdef FEATURE_GRACEFUL_TERMINATION
 
    log_error(LOG_LEVEL_INFO, "Graceful termination requested.");
+
+   close_ports_helper(bfds);
 
    unload_current_config_file();
    unload_current_actions_file();

@@ -3098,6 +3098,14 @@ forward   /.*\.(exe|com|dll|zip)$    antivir.example.com:8010
     If you aren't using an occasionally slow proxy like Tor, reducing
     it to a few seconds should be fine.
    </para>
+   <warning>
+    <para>
+     When a TLS library is being used to read or write data from a socket with
+     <literal><ulink url="actions-file.html#HTTPS-INSPECTION">https-inspection</ulink></literal>
+     enabled the socket-timeout currently isn't applied and the timeout
+     used depends on the library (which may not even use a timeout).
+    </para>
+   </warning>
   </listitem>
  </varlistentry>
  <varlistentry>
@@ -3176,10 +3184,15 @@ forward   /.*\.(exe|com|dll|zip)$    antivir.example.com:8010
    </para>
    <para>
     One most POSIX-compliant systems &my-app; can't properly deal with
-    more than FD_SETSIZE file descriptors at the same time and has to reject
-    connections if the limit is reached. This will likely change in a
-    future version, but currently this limit can't be increased without
-    recompiling &my-app; with a different FD_SETSIZE limit.
+    more than FD_SETSIZE file descriptors if &my-app; has been configured
+    to use select() and has to reject connections if the limit is reached.
+    When using select() this limit therefore can't be increased without
+    recompiling &my-app; with a different FD_SETSIZE limit unless &my-app;
+    is running on Windows with _WIN32 defined.
+   </para>
+   <para>
+    When &my-app; has been configured to use poll() the FD_SETSIZE limit
+    does not apply.
    </para>
   </listitem>
  </varlistentry>
