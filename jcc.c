@@ -4132,7 +4132,7 @@ static void handle_established_connection(struct client_state *csp)
          }
          continue;
       }
-      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c Line 4135");
+      log_error(LOG_LEVEL_INFO, "How did we get here?  jcc.c line 4135");
       mark_server_socket_tainted(csp);
 #ifdef FEATURE_HTTPS_INSPECTION
       close_client_and_server_ssl_connections(csp);
