@@ -1625,9 +1625,10 @@ sub handle_loglevel_connect($) {
         $c = highlight_matched_host($c, '(?<=for )[^\s]+');
         $c =~ s@(?<=in slot )(\d+)@$h{'Number'}$1$h{'Standard'}@;
 
-    } elsif ($c =~ m/^Socket/) {
+    } elsif ($c =~ m/^Socket \d+ (already|closed)/) {
 
         # Socket 16 already forgotten or never remembered.
+        # Socket 9 closed while waiting for client headers
         $c =~ s@(?<=Socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
 
     } elsif ($c =~ m/^The connection to/) {
@@ -1902,6 +1903,12 @@ sub handle_loglevel_connect($) {
 
         # Client socket 7 is no longer usable. The server socket has been closed.
         $c =~ s@(?<=socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^Socket timeout \d+ reached/) {
+
+        # Socket timeout 3 reached: http://127.0.0.1:20000/no-filter/chunked-content/36
+        $c =~ s@(?<=timeout )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+        $c = highlight_matched_url($c, "(?<=reached: ).*")
 
     } elsif ($c =~ m/^Looks like we / or
              $c =~ m/^Unsetting keep-alive flag/ or
@@ -2760,24 +2767,27 @@ sub time_stamp_to_msecs($) {
 sub inactivity_detection_loop() {
 
     our %cli_options;
-    my ($time_stamp, $thread, $log_level, $content);
+    my ($date, $time_stamp, $thread, $log_level, $content);
     my ($msecs, $previous_msecs, $inactivity);
     my $inactivity_threshold = $cli_options{'inactivity-threshold'};
-    my $previous_message;
-    my $log_message_out_of_order = 0;
+    my $previous_date;
+    my $log_messages_out_of_order = 0;
 
     while (<>) {
-        (undef, $time_stamp, $thread, $log_level, $content) = split(/ /, $_, 5);
+        ($date, $time_stamp, $thread, $log_level, $content) = split(/ /, $_, 5);
 
         next if (not defined($log_level));
         next if ($time_stamp eq "-");
         $msecs = time_stamp_to_msecs($time_stamp);
         unless (defined $msecs) {
             print "Failed to convert $time_stamp into miliseconds\n";
+            print "$_";
             next;
         }
         unless (defined $previous_msecs) {
             $previous_msecs = $msecs;
+            $previous_date = $date;
+            print "$_";
             next;
         }
         $inactivity = $msecs - $previous_msecs;
@@ -2786,18 +2796,23 @@ sub inactivity_detection_loop() {
             # a Privoxy thread may be moved off schedule between
             # getting the timestamp for the log message and actually
             # writing it.
-            $log_message_out_of_order++;
+            $log_messages_out_of_order++;
         }
         if ($inactivity > $inactivity_threshold) {
-            #print "$previous_message";
-            print "Detected inactivity: $inactivity msecs\n";
+            if ($previous_date eq $date) {
+                print "Detected inactivity: $inactivity msecs\n";
+            } else {
+                # While we could include the date in the timestamp
+                # we currently don't.
+                print "Detected date change. Timestamp difference ignored.\n";
+            }
         }
         print "$_";
         $previous_msecs = $msecs;
-        $previous_message = $_;
+        $previous_date = $date;
     }
-    if ($log_message_out_of_order) {
-        print "At least $log_message_out_of_order messages were written out of the chronological order.\n";
+    if ($log_messages_out_of_order) {
+        print "At least $log_messages_out_of_order messages were written out of the chronological order.\n";
         print "This can result in false positives. Consider sorting the log first.\n";
     }
 }
@@ -2976,8 +2991,9 @@ will hide the "filter foo caused 0 hits" message.
 
 =head1 OPTIONS
 
-[B<--detect-inactivity>] Instead of syntax highlighting, detect inactivities
-of more than B<inactivity-threshold> miliseconds. Mainly useful for debugging.
+[B<--detect-inactivity>] Instead of syntax highlighting, detect periods
+of log inactivity of more than the amount of miliseconds specified with
+the B<--inactivity-threshold> option. Mainly useful for debugging.
 
 [B<--host-statistics-threshold>] Only show the request count for a host
 if it's above or equal to the given threshold. If the threshold is 0, host
@@ -2988,8 +3004,9 @@ omitted, ANSI escape sequences are used unless B<--no-syntax-highlighting> is ac
 This option is only intended to make embedding log excerpts in web pages easier.
 It does not escape any input!
 
-[B<--inactivity-threshold>] Specifies the number of miliseconds between log
-messages to consider inactivity when running in [B<--detect-inactivity>] mode.
+[B<--inactivity-threshold msecs>] Specifies the number of miliseconds between
+log messages to consider inactivity when running in [B<--detect-inactivity>]
+mode.
 
 [B<--keep-date>] Don't remove the date when printing highlighted log messages.
 Useful when parsing multiple log files at once.
