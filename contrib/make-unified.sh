@@ -6,7 +6,7 @@
 #      (from main page: https://github.com/StevenBlack/hosts)
 # and save it as unified-hosts.txt
 
-SCRIPT="block-test_new.awk"
+SCRIPT="block-test.awk"
 
 set -x
 
@@ -34,14 +34,15 @@ cp -p config.txt config-original.txt
 
 # stop using the to-be-updated action file & all others after it
 # and turn off privoxy logging
-sed -e 's/^actionsfile unified/#actionsfile unified/' \
-    -e 's/^actionsfile unblock/#actionsfile unblock/' \
-    -e 's/^debug /#debug /'     config.txt > config.new
+sed \
+ -e 's/^actionsfile unified/#actionsfile unified/' \
+ -e 's/^actionsfile unblock/#actionsfile unblock/' \
+ -e 's/^debug /#debug /'     config.txt > config.new
 
 mv config.new config.txt
 
 # get Privoxy to re-read it's config
-curl -q -sS --proxy 127.0.0.1:8118 --referer http://p.p/ http://p.p/show-status > /dev/null
+curl -q -sS --proxy 127.0.0.1:8118   http://config.privoxy.org/ > /dev/null
 
 # see how long it takes to make the new .action file
 date +%s > timestamp.txt
