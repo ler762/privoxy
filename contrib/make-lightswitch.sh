@@ -6,11 +6,11 @@
 #    https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt
 # de-duplicate, and save as lightswitch-hosts.txt
 
-SCRIPT="block-test_new.awk"
-# SCRIPT="block-test_new.awk  --profile=lightswitchProfile.txt"
+# SCRIPT="block-test_old.awk"
+SCRIPT="block-test.awk"
 
 ########################################################################
-if [ "$1" == "time" ]; then
+if [ "$1" = "time" ]; then
    # just want a timing run (vs. d/l a new file and creating a new action file)
    TIMING="yes"
 fi
@@ -54,10 +54,11 @@ cp -p config.txt config-original.txt
 
 # stop using the to-be-updated action file & all others after it
 # and turn off privoxy logging
-sed -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
-    -e 's/^actionsfile unified/#actionsfile unified/' \
-    -e 's/^actionsfile unblock/#actionsfile unblock/' \
-    -e 's/^debug /#debug /'     config.txt > config.new
+sed \
+ -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
+ -e 's/^actionsfile unified/#actionsfile unified/' \
+ -e 's/^actionsfile unblock/#actionsfile unblock/' \
+ -e 's/^debug /#debug /'     config.txt > config.new
 
 mv config.new config.txt
 
@@ -78,7 +79,7 @@ mv config-original.txt config.txt
 # so how long did it take?
 gawk -f elapsed.awk timestamp.txt
 
-if [ $TIMING == "yes" ]; then
+if [ "$TIMING" = "yes" ]; then
   grep '^  print "GET http://config.privoxy.org' $SCRIPT >> timing.txt
   gawk -f elapsed.awk timestamp.txt                      >> timing.txt
 else
