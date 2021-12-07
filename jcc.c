@@ -2206,6 +2206,7 @@ static int send_http_request(struct client_state *csp)
          update_client_headers(csp, to_send_len))
       {
          log_error(LOG_LEVEL_HEADER, "Error updating client headers");
+         freez(to_send);
          return 1;
       }
       csp->expected_client_content_length = 0;
@@ -2230,6 +2231,10 @@ static int send_http_request(struct client_state *csp)
    {
       log_error(LOG_LEVEL_CONNECT, "Failed sending request headers to: %s: %E",
          csp->http->hostport);
+      if (filter_client_body)
+      {
+         freez(to_send);
+      }
       return 1;
    }
 
@@ -2801,6 +2806,8 @@ static jb_err process_encrypted_request_headers(struct client_state *csp)
          "Failed to get the encrypted request destination");
       ssl_send_data_delayed(&(csp->ssl_client_attr),
          (const unsigned char *)CHEADER, strlen(CHEADER), get_write_delay(csp));
+      destroy_list(headers);
+
       return JB_ERR_PARSE;
    }
 
