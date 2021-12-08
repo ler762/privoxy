@@ -54,6 +54,10 @@ BEGIN {
        if ( blocked == "+" ) printf("# already blocked: %s\n", url)
   else if ( blocked != "-" ) {
      printf("############################# unknown:%s: %s\n", blocked, url)
+     # What went wrong???  dunno, but try closing
+     # the coprocessor pipeline to recover
+     privoxyUrlInfo("-_-_close_-_-")
+     # I should retry the test but awk doesn't have GOTO so fukkit
   } else { # not already blocked
      n = length(url)
      if ( (nocheckprev == 0) && ( n >= prevlen ) && ( substr(url, (n-prevlen)+1) == prev) ) {
