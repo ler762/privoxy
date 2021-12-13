@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # get the latest lightswitch05 hosts file & update the .action file
 #
 # grab the files
@@ -9,6 +9,26 @@
 umask 000
 
 SCRIPT="block-test.awk"
+
+OSNAME=`/bin/uname`
+#   there's some weirdness with bash pattern matching, so use evars
+cygwinMatch="^CYGWIN"
+linuxMatch="^Linux"
+if [[ "$OSNAME" =~ $cygwinMatch ]]; then
+    # windows/cygwin machine
+  P="/cygdrive/c/MyProgs/Privoxy.307"
+    #  privoxy config & action files are here
+  config="config.txt"
+  WINDOWS=1;  LINUX=0
+elif [[ "$OSNAME" =~ $linuxMatch ]]; then
+    # linux machine
+  P=/etc/privoxy
+  config="config"
+  WINDOWS=0;  LINUX=1
+else
+  echo "WTF? Not Linux or Cygwin: $OSNAME   DIE!!!"
+  exit 1
+fi
 
 set -x
 
@@ -34,8 +54,8 @@ if [ $stat -ne 0 ]; then
 fi
 
 #  get the title, date, etc. header info from the files
-head -10 ${TD}/ads-and-tracking-extended.txt     > ${TD}/lightswitch-hosts.txt
-head -10 ${TD}/tracking-aggressive-extended.txt >> ${TD}/lightswitch-hosts.txt
+head -10 ${TD}/ads-and-tracking-extended.txt     > ${TD}/lightswitch-hosts.srt
+head -10 ${TD}/tracking-aggressive-extended.txt >> ${TD}/lightswitch-hosts.srt
 
 #  remove leading "0.0.0.0 ", leading/trailing spaces, comments and blank lines
 sed  -e 's/^0\.0\.0\.0 //'  \
@@ -43,10 +63,10 @@ sed  -e 's/^0\.0\.0\.0 //'  \
      -e 's/  *$//'  \
      -e 's/#.*$//'  \
      -e '/^$/d'  ${TD}/ads-and-tracking-extended.txt  ${TD}/tracking-aggressive-extended.txt |\
-fqdnsort >> ${TD}/lightswitch-hosts.txt
+ ./fqdnsort   >> ${TD}/lightswitch-hosts.srt
 
 # save the original Privoxy config
-cp -p config.txt config-original.txt
+cp -p ${P}/${config}  ${TD}/config-original
 
 # stop using the to-be-updated action file & all others after it
 # and turn off privoxy logging
@@ -54,9 +74,10 @@ sed \
  -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
  -e 's/^actionsfile unified/#actionsfile unified/' \
  -e 's/^actionsfile unblock/#actionsfile unblock/' \
- -e 's/^debug /#debug /'     config.txt > config.new
+ -e 's/^debug /#debug /' \
+ ${P}/${config}  > ${TD}/config.new
 
-mv config.new config.txt
+mv ${TD}/config.new  ${P}/${config}
 
 # get Privoxy to re-read it's config
 curl -q -sS --proxy 127.0.0.1:8118 --referer http://config.privoxy.org/ http://config.privoxy.org/show-status > /dev/null
@@ -71,15 +92,24 @@ fi
 date +'%s  %c' > ${TD}/timestamp.txt
 
 echo "{ +block{new lightswitch hosts file} }"> ${TD}/lightswitch-hosts.new
-gawk -f $SCRIPT ${TD}/lightswitch-hosts.txt >> ${TD}/lightswitch-hosts.new
+gawk -f $SCRIPT ${TD}/lightswitch-hosts.srt >> ${TD}/lightswitch-hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
 
 # restore the original Privoxy config
-mv config-original.txt config.txt
+mv ${TD}/config-original  ${P}/${config}
 
 # so how long did it take?
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
-meld  lightswitch-hosts.new  /etc/privoxy/lightswitch-hosts.action
+if [ $WINDOWS == 1 ]; then
+  new=`cygpath -wal ${TD}/lightswitch-hosts.new`
+  old=`cygpath -wal ${P}/lightswitch-hosts.action`
+  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
+elif [ $LINUX == 1 ]; then
+  meld  ${TD}/lightswitch-hosts.new  ${P}/lightswitch-hosts.action
+else
+  echo "WTF? Not Windows -or- Linux??"
+  exit 1
+fi
 
