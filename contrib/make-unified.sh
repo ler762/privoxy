@@ -10,7 +10,7 @@ umask 000
 
 SCRIPT="block-test.awk"
 
-OSNAME=`/bin/uname`
+OSNAME=$(/bin/uname)
 #   there's some weirdness with bash pattern matching, so use evars
 cygwinMatch="^CYGWIN"
 linuxMatch="^Linux"
@@ -32,7 +32,7 @@ fi
 
 set -x
 
-TD=`mktemp -q -d /tmp/UNIXXXXXXX`
+TD=$(mktemp -q -d /tmp/UNIXXXXXXX)
 stat=$?
 if [ $stat -ne 0 ]; then
   echo "barf: unable to create tmp directory, status=${stat}"
@@ -95,8 +95,8 @@ mv ${TD}/config-original  ${P}/${config}
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
 if [ $WINDOWS == 1 ]; then
-  new=`cygpath -wal ${TD}/unified-hosts.new`
-  old=`cygpath -wal ${P}/unified-hosts.action`
+  new=$(cygpath -wal ${TD}/unified-hosts.new)
+  old=$(cygpath -wal ${P}/unified-hosts.action)
   /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
 elif [ $LINUX == 1 ]; then
    meld  ${TD}/unified-hosts.new  ${P}/unified-hosts.action

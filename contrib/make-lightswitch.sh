@@ -10,7 +10,7 @@ umask 000
 
 SCRIPT="block-test.awk"
 
-OSNAME=`/bin/uname`
+OSNAME=$(/bin/uname)
 #   there's some weirdness with bash pattern matching, so use evars
 cygwinMatch="^CYGWIN"
 linuxMatch="^Linux"
@@ -32,7 +32,7 @@ fi
 
 set -x
 
-TD=`mktemp -q -d /tmp/LSXXXXXXXX`
+TD=$(mktemp -q -d /tmp/LSXXXXXXXX)
 stat=$?
 if [ $stat -ne 0 ]; then
   echo "barf: unable to create tmp directory, status=${stat}"
@@ -102,11 +102,11 @@ mv ${TD}/config-original  ${P}/${config}
 # so how long did it take?
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
-if [ $WINDOWS == 1 ]; then
-  new=`cygpath -wal ${TD}/lightswitch-hosts.new`
-  old=`cygpath -wal ${P}/lightswitch-hosts.action`
+if [ $WINDOWS = 1 ]; then
+  new=$(cygpath -wal ${TD}/lightswitch-hosts.new)
+  old=$(cygpath -wal ${P}/lightswitch-hosts.action)
   /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ $LINUX == 1 ]; then
+elif [ $LINUX = 1 ]; then
   meld  ${TD}/lightswitch-hosts.new  ${P}/lightswitch-hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
