@@ -10,6 +10,7 @@
 # ref: https://www.gnu.org/software/gawk/manual/gawkinet/gawkinet.html
 
 BEGIN {
+  # awk -v slow=1  to use multiple print "..." |& webserver instead of a single printf
   prev = "@";  prevlen = 1;
   stderr = "/dev/stderr"
   webserver = "/inet/tcp/0/localhost/8118"
@@ -92,8 +93,9 @@ function privoxyUrlInfo(url,   blocked, final, savedORS, done, status) {
   done = 0
   final = 0
 
-if ( 0 ) {  # this is the slow version
+if ( slow ) {  # this is the slow version
   savedORS = ORS;  ORS="\r\n"  # lines sent to the webserver need \r\n line endings
+
 # print "GET http://config.privoxy.org/show-url-info?url=" url " HTTP/1.1"  |& webserver
 #   standard but slow - template is read from disk and calls merge_current_action
   print "GET http://config.privoxy.org/show-url-final-info?url=" url " HTTP/1.1"  |& webserver
