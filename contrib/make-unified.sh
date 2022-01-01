@@ -94,11 +94,11 @@ mv ${TD}/config-original  ${P}/${config}
 # so how long did it take?
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
-if [ $WINDOWS == 1 ]; then
+if [ $WINDOWS = 1 ]; then
   new=$(cygpath -wal ${TD}/unified-hosts.new)
   old=$(cygpath -wal ${P}/unified-hosts.action)
   /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ $LINUX == 1 ]; then
+elif [ $LINUX = 1 ]; then
    meld  ${TD}/unified-hosts.new  ${P}/unified-hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
