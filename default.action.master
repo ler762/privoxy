@@ -21,7 +21,7 @@
 #                 and enhancements are better placed in user.action,
 #                 the match-all section has been moved to match-all.action.
 #
-#  Copyright   :  Written by and Copyright (C) 2001-2021 the
+#  Copyright   :  Written by and Copyright (C) 2001-2022 the
 #                 Privoxy team. https://www.privoxy.org/
 #
 # Feedback welcome, for details please have a look at:
@@ -2394,6 +2394,8 @@ metrics.sr.ht/
 nlnet.nl/
 # URL = https://adv-archiv.dfn-cert.de/adv/2021-2222/
 adv-archiv.dfn-cert.de/
+# URL = https://pinkstinks.de/werbung-ohne-diskriminierung/
+pinkstinks.de/
 
 
 #############################################################################
