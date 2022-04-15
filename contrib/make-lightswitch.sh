@@ -22,12 +22,19 @@ if [[ "$OSNAME" =~ $cygwinMatch ]]; then
   WINDOWS=1;  LINUX=0
 elif [[ "$OSNAME" =~ $linuxMatch ]]; then
     # linux machine
-  P=/etc/privoxy
+  P="/etc/privoxy"
   config="config"
   WINDOWS=0;  LINUX=1
 else
   echo "WTF? Not Linux or Cygwin: $OSNAME   DIE!!!"
   exit 1
+fi
+
+numaf=`egrep '^actionsfile ' ${P}/${config} | grep -v 'regression-tests.action' | wc -l`
+# I should have 7 action files
+if [ $numaf -ne 7 ]; then
+   echo "Check ${P}/${config}; ${numaf} actionsfiles and there should be 7."
+   exit 5
 fi
 
 set -x
