@@ -1849,6 +1849,19 @@ static jb_err receive_client_request(struct client_state *csp)
       free_http_request(http);
       return JB_ERR_PARSE;
    }
+   if (http->ssl && strcmpic(http->gpc, "CONNECT"))
+   {
+      write_socket_delayed(csp->cfd, CHEADER, strlen(CHEADER),
+         get_write_delay(csp));
+      /* XXX: Use correct size */
+      log_error(LOG_LEVEL_CLF, "%s - - [%T] \"Invalid request\" 400 0",
+         csp->ip_addr_str);
+      log_error(LOG_LEVEL_ERROR, "Client %s tried to send a https "
+         "URL without sending a CONNECT request first",
+         csp->ip_addr_str);
+      free_http_request(http);
+      return JB_ERR_PARSE;
+   }
 
    /* grab the rest of the client's headers */
    init_list(headers);
@@ -1871,7 +1884,8 @@ static jb_err receive_client_request(struct client_state *csp)
          if (!data_is_available(csp->cfd, csp->config->socket_timeout))
          {
             log_error(LOG_LEVEL_ERROR,
-               "Stopped grabbing the client headers.");
+               "Client headers did not arrive in time. Timeout: %d",
+               csp->config->socket_timeout);
             destroy_list(headers);
             return JB_ERR_PARSE;
          }
@@ -3144,6 +3158,16 @@ static void handle_established_connection(struct client_state *csp)
           */
          goto server_wants_to_talk;
       }
+      if (watch_client_socket && client_use_ssl(csp) &&
+         is_ssl_pending(&(csp->ssl_client_attr)))
+      {
+         /*
+          * The TLS libray may also consume all of the remaining data
+          * from the client when we're shuffling the data from an
+          * unbuffered request body to the server.
+          */
+         goto client_wants_to_talk;
+      }
 #endif
 #ifndef HAVE_POLL
       FD_ZERO(&rfds);
@@ -3285,7 +3309,13 @@ static void handle_established_connection(struct client_state *csp)
       if (FD_ISSET(csp->cfd, &rfds))
 #endif /* def HAVE_POLL*/
       {
-         int max_bytes_to_read = (int)csp->receive_buffer_size;
+         int max_bytes_to_read;
+
+#ifdef FEATURE_HTTPS_INSPECTION
+         client_wants_to_talk:
+#endif
+
+         max_bytes_to_read = (int)csp->receive_buffer_size;
 
 #ifdef FEATURE_CONNECTION_KEEP_ALIVE
          if ((csp->flags & CSP_FLAG_CLIENT_REQUEST_COMPLETELY_READ))
