@@ -3,9 +3,9 @@
 # requires the gawk extension PROCINFO["sorted_in"] for array sorting
 #
 {
-  sub("\r", "", $0)        # fix DOS line ending
-  sub("#.*", "", $0)       # remove trailing comments
+  sub("\r", "", $0)        # DOS <cr><lf> line ending -> unix <lf>
   sub("^[ \t]+", "", $0)   # remove leading whitespace
+  sub("#.*", "", $0)       # remove trailing comments
   n = index($0, "/")
   if ( n > 0 ) { # remove path info
      url = substr($0, 1, n-1) # everything to the left of the /
