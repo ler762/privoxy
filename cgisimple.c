@@ -5,7 +5,7 @@
  * Purpose     :  Simple CGIs to get information about Privoxy's
  *                status.
  *
- * Copyright   :  Written by and Copyright (C) 2001-2021 the
+ * Copyright   :  Written by and Copyright (C) 2001-2022 the
  *                Privoxy team. https://www.privoxy.org/
  *
  *                Based on the Internet Junkbuster originally written
@@ -1262,16 +1262,22 @@ jb_err cgi_show_status(struct client_state *csp,
 
    char buf[BUFFER_SIZE];
 #ifdef FEATURE_STATISTICS
-   float perc_rej;   /* Percentage of http requests rejected */
-   int local_urls_read;
-   int local_urls_rejected;
-
    unsigned long int total, runningTotal;
    double percent;
    unsigned int myCounters[numIosizeCounters];
     /* there is no lock serializing access to iosizeCounter, so
      * need a temp copy that won't change while being processed
      */
+
+#ifdef MUTEX_LOCKS_AVAILABLE
+   float percentage_blocked;
+   unsigned long long local_number_of_requests_received;
+   unsigned long long local_number_of_requests_blocked;
+#else
+   float perc_rej;   /* Percentage of http requests rejected */
+   int local_urls_read;
+   int local_urls_rejected;
+#endif
 #endif /* ndef FEATURE_STATISTICS */
    jb_err err = JB_ERR_OK;
 
@@ -1309,9 +1315,15 @@ jb_err cgi_show_status(struct client_state *csp,
    }
 
 #ifdef FEATURE_STATISTICS
+#ifdef MUTEX_LOCKS_AVAILABLE
+   privoxy_mutex_lock(&block_statistics_mutex);
+   local_number_of_requests_received = number_of_requests_received;
+   local_number_of_requests_blocked = number_of_requests_blocked;
+   privoxy_mutex_unlock(&block_statistics_mutex);
+#else
    local_urls_read     = urls_read;
    local_urls_rejected = urls_rejected;
-
+#endif
    /*
     * Need to alter the stats not to include the fetch of this
     * page.
@@ -1322,7 +1334,11 @@ jb_err cgi_show_status(struct client_state *csp,
     * urls_rejected--; * This will be incremented subsequently *
     */
 
+#ifdef MUTEX_LOCKS_AVAILABLE
+   if (local_number_of_requests_received == 0)
+#else
    if (local_urls_read == 0)
+#endif
    {
       if (!err) err = map_block_killer(exports, "have-stats");
    }
@@ -1330,6 +1346,19 @@ jb_err cgi_show_status(struct client_state *csp,
    {
       if (!err) err = map_block_killer(exports, "have-no-stats");
 
+#ifdef MUTEX_LOCKS_AVAILABLE
+      percentage_blocked = (float)local_number_of_requests_blocked * 100.0F /
+            (float)local_number_of_requests_received;
+
+      snprintf(buf, sizeof(buf), "%llu", local_number_of_requests_received);
+      if (!err) err = map(exports, "requests-received", 1, buf, 1);
+
+      snprintf(buf, sizeof(buf), "%llu", local_number_of_requests_blocked);
+      if (!err) err = map(exports, "requests-blocked", 1, buf, 1);
+
+      snprintf(buf, sizeof(buf), "%6.2f", percentage_blocked);
+      if (!err) err = map(exports, "percent-blocked", 1, buf, 1);
+#else
       perc_rej = (float)local_urls_rejected * 100.0F /
             (float)local_urls_read;
 
@@ -1341,6 +1370,7 @@ jb_err cgi_show_status(struct client_state *csp,
 
       snprintf(buf, sizeof(buf), "%6.2f", perc_rej);
       if (!err) err = map(exports, "percent-blocked", 1, buf, 1);
+#endif
    }
 
    s = strdup("");

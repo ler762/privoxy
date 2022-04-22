@@ -41,9 +41,6 @@ struct file_list;
 /* Global variables */
 
 #ifdef FEATURE_STATISTICS
-extern int urls_read;
-extern int urls_rejected;
-
 #define numIosizeCounters 29
   /* ref: May 24, 2017 "TODO 157" ijbswa-developers msg from Fabian Keil
    *  ... a buffer that is too large can actually reduce the throughput.
@@ -64,6 +61,14 @@ extern unsigned int iosizeCounter[numIosizeCounters];
 extern char iosizeCounterDesc[numIosizeCounters][16];
 extern size_t max_buffer_size;
 extern size_t prevReadSize;
+
+#if defined(FEATURE_PTHREAD) || defined(_WIN32)
+extern unsigned long long number_of_requests_received;
+extern unsigned long long number_of_requests_blocked;
+#else
+extern int urls_read;
+extern int urls_rejected;
+#endif
 #endif /*def FEATURE_STATISTICS*/
 
 extern struct client_states clients[1];
@@ -107,9 +112,12 @@ extern privoxy_mutex_t external_filter_mutex;
 extern privoxy_mutex_t client_tags_mutex;
 #endif
 
+#ifdef FEATURE_STATISTICS
+extern privoxy_mutex_t block_statistics_mutex;
+#endif
 #ifdef FEATURE_EXTENDED_STATISTICS
 extern privoxy_mutex_t filter_statistics_mutex;
-extern privoxy_mutex_t block_statistics_mutex;
+extern privoxy_mutex_t block_reason_statistics_mutex;
 #endif
 
 #ifndef HAVE_GMTIME_R

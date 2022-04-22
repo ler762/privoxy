@@ -3087,14 +3087,14 @@ void register_block_reason_for_statistics(const char *block_reason)
 {
    struct block_statistics_entry *entry;
 
-   privoxy_mutex_lock(&block_statistics_mutex);
+   privoxy_mutex_lock(&block_reason_statistics_mutex);
 
    if (block_statistics == NULL)
    {
       block_statistics = zalloc_or_die(sizeof(struct block_statistics_entry));
       entry = block_statistics;
       entry->block_reason = strdup_or_die(block_reason);
-      privoxy_mutex_unlock(&block_statistics_mutex);
+      privoxy_mutex_unlock(&block_reason_statistics_mutex);
       return;
    }
    entry = block_statistics;
@@ -3114,7 +3114,7 @@ void register_block_reason_for_statistics(const char *block_reason)
       entry = entry->next;
    }
 
-   privoxy_mutex_unlock(&block_statistics_mutex);
+   privoxy_mutex_unlock(&block_reason_statistics_mutex);
 
 }
 
@@ -3135,7 +3135,7 @@ static void increment_block_reason_counter(const char *block_reason)
 {
    struct block_statistics_entry *entry;
 
-   privoxy_mutex_lock(&block_statistics_mutex);
+   privoxy_mutex_lock(&block_reason_statistics_mutex);
 
    entry = block_statistics;
    while (entry != NULL)
@@ -3148,7 +3148,7 @@ static void increment_block_reason_counter(const char *block_reason)
       entry = entry->next;
    }
 
-   privoxy_mutex_unlock(&block_statistics_mutex);
+   privoxy_mutex_unlock(&block_reason_statistics_mutex);
 
 }
 
@@ -3171,7 +3171,7 @@ void get_block_reason_count(const char *block_reason, unsigned long long *count)
 {
    struct block_statistics_entry *entry;
 
-   privoxy_mutex_lock(&block_statistics_mutex);
+   privoxy_mutex_lock(&block_reason_statistics_mutex);
 
    entry = block_statistics;
    while (entry != NULL)
@@ -3184,7 +3184,7 @@ void get_block_reason_count(const char *block_reason, unsigned long long *count)
       entry = entry->next;
    }
 
-   privoxy_mutex_unlock(&block_statistics_mutex);
+   privoxy_mutex_unlock(&block_reason_statistics_mutex);
 
 }
 
