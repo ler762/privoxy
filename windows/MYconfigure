@@ -133,6 +133,10 @@ CFLAGS="${CFLAGS} -Wuninitialized -Winit-self"
 # why does the mingw library _not_ include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
 # Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
+# .. which no longer exists.  https://github.com/PCRE2Project/pcre2
+#   As well as downloading from the GitHub site, you can download ...
+#   the older, unmaintained PCRE1 library from an unofficial mirror at
+#   https://sourceforge.net/projects/pcre/files/pcre/
 inc="/source/pcre-8.45/"
 lib="/source/pcre-8.45/.libs"
 CPPFLAGS="${CPPFLAGS} -I${inc}"
