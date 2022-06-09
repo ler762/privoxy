@@ -1,17 +1,20 @@
 #!/bin/bash
+# shellcheck disable=SC2086
+#   is it possible for $(mktemp -q -d /tmp/LSXXXXXXXX) to return embedded blanks?
+#
 # get the latest lightswitch05 hosts file & update the .action file
 #
 # grab the files
 #    https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
 #    https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt
-# de-duplicate, and save as lightswitch-hosts.txt
+# de-duplicate, and save it as the new lightswitch-hosts.action
 
 umask 000
 
 SCRIPT="block-test.awk"
 
 OSNAME=$(/bin/uname)
-#   there's some weirdness with bash pattern matching, so use evars
+#   there's some weirdness I don't understand with bash pattern matching, so use evars
 cygwinMatch="^CYGWIN"
 linuxMatch="^Linux"
 if [[ "$OSNAME" =~ $cygwinMatch ]]; then
@@ -30,11 +33,11 @@ else
   exit 1
 fi
 
-numaf=`egrep '^actionsfile ' ${P}/${config} | grep -v 'regression-tests.action' | wc -l`
+numaf=$(grep -E '^actionsfile ' ${P}/${config} | grep -vc 'regression-tests.action')
 # I should have 7 action files
-if [ $numaf -ne 7 ]; then
-   echo "Check ${P}/${config}; ${numaf} actionsfiles and there should be 7."
-   exit 5
+if [ "$numaf" -ne 7 ]; then
+   echo "Check ${P}/${config}; found ${numaf} actionsfiles and there should be 7"
+   exit 3
 fi
 
 set -x
@@ -43,7 +46,7 @@ TD=$(mktemp -q -d /tmp/LSXXXXXXXX)
 stat=$?
 if [ $stat -ne 0 ]; then
   echo "barf: unable to create tmp directory, status=${stat}"
-  exit 1
+  exit 5
 fi
 
 # get the new hosts file
@@ -98,7 +101,7 @@ fi
 # see how long it takes to make the new .action file
 date +'%s  %c' > ${TD}/timestamp.txt
 
-echo "{ +block{new lightswitch hosts file} }"> ${TD}/lightswitch-hosts.new
+echo "{ +block{lightswitch hosts file} }"   > ${TD}/lightswitch-hosts.new
 gawk -f $SCRIPT ${TD}/lightswitch-hosts.srt >> ${TD}/lightswitch-hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
@@ -109,14 +112,19 @@ mv ${TD}/config-original  ${P}/${config}
 # so how long did it take?
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
-if [ $WINDOWS = 1 ]; then
+if [ "${DISPLAY:-blank}" != "blank" ] ; then
+if [ "$WINDOWS" = 1 ]; then
   new=$(cygpath -wal ${TD}/lightswitch-hosts.new)
   old=$(cygpath -wal ${P}/lightswitch-hosts.action)
-  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ $LINUX = 1 ]; then
+  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  "${new}"  "${old}"
+elif [ "$LINUX" = 1 ]; then
   meld  ${TD}/lightswitch-hosts.new  ${P}/lightswitch-hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
   exit 1
 fi
+fi
+
+mv ${P}/lightswitch-hosts.action  ${P}/lightswitch-hosts.old
+mv ${TD}/lightswitch-hosts.new    ${P}/lightswitch-hosts.action
 

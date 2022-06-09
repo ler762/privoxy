@@ -1,17 +1,20 @@
 #!/bin/bash
+# shellcheck disable=SC2086
+#   is it possible for $(mktemp -q -d /tmp/LSXXXXXXXX) to return embedded blanks?
+#
 # get the latest StevenBlack hosts file & update the .action file
 #
 # grab the file
 #    https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 #      (from main page: https://github.com/StevenBlack/hosts)
-# and save it as unified-hosts.txt
+# de-duplicate, and save it as the new unified-hosts.action
 
 umask 000
 
 SCRIPT="block-test.awk"
 
 OSNAME=$(/bin/uname)
-#   there's some weirdness with bash pattern matching, so use evars
+#   there's some weirdness I don't understand with bash pattern matching, so use evars
 cygwinMatch="^CYGWIN"
 linuxMatch="^Linux"
 if [[ "$OSNAME" =~ $cygwinMatch ]]; then
@@ -30,11 +33,11 @@ else
   exit 1
 fi
 
-numaf=`egrep '^actionsfile ' ${P}/${config} | grep -v 'regression-tests.action' | wc -l`
-# I should have 7 actions files
-if [ $numaf -ne 7 ]; then
-   echo "Check ${config}; ${numaf} actionsfiles and there should be 7."
-   exit 5
+numaf=$(grep -E '^actionsfile ' ${P}/${config} | grep -vc 'regression-tests.action')
+# I should have 7 action files
+if [ "$numaf" -ne 7 ]; then
+   echo "Check ${P}/${config}; found ${numaf} actionsfiles and there should be 7"
+   exit 3
 fi
 
 set -x
@@ -43,7 +46,7 @@ TD=$(mktemp -q -d /tmp/UNIXXXXXXX)
 stat=$?
 if [ $stat -ne 0 ]; then
   echo "barf: unable to create tmp directory, status=${stat}"
-  exit 1
+  exit 5
 fi
 
 # get the new hosts file
@@ -90,7 +93,7 @@ fi
 # see how long it takes to make the new .action file
 date +'%s  %c' > ${TD}/timestamp.txt
 
-echo "{ +block{new unified hosts file} }"> ${TD}/unified-hosts.new
+echo "{ +block{unified hosts file} }"   > ${TD}/unified-hosts.new
 gawk -f $SCRIPT ${TD}/unified-hosts.srt >> ${TD}/unified-hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
@@ -101,14 +104,19 @@ mv ${TD}/config-original  ${P}/${config}
 # so how long did it take?
 gawk -f elapsed.awk ${TD}/timestamp.txt
 
-if [ $WINDOWS = 1 ]; then
+if [ "${DISPLAY:-blank}" != "blank" ] ; then
+if [ "$WINDOWS" = 1 ]; then
   new=$(cygpath -wal ${TD}/unified-hosts.new)
   old=$(cygpath -wal ${P}/unified-hosts.action)
-  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ $LINUX = 1 ]; then
-   meld  ${TD}/unified-hosts.new  ${P}/unified-hosts.action
+  /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  "${new}"  "${old}"
+elif [ "$LINUX" = 1 ]; then
+  meld  ${TD}/unified-hosts.new  ${P}/unified-hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
   exit 1
 fi
+fi
+
+mv ${P}/unified-hosts.action  ${P}/unified-hosts.old
+mv ${TD}/unified-hosts.new    ${P}/unified-hosts.action
 
