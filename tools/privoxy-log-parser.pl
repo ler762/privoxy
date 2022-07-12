@@ -43,7 +43,7 @@ use warnings;
 use Getopt::Long;
 
 use constant {
-    PRIVOXY_LOG_PARSER_VERSION => '0.9.4',
+    PRIVOXY_LOG_PARSER_VERSION => '0.9.5',
     # Feel free to mess with these ...
     DEFAULT_BACKGROUND => 'black',  # Choose registered colour (like 'black')
     DEFAULT_TEXT_COLOUR => 'white', # Choose registered colour (like 'black')
@@ -186,6 +186,8 @@ sub prepare_our_stuff() {
         'configuration-line' => 'red',
         'content-type'       => 'yellow',
         'HOST'               => HEADER_DEFAULT_COLOUR,
+        'tls-version'        => 'pink',
+        'cipher-suite'       => 'light_cyan',
     );
 
     %h_colours = %h;
@@ -1938,6 +1940,18 @@ sub handle_loglevel_connect($) {
         $c =~ s@(?<=offset from )(\d+)@$h{'Number'}$1$h{'Standard'}@;
         $c =~ s@(?<=after discarding )(\d+)@$h{'Number'}$1$h{'Standard'}@;
         $c =~ s@(?<=after flushing )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^Client socket \d+ is no longer usable/) {
+
+        # Client socket 21 is no longer usable. The server socket has been closed.
+        $c =~ s@(?<=Client socket )(\d+)@$h{'Number'}$1$h{'Standard'}@;
+
+    } elsif ($c =~ m/^(Client|Server) successfully connected over/) {
+
+        # Server successfully connected over TLSv1.3 (TLS_AES_256_GCM_SHA384).
+        # Client successfully connected over TLSv1.3 (TLS_AES_128_GCM_SHA256).
+        $c =~ s@(?<=connected over )(TLSv\d\.\d)@$h{'tls-version'}$1$h{'Standard'}@;
+        $c =~ s@(?<=\()([^)]+)@$h{'cipher-suite'}$1$h{'Standard'}@;
 
     } elsif ($c =~ m/^Looks like we / or
              $c =~ m/^Unsetting keep-alive flag/ or
