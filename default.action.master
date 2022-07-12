@@ -119,7 +119,7 @@
 # the domain syntax above. A comprehensive discussion of regular expressions
 # wouldn't fit here.
 #
-# Perl compatible regular expressions are used. See the pcre/docs/ direcory or
+# Perl compatible regular expressions are used. See the pcre/docs/ directory or
 # man perlre (also available at http://perldoc.perl.org/perlre.html) for
 # details. The appendix to our User Manual also has some detail.
 #
@@ -232,7 +232,7 @@
 #    not pixels!)
 #    If the option "first" is given, the first frame of the animation
 #    is used as the replacement. If "last" is given, the last frame of
-#    the animation is used instead, which propably makes more sense for
+#    the animation is used instead, which probably makes more sense for
 #    most banner animations, but also has the risk of not showing the
 #    entire last frame (if it is only a delta to an earlier frame).
 #
@@ -712,6 +712,8 @@ ada*.
 adri*.
 # URL = https://adguard.com/
 adguard.com/
+# URL = https://adfd.org/austausch/
+adfd.org/
 
 #############################################################################
 # Generic block patterns by path:
@@ -771,9 +773,6 @@ support./(.*/)?track
 .gov
 .hs-*.de
 .fh-*.de
-#MASTER# REMARKS: Try to avoid harmless names in non-commercial organizations. Added 10/24/06
-# URL = http://www.gnu.org/graphics/gnu-head-banner.png
-.org/.*(image|banner)
 
 #############################################################################
 # Catch-all for false-positives that are just TOO obvious to let go
@@ -1953,7 +1952,7 @@ www.peereboom.us/adsuck/
 #MASTER# REMARKS: Ebay enlarge picture function doesn't work.
 # URL = http://include.ebaystatic.com/v4js/en_GB/e637i/SYS-LIGER_Omniture_e637i10177164_5_en_GB.js
 include.ebaystatic.com/.*omniture.*\.js
-#MASTER# REMARKS: Allow Yahoo news and mail javascipt pages
+#MASTER# REMARKS: Allow Yahoo news and mail javascript pages
 # URL = http://l.yimg.com/d/combo?news/p/common/generic/news/p/common/generic/popular-searches-min-12622.js&news/p/common/generic/ads-min-11050.js&news/p/common/generic/foundation/popup-min-12622.js
 .yimg.com/d/combo\?
 #MASTER# REMARKS: Page formatting problems when .css files are blocked
@@ -2046,6 +2045,8 @@ nlnet.nl/
 adv-archiv.dfn-cert.de/
 # URL = https://pinkstinks.de/werbung-ohne-diskriminierung/
 pinkstinks.de/
+# URL = https://www.eff.org/files/styles/teaser/public/banner_library/repro-rights-hd-3b.jpg?itok=uCnCHOj5
+.eff.org/
 
 
 #############################################################################
