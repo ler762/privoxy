@@ -93,24 +93,10 @@ function privoxyUrlInfo(url,   blocked, final, savedORS, done, status) {
   done = 0
   final = 0
 
-if ( slow ) {  # this is the slow version
-  savedORS = ORS;  ORS="\r\n"  # lines sent to the webserver need \r\n line endings
-
-# print "GET http://config.privoxy.org/show-url-info?url=" url " HTTP/1.1"  |& webserver
-#   standard but slow - template is read from disk and calls merge_current_action
-  print "GET http://config.privoxy.org/show-url-final-info?url=" url " HTTP/1.1"  |& webserver
-#   nonstandard but fast - no disk reads and calls merge_single_actions
-  print "Host: config.privoxy.org"                |& webserver
-  print "Accept: text/html"                       |& webserver
-  print "Connection: Keep-Alive"                  |& webserver
-  print ""                                        |& webserver
-  ORS = savedORS
-} else {  # this is so much faster.  Why???
   printf("GET http://config.privoxy.org/show-url-final-info?url=%s HTTP/1.1\r\n"\
          "Host: config.privoxy.org\r\n"\
          "Accept: text/html\r\n"\
          "Connection: Keep-Alive\r\n\r\n", url ) |& webserver
-}
 
   while ( ( ! done ) && ((status = (webserver |& getline)) > 0) ) {
      if ( ! final ) {

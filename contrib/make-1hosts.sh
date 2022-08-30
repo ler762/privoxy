@@ -2,12 +2,14 @@
 # shellcheck disable=SC2086
 #   is it possible for $(mktemp -q -d /tmp/LSXXXXXXXX) to return embedded blanks?
 #
-# get the latest StevenBlack hosts file & update the .action file
+# get the latest 1Hosts (Pro) domain list and update the .action file
 #
 # grab the file
-#    https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-#      (from main page: https://github.com/StevenBlack/hosts)
-# and save it as unified-hosts.txt
+#    https://o0.pages.dev/Pro/domains.txt
+#      ( from main page: https://github.com/badmojr/1Hosts   1Hosts (Pro)  Pi-hole Client)
+#    https://o0.pages.dev/Xtra/domains.txt
+#      ( from main page: https://github.com/badmojr/1Hosts   1Hosts (Xtra) Pi-hole Client)
+# and save it as 1hosts.txt
 
 umask 000
 
@@ -43,7 +45,7 @@ fi
 
 set -x
 
-TD=$(mktemp -q -d /tmp/UNIXXXXXXX)
+TD=$(mktemp -q -d /tmp/OHPXXXXXXX)
 stat=$?
 if [ $stat -ne 0 ]; then
   echo "barf: unable to create tmp directory, status=${stat}"
@@ -51,23 +53,22 @@ if [ $stat -ne 0 ]; then
 fi
 
 # get the new hosts file
-curl -q -sS https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts > ${TD}/unified-hosts.txt
+curl -q -sS https://o0.pages.dev/Xtra/domains.txt > ${TD}/1hosts.txt
 stat=$?
 if [ $stat -ne 0 ]; then
-   echo "error $stat: curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+   echo "error $stat: curl https://o0.pages.dev/Xtra/domains.txt"
    exit 10
 fi
 
 #  get the title, date, etc. header info from the file
-head -14 ${TD}/unified-hosts.txt > ${TD}/unified-hosts.srt
+head -3 ${TD}/1hosts.txt > ${TD}/1hosts.srt
 
-#  remove leading "0.0.0.0 ", leading/trailing spaces, comments and blank lines
-sed  -e 's/^0\.0\.0\.0 //'  \
-     -e 's/^  *//'  \
+#  leading/trailing spaces, comments and blank lines
+sed  -e 's/^  *//'  \
      -e 's/  *$//'  \
      -e 's/#.*$//'  \
-     -e '/^$/d'    ${TD}/unified-hosts.txt |\
- ./fqdnsort     >> ${TD}/unified-hosts.srt
+     -e '/^$/d'    ${TD}/1hosts.txt |\
+ ./fqdnsort     >> ${TD}/1hosts.srt
 
 # save the original Privoxy config
 cp -p ${P}/${config}  ${TD}/config-original
@@ -75,6 +76,8 @@ cp -p ${P}/${config}  ${TD}/config-original
 # stop using the to-be-updated action file & all others after it
 # and turn off privoxy logging
 sed \
+ -e 's/^actionsfile 1hosts/#actionsfile 1hosts/' \
+ -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
  -e 's/^actionsfile unified/#actionsfile unified/' \
  -e 's/^actionsfile unblock/#actionsfile unblock/' \
  -e 's/^debug /#debug /' \
@@ -94,8 +97,8 @@ fi
 # see how long it takes to make the new .action file
 date +'%s  %c' > ${TD}/timestamp.txt
 
-echo "{ +block{unified hosts file} }"   > ${TD}/unified-hosts.new
-gawk -f $SCRIPT ${TD}/unified-hosts.srt >> ${TD}/unified-hosts.new
+echo "{ +block{1hosts hosts file} }"   > ${TD}/1hosts.new
+gawk -f $SCRIPT ${TD}/1hosts.srt >> ${TD}/1hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
 
@@ -107,12 +110,12 @@ gawk -f elapsed.awk ${TD}/timestamp.txt
 
 if [ 0 = 1 ]; then
 if [ "${DISPLAY:-blank}" != "blank" ] ; then
-if [ "$WINDOWS" = 1 ]; then
-  new=$(cygpath -wal ${TD}/unified-hosts.new)
-  old=$(cygpath -wal ${P}/unified-hosts.action)
+if [ $WINDOWS = 1 ]; then
+  new=$(cygpath -wal ${TD}/1hosts.new)
+  old=$(cygpath -wal ${P}/1hosts.action)
   /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ "$LINUX" = 1 ]; then
-  meld  ${TD}/unified-hosts.new  ${P}/unified-hosts.action
+elif [ $LINUX = 1 ]; then
+  meld  ${TD}/1hosts.new  ${P}/1hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
   exit 1
@@ -120,6 +123,6 @@ fi
 fi
 fi
 
-mv ${P}/unified-hosts.action  ${P}/unified-hosts.old
-mv ${TD}/unified-hosts.new    ${P}/unified-hosts.action
+mv ${P}/1hosts.action  ${P}/1hosts.old
+mv ${TD}/1hosts.new    ${P}/1hosts.action
 
