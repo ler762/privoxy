@@ -130,6 +130,13 @@ CFLAGS="${CFLAGS} -Wuninitialized -Winit-self"
 # using const in declarations and prototypes.
 # >>> Otherwise, it is just a nuisance. <<<  -- this, very much this
 
+CFLAGS="${CFLAGS} -fcf-protection=full"
+# Enable checking that target addresses of control-flow transfer instructions are valid.
+# This prevents diverting the flow of control to an unexpected target.
+# This is intended to protect against such threats as
+# Return-oriented Programming (ROP), and similarly call/jmp-oriented
+# programming (COP/JOP).
+
 # why does the mingw library _not_ include .a files for libpcre?
 # *sigh* build my own pcre so I can do static linking
 # Get the 8.x PCRE library from  https://ftp.pcre.org/pub/pcre/
