@@ -7,9 +7,9 @@
 # grab the file
 #    https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
 #      (from main page: https://github.com/StevenBlack/hosts)
-# and save it as unified-hosts.txt
+# sort/de-duplicate and save it as unified-hosts.txt
 
-umask 000
+umask 003
 
 SCRIPT="block-test.awk"
 
@@ -51,10 +51,11 @@ if [ $stat -ne 0 ]; then
 fi
 
 # get the new hosts file
-curl -q -sS https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts > ${TD}/unified-hosts.txt
+URL="https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+curl -q -sS $URL > ${TD}/unified-hosts.txt
 stat=$?
 if [ $stat -ne 0 ]; then
-   echo "error $stat: curl https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+   echo "error $stat: curl $URL"
    exit 10
 fi
 
@@ -76,6 +77,8 @@ cp -p ${P}/${config}  ${TD}/config-original
 # and turn off privoxy logging
 sed \
  -e 's/^actionsfile unified/#actionsfile unified/' \
+ -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
+ -e 's/^actionsfile 1hosts/#actionsfile 1hosts/' \
  -e 's/^actionsfile unblock/#actionsfile unblock/' \
  -e 's/^debug /#debug /' \
  ${P}/${config}  > ${TD}/config.new

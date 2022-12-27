@@ -7,9 +7,9 @@
 # grab the files
 #    https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
 #    https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt
-# de-duplicate and save it as lightswitch-hosts.srt
+# sort/de-duplicate and save it as lightswitch-hosts.srt
 
-umask 000
+umask 003
 
 SCRIPT="block-test.awk"
 
@@ -51,16 +51,18 @@ if [ $stat -ne 0 ]; then
 fi
 
 # get the new hosts file
-curl -q -sS https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt  > ${TD}/ads-and-tracking-extended.txt
+URL="https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt"
+curl -q -sS $URL > ${TD}/ads-and-tracking-extended.txt
 stat=$?
 if [ $stat -ne 0 ]; then
-   echo "error $stat: curl https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt"
+   echo "error $stat: curl $URL"
    exit 10
 fi
-curl -q -sS https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt > ${TD}/tracking-aggressive-extended.txt
+URL="https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt"
+curl -q -sS $URL > ${TD}/tracking-aggressive-extended.txt
 stat=$?
 if [ $stat -ne 0 ]; then
-   echo "error $stat: curl https://www.github.developerdan.com/hosts/lists/tracking-aggressive-extended.txt"
+   echo "error $stat: curl $URL"
    exit 11
 fi
 
@@ -98,7 +100,6 @@ if [ $stat -eq 0 ]; then
    mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
 fi
 
-
 # save the original Privoxy config
 cp -p ${P}/${config}  ${TD}/config-original
 
@@ -106,7 +107,7 @@ cp -p ${P}/${config}  ${TD}/config-original
 # and turn off privoxy logging
 sed \
  -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
- -e 's/^actionsfile unified/#actionsfile unified/' \
+ -e 's/^actionsfile 1hosts/#actionsfile 1hosts/' \
  -e 's/^actionsfile unblock/#actionsfile unblock/' \
  -e 's/^debug /#debug /' \
  ${P}/${config}  > ${TD}/config.new

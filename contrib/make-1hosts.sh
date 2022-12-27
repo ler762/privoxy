@@ -7,11 +7,13 @@
 # grab the file
 #    https://o0.pages.dev/Pro/domains.txt
 #      ( from main page: https://github.com/badmojr/1Hosts   1Hosts (Pro)  Pi-hole Client)
+#
 #    https://o0.pages.dev/Xtra/domains.txt
 #      ( from main page: https://github.com/badmojr/1Hosts   1Hosts (Xtra) Pi-hole Client)
-# and save it as 1hosts.txt
+#      ** plenty too many false positives **  DO NOT USE **
+# sort/de-duplicate and save it as 1hosts.txt
 
-umask 000
+umask 003
 
 SCRIPT="block-test.awk"
 
@@ -53,17 +55,18 @@ if [ $stat -ne 0 ]; then
 fi
 
 # get the new hosts file
-curl -q -sS https://o0.pages.dev/Xtra/domains.txt > ${TD}/1hosts.txt
+URL="https://o0.pages.dev/Pro/domains.txt"
+curl -q -sS $URL > ${TD}/1hosts.txt
 stat=$?
 if [ $stat -ne 0 ]; then
-   echo "error $stat: curl https://o0.pages.dev/Xtra/domains.txt"
+   echo "error $stat: curl $URL"
    exit 10
 fi
 
 #  get the title, date, etc. header info from the file
 head -3 ${TD}/1hosts.txt > ${TD}/1hosts.srt
 
-#  leading/trailing spaces, comments and blank lines
+#  remove leading/trailing spaces, comments and blank lines
 sed  -e 's/^  *//'  \
      -e 's/  *$//'  \
      -e 's/#.*$//'  \
@@ -77,8 +80,6 @@ cp -p ${P}/${config}  ${TD}/config-original
 # and turn off privoxy logging
 sed \
  -e 's/^actionsfile 1hosts/#actionsfile 1hosts/' \
- -e 's/^actionsfile lightswitch/#actionsfile lightswitch/' \
- -e 's/^actionsfile unified/#actionsfile unified/' \
  -e 's/^actionsfile unblock/#actionsfile unblock/' \
  -e 's/^debug /#debug /' \
  ${P}/${config}  > ${TD}/config.new
@@ -110,11 +111,11 @@ gawk -f elapsed.awk ${TD}/timestamp.txt
 
 if [ 0 = 1 ]; then
 if [ "${DISPLAY:-blank}" != "blank" ] ; then
-if [ $WINDOWS = 1 ]; then
+if [ "$WINDOWS" = 1 ]; then
   new=$(cygpath -wal ${TD}/1hosts.new)
   old=$(cygpath -wal ${P}/1hosts.action)
   /cygdrive/c/MyProgs/Winmerge/WinmergeU.exe  ${new}  ${old}
-elif [ $LINUX = 1 ]; then
+elif [ "$LINUX" = 1 ]; then
   meld  ${TD}/1hosts.new  ${P}/1hosts.action
 else
   echo "WTF? Not Windows -or- Linux??"
