@@ -125,7 +125,7 @@
     url="../user-manual/config.html#DEBUG">debug options</ulink> are enabled
     (all of them):
    </para>
-   <programlisting>
+   <literallayout>
 debug     1 # Log the destination for each request.  See also debug 1024.
 debug     2 # show each connection status
 debug     4 # show tagging-related messages
@@ -137,16 +137,16 @@ debug  1024 # Log the destination for requests Privoxy didn't let through, and t
 debug  4096 # Startup banner and warnings.
 debug  8192 # Non-fatal errors
 debug 65536 # Log applying actions
-</programlisting>
+</literallayout>
    <para>
     If you are having trouble with a filter, please additionally enable
    </para>
-   <programlisting>debug    64 # debug regular expression filters</programlisting>
+   <literallayout>debug    64 # debug regular expression filters</literallayout>
    <para>
     If you suspect that Privoxy interprets the request or the response
     incorrectly, please enable additionally
    </para>
-   <programlisting>debug 32768 # log all data read from the network</programlisting>
+   <literallayout>debug 32768 # log all data read from the network</literallayout>
    <para>
     It's easy for us to ignore log messages that aren't relevant but missing
     log messages may make it impossible to investigate a problem. If you aren't
