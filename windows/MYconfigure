@@ -178,8 +178,6 @@ echo "LDFLAGS=${LDFLAGS}"
 # ./configure cross-compilation options:
 #    --build: the system on which the program will be built.
 #    --host:  the system on which the generated program will run.
-#             i686-w64-mingw32
-#             x86_64-w64-mingw32
 #    --target: only used to build a cross-compiling toolchain.
 
 ./configure  --host=i686-w64-mingw32 \
