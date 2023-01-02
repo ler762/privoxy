@@ -92,7 +92,6 @@ CFLAGS="${CFLAGS} -Wall"
 # see: http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 #    but then plenty too many complaints by
-#      -Wmaybe-uninitialized
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
