@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl
-dnl Written by and Copyright (C) 2001-2021 the
+dnl Written by and Copyright (C) 2001-2023 the
 dnl Privoxy team. https://www.privoxy.org/
 dnl
 dnl Based on the Internet Junkbuster originally written
@@ -81,11 +81,11 @@ dnl release and no new release is near.
 VERSION_MAJOR=3
 VERSION_MINOR=0
 VERSION_POINT=34
-CODE_STATUS="UNRELEASED"
+CODE_STATUS="stable"
 
 dnl Timestamp (date +%s) used by the mtree-spec target.
 dnl Should be updated before releases but forgetting it isn't critical.
-SOURCE_DATE_EPOCH=1636218132
+SOURCE_DATE_EPOCH=1672586827
 
 dnl =================================================================
 dnl Substitute the version numbers
