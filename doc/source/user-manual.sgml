@@ -2536,12 +2536,6 @@ media.example.com/.*banners
 <!-- XXX: This section contains duplicates content from the
           client-specific-tag documentation. -->
 
-<warning>
-<para>
- This is an experimental feature. The syntax is likely to change in future versions.
-</para>
-</warning>
-
 <para>
  Client tag patterns are not set based on HTTP headers but based on
  the client's IP address. Users can enable them themselves, but the
@@ -5454,9 +5448,6 @@ new action
     a pattern with path doesn't work as the path is only seen
     by &my-app; if the action is already enabled.
    </para>
-   <para>
-    This is an experimental feature.
-   </para>
   </listitem>
  </varlistentry>
 
@@ -7726,9 +7717,9 @@ pre-defined filters for your convenience:
   <term><emphasis>banners-by-link</emphasis></term>
   <listitem>
    <para>
-    This is an experimental filter that attempts to kill any banners if
-    their URLs seem to point to known or suspected click trackers. It is currently
-    not of much value and is not recommended for use by default.
+    This filter attempts to kill any banners if their URLs seem to point
+    to known or suspected click trackers. It is currently not of much value
+    and is not recommended for use by default.
    </para>
   </listitem>
  </varlistentry>
