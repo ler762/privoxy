@@ -539,6 +539,18 @@ https://www.privoxy.org/donate
      for given domains instead of accepting all that are specified with
      the trusted-cas-file directive.
 
+202) Have the windows make file create the ./CA and ./certs directory
+     to match the default values in config.txt
+
+203) Include a "trustedCAs.pem" file in the privoxy/CA directory?
+
+204) MS ie is no more.. can we get rid of "+filter{ie-exploits} \" in default.action now?
+
+205) Privoxy for windows comes with the docs, so add a
+       user-manual ./doc/user-manual/
+     at the top of config.txt
+
+
 ##########################################################################
 
 Hosting wish list (relevant for #53)
