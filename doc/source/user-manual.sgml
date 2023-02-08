@@ -15,10 +15,10 @@
 <!entity config SYSTEM "p-config.sgml">
 <!entity changelog SYSTEM "changelog.sgml">
 <!entity p-version "3.0.34">
-<!entity p-status "UNRELEASED">
+<!entity p-status "stable">
 <!entity % p-authors-formal "INCLUDE"> <!-- include additional text, etc  -->
-<!entity % p-not-stable "INCLUDE">
-<!entity % p-stable "IGNORE">
+<!entity % p-not-stable "IGNORE">
+<!entity % p-stable "INCLUDE">
 <!entity % p-text "IGNORE">        <!-- define we are not a text only doc -->
 <!entity % p-doc "INCLUDE">        <!-- and we are a formal doc           -->
 <!entity % p-readme "IGNORE">
@@ -35,7 +35,7 @@
 
  Purpose     :  user manual
 
- Copyright (C) 2001-2022 Privoxy Developers https://www.privoxy.org/
+ Copyright (C) 2001-2023 Privoxy Developers https://www.privoxy.org/
  See LICENSE.
 
  ========================================================================
@@ -54,7 +54,7 @@
  <subscript>
 <!-- Completely the wrong markup, but very little is allowed  -->
 <!-- in this part of an article. FIXME -->
- <link linkend="copyright">Copyright</link> &my-copy; 2001-2022 by
+ <link linkend="copyright">Copyright</link> &my-copy; 2001-2023 by
  <ulink url="https://www.privoxy.org/">Privoxy Developers</ulink>
  </subscript>
 </pubdate>
@@ -302,11 +302,15 @@ How to install the binary packages depends on your operating system:
 </sect3>
 
 <!--   ~~~~~       New section      ~~~~~     -->
-<sect3 id="installation-freebsd"><title>FreeBSD</title>
+<sect3 id="installation-freebsd"><title>FreeBSD and ElectroBSD</title>
 
 <para>
  Privoxy is part of FreeBSD's Ports Collection, you can build and install
  it with <literal>cd /usr/ports/www/privoxy; make install clean</literal>.
+</para>
+<para>
+ If your system is configured to install binary packages you can
+ try to install &my-app; with <literal>pkg install privoxy</literal>.
 </para>
 </sect3>
 
