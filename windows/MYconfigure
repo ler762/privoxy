@@ -80,6 +80,11 @@ LDFLAGS="${LDFLAGS} -Wl,--nxcompat"
 #   $ peflags -v privoxy.exe
 #   privoxy.exe: coff(0x0106[+executable_image,+line_nums_stripped,+32bit_machine]) pe(0x0140[+dynamicbase,+nxcompat])
 
+# check_ldflags -Wl,--nxcompat,--dynamicbase,--high-entropy-va
+#   --dynamicbase      enabled by default
+#   --high-entropy-va  enabled by default
+#   --nxcompat         enabled by default
+
 
 LDFLAGS="${LDFLAGS} -Wl,--dynamicbase,--export-all-symbols"
 # https://en.wikipedia.org/wiki/Address_space_layout_randomization
