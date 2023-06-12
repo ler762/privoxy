@@ -11,7 +11,6 @@
 
 BEGIN {
   # awk -v slow=1  to use multiple print "..." |& webserver instead of a single printf
-  slow = 0  # too much trouble to change the calling script
   prev = "@";  prevlen = 1;
   stderr = "/dev/stderr"
   webserver = "/inet/tcp/0/localhost/8118"
@@ -47,6 +46,10 @@ BEGIN {
      printf("# *************************** skipping localhost: %s\n", url)
      next
   }
+
+  n = index(url, "/")
+  if ( n == 0 && ( substr(url, length(url)) != ".") ) { url = url "/" }
+     # if no trailing dot or slash then add a trailing slash
 
   checkurl = url
   if ( substr(url, 1, 1) == "." ) { checkurl = "foo" url }   # tack a name on the front if the pattern has a leading dot
