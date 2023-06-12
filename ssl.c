@@ -473,7 +473,7 @@ extern int create_client_ssl_connection(struct client_state *csp)
       {
          mbedtls_strerror(ret, err_buf, sizeof(err_buf));
          log_error(LOG_LEVEL_ERROR,
-            "medtls_ssl_handshake with client failed: %s", err_buf);
+            "medtls_ssl_handshake for %s with client failed: %s", csp->http->host, err_buf);
          ret = -1;
          goto exit;
       }
