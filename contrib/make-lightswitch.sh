@@ -34,7 +34,7 @@ else
 fi
 
 numaf=$(grep -E '^actionsfile ' ${P}/${config} | grep -vc 'regression-tests.action')
-numafExpected=8
+numafExpected=9
 # I should have this many action files
 if [ "$numaf" -ne $numafExpected ]; then
    echo "Check ${config}; found ${numaf} actionsfiles and there should be ${numafExpected}"
@@ -52,6 +52,7 @@ fi
 
 # get the new hosts file
 URL="https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt"
+
 curl -q -sS $URL > ${TD}/ads-and-tracking-extended.txt
 stat=$?
 if [ $stat -ne 0 ]; then
@@ -154,4 +155,3 @@ fi
 
 mv ${P}/lightswitch-hosts.action  ${P}/lightswitch-hosts.old
 mv ${TD}/lightswitch-hosts.new    ${P}/lightswitch-hosts.action
-

@@ -38,7 +38,7 @@ else
 fi
 
 numaf=$(grep -E '^actionsfile ' ${P}/${config} | grep -vc 'regression-tests.action')
-numafExpected=8
+numafExpected=9
 # I should have this many action files
 if [ "$numaf" -ne $numafExpected ]; then
    echo "Check ${config}; found ${numaf} actionsfiles and there should be ${numafExpected}"
@@ -56,6 +56,7 @@ fi
 
 # get the new hosts file
 URL="https://o0.pages.dev/Pro/domains.txt"
+
 curl -q -sS $URL > ${TD}/1hosts.txt
 stat=$?
 if [ $stat -ne 0 ]; then
@@ -64,14 +65,14 @@ if [ $stat -ne 0 ]; then
 fi
 
 #  get the title, date, etc. header info from the file
-head -3 ${TD}/1hosts.txt > ${TD}/1hosts.srt
+head -3 ${TD}/1hosts.txt  > ${TD}/1hosts.srt
 
 #  remove leading/trailing spaces, comments and blank lines
 sed  -e 's/^  *//'  \
      -e 's/  *$//'  \
      -e 's/#.*$//'  \
-     -e '/^$/d'    ${TD}/1hosts.txt |\
- ./fqdnsort     >> ${TD}/1hosts.srt
+     -e '/^$/d'     ${TD}/1hosts.txt |\
+ ./fqdnsort      >> ${TD}/1hosts.srt
 
 # save the original Privoxy config
 cp -p ${P}/${config}  ${TD}/config-original
@@ -99,7 +100,7 @@ fi
 date +'%s  %c' > ${TD}/timestamp.txt
 
 echo "{ +block{1hosts hosts file} }"   > ${TD}/1hosts.new
-gawk -f $SCRIPT ${TD}/1hosts.srt >> ${TD}/1hosts.new
+gawk -f $SCRIPT ${TD}/1hosts.srt      >> ${TD}/1hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
 
@@ -126,4 +127,3 @@ fi
 
 mv ${P}/1hosts.action  ${P}/1hosts.old
 mv ${TD}/1hosts.new    ${P}/1hosts.action
-

@@ -34,7 +34,7 @@ else
 fi
 
 numaf=$(grep -E '^actionsfile ' ${P}/${config} | grep -vc 'regression-tests.action')
-numafExpected=8
+numafExpected=9
 # I should have this many action files
 if [ "$numaf" -ne $numafExpected ]; then
    echo "Check ${config}; found ${numaf} actionsfiles and there should be ${numafExpected}"
@@ -52,6 +52,7 @@ fi
 
 # get the new hosts file
 URL="https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+
 curl -q -sS $URL > ${TD}/unified-hosts.txt
 stat=$?
 if [ $stat -ne 0 ]; then
@@ -60,7 +61,7 @@ if [ $stat -ne 0 ]; then
 fi
 
 #  get the title, date, etc. header info from the file
-head -14 ${TD}/unified-hosts.txt > ${TD}/unified-hosts.srt
+head -12 ${TD}/unified-hosts.txt  > ${TD}/unified-hosts.srt
 
 #  remove leading "0.0.0.0 ", leading/trailing spaces, comments and blank lines
 sed  -e 's/^0\.0\.0\.0 //'  \
@@ -97,7 +98,7 @@ fi
 # see how long it takes to make the new .action file
 date +'%s  %c' > ${TD}/timestamp.txt
 
-echo "{ +block{unified hosts file} }"   > ${TD}/unified-hosts.new
+echo "{ +block{unified hosts file} }"    > ${TD}/unified-hosts.new
 gawk -f $SCRIPT ${TD}/unified-hosts.srt >> ${TD}/unified-hosts.new
 
 date +'%s  %c' >> ${TD}/timestamp.txt
@@ -125,4 +126,3 @@ fi
 
 mv ${P}/unified-hosts.action  ${P}/unified-hosts.old
 mv ${TD}/unified-hosts.new    ${P}/unified-hosts.action
-
