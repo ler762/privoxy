@@ -2031,7 +2031,7 @@ jb_err template_fill(char **template_ptr, const struct map *exports)
    char buf[BUFFER_SIZE];
    char *tmp_out_buffer;
    char *file_buffer;
-   size_t size;
+   size_t buffer_size, new_size;
    int error;
    const char *flags;
 
@@ -2040,7 +2040,7 @@ jb_err template_fill(char **template_ptr, const struct map *exports)
    assert(exports);
 
    file_buffer = *template_ptr;
-   size = strlen(file_buffer) + 1;
+   buffer_size = strlen(file_buffer) + 1;
 
    /*
     * Assemble pcrs joblist from exports map
@@ -2090,7 +2090,10 @@ jb_err template_fill(char **template_ptr, const struct map *exports)
       }
       else
       {
-         error = pcrs_execute(job, file_buffer, size, &tmp_out_buffer, &size);
+         error = pcrs_execute(job, file_buffer, buffer_size, &tmp_out_buffer,
+            &new_size);
+
+         buffer_size = new_size;
 
          pcrs_free_job(job);
          if (NULL == tmp_out_buffer)
