@@ -18,6 +18,8 @@ fi
 #
 # --host=i686-w64-mingw32         Use the mingw cross-compiler to build a 'native' windows binary
 # --enable-mingw32                Use mingw32 for a Windows GUI
+# --enable-pcre2                  Use the PCRE2 (pcre 10.x) library if available
+# --disable-pcre2                 Don't try to use pcre2 even if it's available
 # --enable-static-linking         Use static linking instead of dynamic linking (and not have
 #                                 to put all the .DLLs in the path or the same dir as Privoxy)
 # --disable-pthread               Use native threads instead of POSIX pthreads library
@@ -167,8 +169,22 @@ CFLAGS="${CFLAGS} -Werror=incompatible-pointer-types"
 # *sigh* build my own pcre so I can do static linking
 # Get the 8.x PCRE library from
 #   https://sourceforge.net/projects/pcre/files/pcre/
-inc="/source/pcre-8.45/"
-lib="/source/pcre-8.45/.libs"
+# Get the 10.x PCRE library from
+#   https://github.com/PCRE2Project/pcre2/releases
+#
+#
+usepcre2=no
+#
+#
+if [ "$usepcre2" = "yes" ]; then
+    PCREOPT="--enable-pcre2"
+    inc="/source/pcre2-10.42/"
+    lib="/source/pcre2-10.42/.libs"
+else
+    PCREOPT="--disable-pcre2"
+    inc="/source/pcre-8.45/"
+    lib="/source/pcre-8.45/.libs"
+fi
 CPPFLAGS="${CPPFLAGS} -I${inc}"
 LDFLAGS="${LDFLAGS} -L${lib}"
 
@@ -209,6 +225,7 @@ echo "LDFLAGS=${LDFLAGS}"
 ./configure  --host=i686-w64-mingw32 \
              --enable-mingw32  --enable-zlib \
              --enable-extended-statistics \
+             ${PCREOPT} \
              --enable-pcre-host-patterns \
              --enable-pcre-jit-compilation \
              --enable-static-linking \
