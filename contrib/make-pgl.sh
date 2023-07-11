@@ -50,7 +50,7 @@ if [ $stat -ne 0 ]; then
 fi
 
 # get the new hosts file
-URL="https://pgl.yoyo.org/as/serverlist.php?hostformat=hosts;showintro=0;mimetype=plaintext"
+URL="https://pgl.yoyo.org/as/serverlist.php?hostformat=junkbuster&showintro=1&mimetype=plaintext"
 
 curl -q -sS "$URL" > ${TD}/pgl-hosts.txt
 stat=$?
