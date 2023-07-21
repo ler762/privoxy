@@ -18,7 +18,6 @@ fi
 #
 # --host=i686-w64-mingw32         Use the mingw cross-compiler to build a 'native' windows binary
 # --enable-mingw32                Use mingw32 for a Windows GUI
-# --enable-pcre2                  Use the PCRE2 (pcre 10.x) library if available
 # --disable-pcre2                 Don't try to use pcre2 even if it's available
 # --enable-static-linking         Use static linking instead of dynamic linking (and not have
 #                                 to put all the .DLLs in the path or the same dir as Privoxy)
@@ -173,11 +172,11 @@ CFLAGS="${CFLAGS} -Werror=incompatible-pointer-types"
 #   https://github.com/PCRE2Project/pcre2/releases
 #
 #
-usepcre2=no
+usepcre2=yes
 #
 #
 if [ "$usepcre2" = "yes" ]; then
-    PCREOPT="--enable-pcre2"
+    PCREOPT=""
     inc="/source/pcre2-10.42/"
     lib="/source/pcre2-10.42/.libs"
 else
