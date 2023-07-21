@@ -221,8 +221,7 @@ echo "LDFLAGS=${LDFLAGS}"
 #    --host:  the system on which the generated program will run.
 #    --target: only used to build a cross-compiling toolchain.
 
-./configure  --host=i686-w64-mingw32 \
-             --enable-mingw32  --enable-zlib \
+./configure  --host=i686-w64-mingw32  --enable-mingw32  --enable-zlib \
              --enable-extended-statistics \
              ${PCREOPT} \
              --enable-pcre-host-patterns \
