@@ -64,11 +64,11 @@
 #endif /* FEATURE_HTTPS_INSPECTION_MBEDTLS */
 
 #ifdef FEATURE_HTTPS_INSPECTION_OPENSSL
+#ifdef _WIN32
 #include <windef.h>
 #include <minwindef.h>
 #include <basetsd.h>
 #include <minwinbase.h>
-#ifdef _WIN32
 #include <wincrypt.h>
 #undef X509_NAME
 #undef X509_EXTENSIONS
