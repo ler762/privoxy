@@ -5184,6 +5184,10 @@ static void serve(struct client_state *csp)
 
 /*
  *    don't check for action/filter file changes if processing cgi requests
+ *     - operating system calls are slow
+ *     - accessing disk drives is even slower
+ *    so don't check timestamps on action/filter files
+ *    especially when I'm calling show-url-final-info on a 100K+ line host file
  *
  *    XXX skip disk access only for show-url-final-info?
  *        (ie. any_loaded_file_changed calling stat on all the config files)
