@@ -41,7 +41,7 @@
 #ifdef _WIN32
 /* https://www.openssl.org/docs/faq.html
    I’ve compiled a program under Windows and it crashes: Why?
-   because it needs this include:
+   tl,dr: because it needs this include:
 */
 #include <openssl/applink.c>
 #endif /* _WIN32 */
