@@ -5186,12 +5186,12 @@ static void serve(struct client_state *csp)
  *    don't check for action/filter file changes if processing cgi requests
  *     - operating system calls are slow
  *     - accessing disk drives is even slower
- *    so don't check timestamps on action/filter files
+ *    so don't check timestamps on the config or action/filter files
  *    especially when I'm calling show-url-final-info on a 100K+ line host file
  *
- *    XXX skip disk access only for show-url-final-info?
- *        (ie. any_loaded_file_changed calling stat on all the config files)
- *        or are other cgi calls expected to be called in a tight loop?
+ *    or maybe only skip checking for file changes if show-url-final-info
+ *    is being called???
+ *
  */
       if (continue_chatting && !(csp->flags & CSP_FLAG_CRUNCHED) && any_loaded_file_changed(csp))
       {
@@ -5296,19 +5296,6 @@ static void serve(struct client_state *csp)
             socket_is_still_alive(csp->server_connection.sfd),
             csp->server_connection.keep_alive_timeout,
             config_file_change_detected);
-
-         /* LR ------ begin **
-         log_error(LOG_LEVEL_CONNECT,"RUNTIME_FEATURE_CONNECTION_KEEP_ALIVE: %s",
-             csp->config->feature_flags & RUNTIME_FEATURE_CONNECTION_KEEP_ALIVE ? "true" : "false");
-         log_error(LOG_LEVEL_CONNECT,"CSP_FLAG_SERVER_CONNECTION_KEEP_ALIVE: %s",
-             csp->flags & CSP_FLAG_SERVER_CONNECTION_KEEP_ALIVE ? "true" : "false");
-         log_error(LOG_LEVEL_CONNECT,"CSP_FLAG_SERVER_SOCKET_TAINTED: %s",
-             csp->flags & CSP_FLAG_SERVER_SOCKET_TAINTED ? "true" : "false");
-         log_error(LOG_LEVEL_CONNECT,"csp->cfd != JB_INVALID_SOCKET: %s",
-             csp->cfd != JB_INVALID_SOCKET ? "true" : "false");
-         log_error(LOG_LEVEL_CONNECT,"csp->server_connection.sfd != JB_INVALID_SOCKET: %s",
-             csp->server_connection.sfd != JB_INVALID_SOCKET ? "true" : "false");
-         ** LR ------- end */
       }
    } while (continue_chatting);
 
