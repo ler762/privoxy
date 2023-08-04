@@ -109,7 +109,9 @@ if ( slow ) {  # this is the slow version
   print "Connection: Keep-Alive"                  |& webserver
   print ""                                        |& webserver
   ORS = savedORS
-} else {  # this is so much faster.  Why???
+} else {
+    # this is faster because awk does a single write to webserver
+    # multiple print statements cause multiple writes :(
   printf("GET http://config.privoxy.org/show-url-final-info?url=%s HTTP/1.1\r\n"\
          "Host: config.privoxy.org\r\n"\
          "Accept: text/html\r\n"\
