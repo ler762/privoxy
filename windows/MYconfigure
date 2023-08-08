@@ -206,13 +206,13 @@ LDFLAGS="${LDFLAGS} -L${lib}"
 # Get the 2.28.x mbedtls library from  https://github.com/Mbed-TLS/mbedtls/tags
 # Release Notes: https://github.com/Mbed-TLS/mbedtls/releases/tag/v2.28.4
 
-MITMOPT="--with-mbedtls"
-inc="/source/mbedtls-2.28.4/include"
-lib="/source/mbedtls-2.28.4/library"
-CPPFLAGS="${CPPFLAGS} -I${inc}"
-LDFLAGS="${LDFLAGS} -L${lib}"
+##MITMOPT="--with-mbedtls"
+##inc="/source/mbedtls-2.28.4/include"
+##lib="/source/mbedtls-2.28.4/library"
+##CPPFLAGS="${CPPFLAGS} -I${inc}"
+##LDFLAGS="${LDFLAGS} -L${lib}"
 
-##MITMOPT="--with-openssl"
+MITMOPT="--with-openssl"
 
 # brotli
 # Get the brotli library from  https://github.com/google/brotli/releases
