@@ -38,6 +38,8 @@ config.log
 config.new
 config.status
 jarfile
+log.MYconfigure
+log.make
 logfile
 privoxy
 privoxy.exe
