@@ -680,6 +680,9 @@ int write_socket_delayed(jb_socket fd, const char *buf, size_t len, unsigned int
 {
    size_t i = 0;
 
+   log_error(LOG_LEVEL_IO, 
+             "write_socket_delayed: socket %d *buf=%lu len=%lu delay=%d", fd, buf, len, delay);
+
    if (delay == 0)
    {
       return write_socket(fd, buf, len);
