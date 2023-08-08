@@ -81,16 +81,6 @@ sed  -e 's/^0\.0\.0\.0 //'  \
 
 # remove 10K+ lines of things that are blocked
 #
-# $ grep -E '\.duckdns\.org$' lightswitch-hosts.srt | wc -l
-# 146921
-grep -E '^duckdns\.org$' ${TD}/lightswitch-hosts.srt > /dev/null
-stat=$?
-if [ $stat -eq 0 ]; then
-   # have a "duckdns.org" so I can remove all the following ".duckdns.org" lines
-   grep -Ev '\.duckdns\.org$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
-   mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
-fi
-#
 # $ grep -E '\.000webhostapp\.com$' lightswitch-hosts.srt | wc -l
 # 27352
 grep -E '^000webhostapp\.com$' ${TD}/lightswitch-hosts.srt > /dev/null
@@ -100,6 +90,48 @@ if [ $stat -eq 0 ]; then
    grep -Ev '\.000webhostapp\.com$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
    mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
 fi
+
+# $ grep -E '\.duckdns\.org$' lightswitch-hosts.srt | wc -l
+# 146921
+grep -E '^duckdns\.org$' ${TD}/lightswitch-hosts.srt > /dev/null
+stat=$?
+if [ $stat -eq 0 ]; then
+   # have a "duckdns.org" so I can remove all the following ".duckdns.org" lines
+   grep -Ev '\.duckdns\.org$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
+   mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
+fi
+
+# $ grep -E '\.mktoweb.com$' lightswitch-hosts.srt | wc -l
+# 11884
+grep -E '^mktoweb\.com$' ${TD}/lightswitch-hosts.srt > /dev/null
+stat=$?
+if [ $stat -eq 0 ]; then
+   # have a "mktoweb.com" so I an remove all the following ".mktoweb.com" lines
+   grep -Ev '\.mktoweb\.com$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
+   mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
+fi
+
+# $ grep -E '\.doubleclick.net$' lightswitch-hosts.srt | wc -l
+# 9421
+grep -E '^doubleclick\.net$' ${TD}/lightswitch-hosts.srt > /dev/null
+stat=$?
+if [ $stat -eq 0 ]; then
+   # have a "doubleclick.net" so I an remove all the following ".doubleclick.net" lines
+   grep -Ev '\.doubleclick\.net$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
+   mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
+fi
+
+
+# $ grep -E '\.clickfunnels.com$' lightswitch-hosts.srt | wc -l
+# 9415
+grep -E '^clickfunnels\.com$' ${TD}/lightswitch-hosts.srt > /dev/null
+stat=$?
+if [ $stat -eq 0 ]; then
+   # have a "clickfunnels.com" so I an remove all the following ".clickfunnels.com" lines
+   grep -Ev '\.clickfunnels.com$' ${TD}/lightswitch-hosts.srt > ${TD}/lightswitch-hosts.tmp
+   mv ${TD}/lightswitch-hosts.tmp  ${TD}/lightswitch-hosts.srt
+fi
+
 
 # save the original Privoxy config
 cp -p ${P}/${config}  ${TD}/config-original
