@@ -430,7 +430,7 @@ static int parse_numeric_value(const char *name, const char *value)
       log_error(LOG_LEVEL_FATAL, "Directive %s used without argument", name);
    }
 
-   number = (int)strtol(value, &endptr, 10);
+   number = (int)strtol(value, &endptr, 0);
    if (*endptr != '\0')
    {
       log_error(LOG_LEVEL_FATAL,
@@ -804,6 +804,7 @@ struct configuration_spec * load_config(void)
  * *************************************************************************/
          case hash_buffer_limit :
             config->buffer_limit = (size_t)(1024 * parse_numeric_value(cmd, arg));
+            log_error(LOG_LEVEL_INFO, "buffer_limit = %d", config->buffer_limit);
             break;
 
 /* *************************************************************************
@@ -929,7 +930,11 @@ struct configuration_spec * load_config(void)
  * Specifies debug level, multiple values are ORed together.
  * *************************************************************************/
          case hash_debug :
+            char outbuf[40];
+            memset(outbuf, 0, sizeof(outbuf));
             config->debug |= parse_numeric_value(cmd, arg);
+            snprintf(outbuf, sizeof(outbuf), "debug = 0x%08x (%d) ", config->debug, config->debug);
+            log_error(LOG_LEVEL_INFO, "%s", outbuf);
             break;
 
 /* *************************************************************************
