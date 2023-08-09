@@ -38,10 +38,11 @@ export CPPFLAGS=""
 export LDFLAGS=""
 # start with initially empty flags
 
+
 CFLAGS="${CFLAGS} -fdiagnostics-color=always"
-# Use color in diagnostics even if stderr is not going to a terminal.
-# It's nice having warnings in color when I run a script that does
-#   'make 2>&1 | tee  log.make'
+# Have gcc diagnostics be in color even if stderr is not going to a terminal.
+# It's nice having warnings in color even if I run a script that does
+#   'make 2>&1 | tee log.make'
 
 CFLAGS="${CFLAGS} -fstack-protector-strong -D_FORTIFY_SOURCE=2"
 LDFLAGS="${LDFLAGS} -fstack-protector-strong"
@@ -103,8 +104,7 @@ CFLAGS="${CFLAGS} -Wall"
 # see: http://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 # -Wall   doesn't actually turn on all warnings, so add  -Wextra
 CFLAGS="${CFLAGS} -Wextra"
-#
-#  but then plenty too many complaints by
+#    but then plenty too many complaints by
 #      -Wmissing-field-initializers
 #      -Wsign-compare
 #      -Wtype-limits
