@@ -422,10 +422,6 @@ https://www.privoxy.org/donate
 163) Use subdirectories in the certificate-directory to lower the number
      of files per directory.
 
-164) Evaluate switching from pcreposix(3) to pcre's native api
-     for URL matching which allows to compile the patterns once
-     at load-time.
-
 165) Add a max-connections-per-client directive.
 
 167) Set up a public Privoxy-Filter-Test instance.
@@ -542,18 +538,23 @@ https://www.privoxy.org/donate
 202) Allow to use multiple log files with different debug settings.
      Suggested by Jonathan Marten in FR#607.
 
-203) Have the windows make file create the ./CA and ./certs directory
+203) Add HTTP/2 support.
+
+204) Make the Privoxy website available over IPv6.
+
+205) Document how commit messages should look like.
+
+xxx) Have the windows make file create the ./CA and ./certs directory
      to match the default values in config.txt
 
-204) Include a "trustedCAs.pem" file in the privoxy/CA directory?
+xxx) Include a "trustedCAs.pem" file in the privoxy/CA directory?
 
-205) MS Internet Explorer is no more.. can we get rid of
+xxx) MS Internet Explorer is no more.. can we get rid of
      "+filter{ie-exploits} \" in default.action now?
 
-206) Privoxy for windows comes with the docs, so add a
+xxx) Privoxy for windows comes with the docs, so add a
        user-manual ./doc/user-manual/
      at the top of config.txt
-
 
 ##########################################################################
 
