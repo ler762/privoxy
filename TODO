@@ -422,10 +422,6 @@ https://www.privoxy.org/donate
 163) Use subdirectories in the certificate-directory to lower the number
      of files per directory.
 
-164) Evaluate switching from pcreposix(3) to pcre's native api
-     for URL matching which allows to compile the patterns once
-     at load-time.
-
 165) Add a max-connections-per-client directive.
 
 167) Set up a public Privoxy-Filter-Test instance.
@@ -541,6 +537,12 @@ https://www.privoxy.org/donate
 
 202) Allow to use multiple log files with different debug settings.
      Suggested by Jonathan Marten in FR#607.
+
+203) Add HTTP/2 support.
+
+204) Make the Privoxy website available over IPv6.
+
+205) Document how commit messages should look like.
 
 ##########################################################################
 
