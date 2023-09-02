@@ -547,7 +547,7 @@ https://www.privoxy.org/donate
 xxx) Have the windows make file create the ./CA and ./certs directory
      to match the default values in config.txt
 
-xxx) Include a "trustedCAs.pem" file in the privoxy/CA directory?
+xxx) Include a "trustedCAs.pem" file in the privoxy/CA directory.
 
 xxx) MS Internet Explorer is no more.. can we get rid of
      "+filter{ie-exploits} \" in default.action now?
