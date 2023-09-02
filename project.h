@@ -1001,7 +1001,7 @@ struct reusable_connection
  * Maximum number of sockets to listen to.  This limit is arbitrary - it's just used
  * to size an array.
  */
-#define MAX_LISTENING_SOCKETS 10
+#define MAX_LISTENING_SOCKETS 20
 
 struct ssl_attr {
 #ifdef FEATURE_HTTPS_INSPECTION_MBEDTLS
