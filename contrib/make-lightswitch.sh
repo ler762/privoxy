@@ -186,4 +186,4 @@ fi
 fi
 
 mv ${P}/lightswitch-hosts.action  ${P}/lightswitch-hosts.old
-mv ${TD}/lightswitch-hosts.new    ${P}/lightswitch-hosts.action
+mv ${TD}/lightswitch-hosts.new    ${P}/lightswitch-hosts.action 

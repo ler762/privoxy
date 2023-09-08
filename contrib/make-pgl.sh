@@ -127,5 +127,5 @@ fi
 fi
 
 mv ${P}/pgl-hosts.action  ${P}/pgl-hosts.old
-mv ${TD}/pgl-hosts.new    ${P}/pgl-hosts.action
+mv ${TD}/pgl-hosts.new    ${P}/pgl-hosts.action 
 

@@ -31,4 +31,4 @@ END {
     # Order by indices in ascending order compared as strings
   for (s in fqdn )
     printf("%s\n", fqdn[s] )
-}
+} 
