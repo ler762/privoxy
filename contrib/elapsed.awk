@@ -27,5 +27,5 @@ END {
      etime = e[1]*60*60 + e[2]*60 + e[3] + e[4]/100
    }
    printf("Elapsed time: %05.2f seconds\n", etime - btime)
-} 
+}
 

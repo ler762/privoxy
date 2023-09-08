@@ -126,4 +126,5 @@ fi
 fi
 
 mv ${P}/1hosts.action  ${P}/1hosts.old
-mv ${TD}/1hosts.new    ${P}/1hosts.action 
+mv ${TD}/1hosts.new    ${P}/1hosts.action
+

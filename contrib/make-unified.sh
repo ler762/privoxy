@@ -125,4 +125,5 @@ fi
 fi
 
 mv ${P}/unified-hosts.action  ${P}/unified-hosts.old
-mv ${TD}/unified-hosts.new    ${P}/unified-hosts.action 
+mv ${TD}/unified-hosts.new    ${P}/unified-hosts.action
+

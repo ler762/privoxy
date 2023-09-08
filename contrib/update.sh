@@ -11,4 +11,5 @@ printf "\n\n\n"
 ./make-1hosts.sh
 printf "\n\n\n"
 
-echo "finished $(date)" 
+echo "finished $(date)"
+
